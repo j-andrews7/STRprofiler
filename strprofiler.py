@@ -3,10 +3,56 @@ import rich_click as click
 from pathlib import Path
 from datetime import datetime
 
+def str_ingress(paths, f_format, sample_col, marker_col, sample_map=None):
+    """
+    Reads in a list of paths and returns a pandas DataFrame of STR alleles in long format.
+    """
+
+    for path in paths:
+        if path.suffix == '.xlsx':
+            df = pd.read_excel(path)
+        elif path.suffix == '.csv':
+            df = pd.read_csv(path)
+        elif path.suffix == '.tsv':
+            df = pd.read_csv(path, sep='\t')
+        elif path.suffix == '.txt':
+            df = pd.read_csv(path, sep='\t')
+        
+        df = df.applymap(lambda x: x.strip() if type(x)==str else x)
+
+        df.columns = df.columns.str.strip()
+
+        # Collapse allele columns for each marker into a single column if in wide format.
+        df['Alleles'] = df.filter(like='Allele').apply(lambda x: ','.join([str(y) for y in x]), axis=1).str.strip(",")
+
+        # Replace sample names with sample map if provided.
+        if sample_map is not None:
+            for id in sample_map.icol(0):
+                df.loc[df[sample_col] == id, sample_col] = sample_map.icol(1)[sample_map.icol(0) == id]
+
+        # Group and collect dict from each sample for markers and alleles.
+        grouped = df.groupby(sample_col)
+
+        samps_dicts = []
+
+        for samp in grouped.groups.keys():
+            samp_df = grouped.get_group(samp)
+            samps_dict = samp_df.set_index(marker_col).to_dict()["Alleles"]
+            samps_dict["Sample"] = samp
+            
+            samps_dicts.append(samps_dict)
+
+        allele_df = pd.DataFrame(samps_dicts)
+    return allele_df
+
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option("-su", "--summary", help="", type=click.Path())
-@click.option("-tanth", "--tan_threshold", default=80, help="", show_default=True, type=float)
-@click.option("-masth", "--mas_threshold", default=80, help="", show_default=True, type=float)
+@click.option("-tanth", "--tan_threshold", default=80, 
+              help="Minimum Tanabe score to report as potential matches in summary table.", 
+              show_default=True, type=float)
+@click.option("-masth", "--mas_threshold", default=80, 
+              help="Minimum Masters (vs. query) score to report as potential matches in summary table.", 
+              show_default=True, type=float)
 @click.option("-f", "--fmt", 
               help="""Format of STR profile(s). Can be 'long' or 'wide'. 
               If 'long', all columns except the sample column are presumed to be markers.""", 
@@ -43,5 +89,4 @@ def strprofiler(strs, summary, output_dir, tan_threshold, mas_threshold, fmt, am
     print("Sample column: " + sample_col, file=log_file)
     print("Marker column: " + marker_col, file=log_file)
     
-    out_file.close()
     log_file.close()
