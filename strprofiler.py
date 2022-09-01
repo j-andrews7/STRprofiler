@@ -8,6 +8,8 @@ def str_ingress(paths, f_format, sample_col, marker_col, sample_map=None):
     Reads in a list of paths and returns a pandas DataFrame of STR alleles in long format.
     """
 
+    samps_dicts = []
+
     for path in paths:
         if path.suffix == '.xlsx':
             df = pd.read_excel(path)
@@ -23,17 +25,10 @@ def str_ingress(paths, f_format, sample_col, marker_col, sample_map=None):
         df.columns = df.columns.str.strip()
 
         # Collapse allele columns for each marker into a single column if in wide format.
-        df['Alleles'] = df.filter(like='Allele').apply(lambda x: ','.join([str(y) for y in x]), axis=1).str.strip(",")
-
-        # Replace sample names with sample map if provided.
-        if sample_map is not None:
-            for id in sample_map.icol(0):
-                df.loc[df[sample_col] == id, sample_col] = sample_map.icol(1)[sample_map.icol(0) == id]
+        df['Alleles'] = df.filter(like='Allele').apply(lambda x: ','.join([str(y) for y in x]), axis=1).str.strip(",").str.strip("nan").str.strip(",")
 
         # Group and collect dict from each sample for markers and alleles.
         grouped = df.groupby(sample_col)
-
-        samps_dicts = []
 
         for samp in grouped.groups.keys():
             samp_df = grouped.get_group(samp)
@@ -42,7 +37,13 @@ def str_ingress(paths, f_format, sample_col, marker_col, sample_map=None):
             
             samps_dicts.append(samps_dict)
 
-        allele_df = pd.DataFrame(samps_dicts)
+    allele_df = pd.DataFrame(samps_dicts)
+    
+    # Replace sample names with sample map if provided.
+    if sample_map is not None:
+        for id in sample_map.iloc[:, 0]:
+            allele_df.loc[allele_df["Sample"] == id, sample_col] = sample_map.iloc[:,1][sample_map.iloc[:,0] == id].to_string(header=False, index=False)
+    
     return allele_df
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
