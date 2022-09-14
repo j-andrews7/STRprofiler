@@ -4,12 +4,14 @@ version = "0.1.0"
 description = "A simple python utility to compare short tandem repeat (STR) profiles."
 authors = ["Jared Andrews"]
 license = "MIT"
-repositoy = "https://github.com/j-andrews7/strprofiler"
+repository = "https://github.com/j-andrews7/strprofiler"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = ">=3.8,<4.0"
 pandas = "^1.4.3"
 rich-click = "^1.5.2"
+numpy = "^1.23.3"
+openpyxl = "^3.0.10"
 
 [tool.poetry.dev-dependencies]
 
