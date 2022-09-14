@@ -194,7 +194,7 @@ def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_thresho
               default = "long", show_default=True, 
               type=click.Choice(['long', 'wide'], case_sensitive=False))
 @click.option("-sm", "--sample_map", help="Path to sample map for renaming.", type=click.Path())
-@click.option("-acol", "--amel_col", help="Name of Amelogenin column in STR file(s). Excluded form scoring.", 
+@click.option("-acol", "--amel_col", help="Name of Amelogenin column in STR file(s).", 
               default = "AMEL", show_default=True, type=str)
 @click.option("-scol", "--sample_col", help="Name of sample column in STR file(s).", 
               default = "Sample", show_default=True, type=str)
