@@ -203,6 +203,8 @@ def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_thresho
               default = "Marker", show_default=True, type=str)
 @click.option("-pfix", "--penta_fix", help="""Whether to try to harmonize PentaE/D allele spelling.""", 
               default = True, show_default=True, type=bool)
+@click.option("-amel", "--score_amel", help="""Use Amelogenin for scoring.""", 
+              default = False, show_default=True, type=bool)
 @click.option("-o", "--output_dir", default="./STRprofiler", 
               help="Path to the output directory.", show_default=True, type=click.Path())
 @click.argument("input_files", required=True, type=click.Path(exists=True), nargs = -1)
@@ -211,7 +213,7 @@ def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler",
                 tan_threshold = 80, mas_q_threshold = 80, 
                 mas_r_threshold = 80, mix_threshold = 4, fmt = "long", 
                 amel_col = "AMEL", sample_col = "Sample Name", 
-                marker_col = "Marker", penta_fix = True):
+                marker_col = "Marker", penta_fix = True, score_amel = False):
     """STRprofiler compares STR profiles to each other."""
 
     # Make output directory and open file for logging.
@@ -231,6 +233,7 @@ def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler",
     print("Sample column: " + sample_col, file=log_file)
     print("Marker column: " + marker_col, file=log_file)
     print("Penta fix: " + str(penta_fix), file=log_file)
+    print("Use amelogenin for scoring: " + str(score_amel), file=log_file)
     
     # Check for sample map.
     if sample_map is not None:
@@ -263,7 +266,7 @@ def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler",
             if sa != s:
                 r = samps[sa]
                 print("Comparing " + s + " to " + sa, file = log_file)
-                scores = score_query(query = q, reference = r)
+                scores = score_query(query = q, reference = r, use_amel = score_amel)
                 
                 # Create dict of scores for each sample comparison.
                 samp_out = OrderedDict({"Sample": sa})
@@ -289,7 +292,7 @@ def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler",
         
     summaries = pd.DataFrame(summaries)
     # Write summary output.
-    summaries.to_csv(Path(output_dir, "full_summary.strprofiler" + dt_string + ".csv"), index = False)
+    summaries.to_csv(Path(output_dir, "full_summary.strprofiler." + dt_string + ".csv"), index = False)
     
     log_file.close()
     
