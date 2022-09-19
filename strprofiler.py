@@ -193,7 +193,9 @@ def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_thresho
               If 'long', all columns except the sample column are presumed to be markers.""", 
               default = "long", show_default=True, 
               type=click.Choice(['long', 'wide'], case_sensitive=False))
-@click.option("-sm", "--sample_map", help="Path to sample map for renaming.", type=click.Path())
+@click.option("-sm", "--sample_map", help="""Path to sample map in csv format for renaming.
+              First column should be sample names as given in STR file(s), 
+              second should be new names to assign. No header.""", type=click.Path())
 @click.option("-acol", "--amel_col", help="Name of Amelogenin column in STR file(s).", 
               default = "AMEL", show_default=True, type=str)
 @click.option("-scol", "--sample_col", help="Name of sample column in STR file(s).", 
@@ -203,7 +205,7 @@ def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_thresho
               default = "Marker", show_default=True, type=str)
 @click.option("-pfix", "--penta_fix", help="""Whether to try to harmonize PentaE/D allele spelling.""", 
               default = True, show_default=True, type=bool)
-@click.option("-amel", "--score_amel", help="""Use Amelogenin for scoring.""", 
+@click.option("-amel", "--score_amel", help="""Use Amelogenin for similarity scoring.""", 
               default = False, show_default=True, type=bool)
 @click.option("-o", "--output_dir", default="./STRprofiler", 
               help="Path to the output directory.", show_default=True, type=click.Path())

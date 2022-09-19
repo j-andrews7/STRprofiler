@@ -32,23 +32,26 @@ pip install strprofiler
 
 
 ```bash
-Usage: strprofiler [OPTIONS] INPUT_FILES...                                                                                                                                                                                    
-
-STRprofiler compares STR profiles to each other.                            
+ Usage: strprofiler [OPTIONS] INPUT_FILES...                                                                                                                                                                                                                         
                                                                                                                                                                                                                                                                      
-╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --tan_threshold    -tanth   FLOAT        Minimum Tanabe score to report as potential matches in summary table. [default: 80]                                                                                                                                      │
-│ --mas_q_threshold  -masqth  FLOAT        Minimum Masters (vs. query) score to report as potential matches in summary table. [default: 80]                                                                                                                         │
-│ --mas_r_threshold  -masrth  FLOAT        Minimum Masters (vs. reference) score to report as potential matches in summary table. [default: 80]                                                                                                                     │
-│ --mix_threshold    -mix     INTEGER      Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing. [default: 3]                                                                                                                │
-│ --fmt              -f       [long|wide]  Format of STR profile(s). Can be 'long' or 'wide'.  If 'long', all columns except the sample column are presumed to be markers. [default: long]                                                                          │
-│ --sample_map       -sm      PATH         Path to sample map for renaming.                                                                                                                                                                                         │
-│ --amel_col         -acol    TEXT         Name of Amelogenin column in STR file(s). [default: AMEL]                                                                                                                                                                │
-│ --sample_col       -scol    TEXT         Name of sample column in STR file(s). [default: Sample]                                                                                                                                                                  │
-│ --marker_col       -mcol    TEXT         Name of marker column in STR file(s). Only used if format is 'wide'. [default: Marker]                                                                                                                                   │
-│ --penta_fix        -pfix                 Whether to try to harmonize PentaE/D allele spelling. [default: True]                                                                                                                                                    │
-│ --score_amel       -amel                 Use Amelogenin for scoring. [default: False]                                                                                       │
-│ --output_dir       -o       PATH         Path to the output directory. [default: ./STRprofiler]                                                                                                                                                                   │
-│ --version                                Show the version and exit.                                                                                        │
-│ --help                                   Show this message and exit.    
+ STRprofiler compares STR profiles to each other.                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                     
+╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --tan_threshold    -tanth   FLOAT        Minimum Tanabe score to report as potential matches in summary table. [default: 80]                          │
+│ --mas_q_threshold  -masqth  FLOAT        Minimum Masters (vs. query) score to report as potential matches in summary table. [default: 80]             │
+│ --mas_r_threshold  -masrth  FLOAT        Minimum Masters (vs. reference) score to report as potential matches in summary table. [default: 80]         │
+│ --mix_threshold    -mix     INTEGER      Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing. [default: 3]    │
+│ --fmt              -f       [long|wide]  Format of STR profile(s). Can be 'long' or 'wide'.                                                           |
+|                                            If 'long', all columns except the sample column are presumed to be markers. [default: long]                │
+│ --sample_map       -sm      PATH         Path to sample map in csv format for renaming. First column should be sample names as given                  |
+|                                            in STR file(s),  second should be new names to assign. No header.                                          │
+│ --amel_col         -acol    TEXT         Name of Amelogenin column in STR file(s). [default: AMEL]                                                    │
+│ --sample_col       -scol    TEXT         Name of sample column in STR file(s). [default: Sample]                                                      │
+│ --marker_col       -mcol    TEXT         Name of marker column in STR file(s). Only used if format is 'wide'. [default: Marker]                       │
+│ --penta_fix        -pfix                 Whether to try to harmonize PentaE/D allele spelling. [default: True]                                        │
+│ --score_amel       -amel                 Use Amelogenin for similarity scoring. [default: False]                                                      │
+│ --output_dir       -o       PATH         Path to the output directory. [default: ./STRprofiler]                                                       │
+│ --version                                Show the version and exit.                                                                                   │
+│ --help                                   Show this message and exit.                                                                                  │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
