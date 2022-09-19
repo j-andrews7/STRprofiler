@@ -29,8 +29,9 @@ def str_ingress(paths, f_format, sample_col, marker_col, sample_map=None, penta_
         df.columns = df.columns.str.strip()
 
         # Collapse allele columns for each marker into a single column if in wide format.
+        # ".0" strip handles edgecase where some alleles have a trailing ".0".
         df['Alleles'] = df.filter(like='Allele').apply(lambda x: 
-            ','.join([str(y).strip() for y in x if str(y) != "nan"]), axis=1).str.strip(",")
+            ','.join([str(y).strip().rstrip(".0") for y in x if str(y) != "nan"]), axis=1).str.strip(",")
 
         # Group and collect dict from each sample for markers and alleles.
         grouped = df.groupby(sample_col)
@@ -39,6 +40,11 @@ def str_ingress(paths, f_format, sample_col, marker_col, sample_map=None, penta_
             samp_df = grouped.get_group(samp)
             samps_dict = samp_df.set_index(marker_col).to_dict()["Alleles"]
             samps_dict["Sample"] = samp
+            
+            # Remove duplicate alleles.
+            for k in samps_dict.keys():
+                if k != "Sample":
+                    samps_dict[k] = ','.join(OrderedDict.fromkeys(samps_dict[k].split(',')))
             
             # Rename PentaD and PentaE from common spellings.
             if penta_fix:
