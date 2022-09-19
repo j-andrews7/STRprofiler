@@ -32,10 +32,10 @@ pip install strprofiler
 
 
 ```bash
- Usage: strprofiler [OPTIONS] INPUT_FILES...                                                                                                                                                                                                                         
-                                                                                                                                                                                                                                                                     
- STRprofiler compares STR profiles to each other.                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                     
+ Usage: strprofiler [OPTIONS] INPUT_FILES...   
+
+ STRprofiler compares STR profiles to each other.  
+
 ╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │ --tan_threshold    -tanth   FLOAT        Minimum Tanabe score to report as potential matches in summary table. [default: 80]                          │
 │ --mas_q_threshold  -masqth  FLOAT        Minimum Masters (vs. query) score to report as potential matches in summary table. [default: 80]             │
