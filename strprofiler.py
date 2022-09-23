@@ -6,9 +6,25 @@ import numpy as np
 from collections import OrderedDict
 from math import nan
 
-def str_ingress(paths, f_format, sample_col, marker_col, sample_map=None, penta_fix=False):
-    """
-    Reads in a list of paths and returns a pandas DataFrame of STR alleles in long format.
+def str_ingress(paths, f_format="long", sample_col="Sample", marker_col="Marker", 
+                sample_map=None, penta_fix=False):
+    """Reads in a list of paths and returns a pandas DataFrame of STR alleles in long format.
+
+    :param paths: _description_
+    :type paths: _type_
+    :param f_format: _description_, defaults to "long"
+    :type f_format: str, optional
+    :param sample_col: Name of sample column in each STR profile, defaults to "Sample"
+    :type sample_col: str, optional
+    :param marker_col: Name of marker identifier column in each STR profile, 
+        defaults to "Marker". Ignored if f_format is "long".
+    :type marker_col: str, optional
+    :param sample_map: _description_, defaults to None
+    :type sample_map: pandas.DataFrame, optional
+    :param penta_fix: _description_, defaults to False
+    :type penta_fix: bool, optional
+    :return: A pandas DataFrame of STR alleles in long format.
+    :rtype: pandas.DataFrame
     """
 
     samps_dicts = []
@@ -76,14 +92,35 @@ def str_ingress(paths, f_format, sample_col, marker_col, sample_map=None, penta_
     return allele_df
 
 
+def detect_format(allele_df):
+    """Detects the format of the STR DataFrame.
+
+    :param allele_df: _description_
+    :type allele_df: pandas.DataFrame
+    :return: _description_
+    :rtype: str
+    """    """"""
+
+    if "Allele" in allele_df.columns:
+        return "long"
+    else:
+        return "wide"
+
+
 def score_query(query, reference, use_amel=False, amel_col = "AMEL"):
+    """Calculates the Tanabe and Masters scores for a query sample against a reference sample.
+
+    :param query: _description_
+    :type query: _type_
+    :param reference: _description_
+    :type reference: _type_
+    :param use_amel: _description_, defaults to False
+    :type use_amel: bool, optional
+    :param amel_col: _description_, defaults to "AMEL"
+    :type amel_col: str, optional
+    :return: _description_
+    :rtype: _type_
     """
-    Calculates the Tanabe and Masters scores for a query sample against a reference sample.
-    
-    Args:
-        query (_type_): _description_
-        reference (_type_): _description_
-    """ 
     
     n_r_alleles = 0
     n_q_alleles = 0
@@ -128,9 +165,12 @@ def score_query(query, reference, use_amel=False, amel_col = "AMEL"):
 def mixing_check(alleles, three_allele_threshold = 3):
     """Checks for potential sample mixing.
 
-    Args:
-        alleles (_type_): _description_
-        three_allele_threshold (_type_): _description_
+    :param alleles: _description_
+    :type alleles: _type_
+    :param three_allele_threshold: _description_, defaults to 3
+    :type three_allele_threshold: int, optional
+    :return: _description_
+    :rtype: _type_
     """
 
     mixed = False
@@ -150,13 +190,22 @@ def mixing_check(alleles, three_allele_threshold = 3):
 def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_threshold, mixed, s_name):
     """Generate summary line from full sample-specific output.
 
-    Args:
-        samp_df (_type_): _description_
-        tan_threshold (_type_): _description_
-        mas_q_threshold (_type_): _description_
-        mas_r_threshold (_type_): _description_
-        mixed (_type_): _description_
-        s_name (_type_): _description_
+    :param samp_df: _description_
+    :type samp_df: _type_
+    :param alleles: _description_
+    :type alleles: _type_
+    :param tan_threshold: _description_
+    :type tan_threshold: _type_
+    :param mas_q_threshold: _description_
+    :type mas_q_threshold: _type_
+    :param mas_r_threshold: _description_
+    :type mas_r_threshold: _type_
+    :param mixed: _description_
+    :type mixed: _type_
+    :param s_name: _description_
+    :type s_name: _type_
+    :return: _description_
+    :rtype: _type_
     """
     
     tanabe_match = samp_df[samp_df["tanabe_score"] >= tan_threshold]
@@ -226,7 +275,35 @@ def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler",
                 mas_r_threshold = 80, mix_threshold = 4, fmt = "long", 
                 amel_col = "AMEL", sample_col = "Sample Name", 
                 marker_col = "Marker", penta_fix = True, score_amel = False):
-    """STRprofiler compares STR profiles to each other."""
+    """STRprofiler compares STR profiles to each other.
+
+    :param input_files: _description_
+    :type input_files: _type_
+    :param sample_map: _description_, defaults to None
+    :type sample_map: _type_, optional
+    :param output_dir: _description_, defaults to "./STRprofiler"
+    :type output_dir: str, optional
+    :param tan_threshold: _description_, defaults to 80
+    :type tan_threshold: int, optional
+    :param mas_q_threshold: _description_, defaults to 80
+    :type mas_q_threshold: int, optional
+    :param mas_r_threshold: _description_, defaults to 80
+    :type mas_r_threshold: int, optional
+    :param mix_threshold: _description_, defaults to 4
+    :type mix_threshold: int, optional
+    :param fmt: _description_, defaults to "long"
+    :type fmt: str, optional
+    :param amel_col: _description_, defaults to "AMEL"
+    :type amel_col: str, optional
+    :param sample_col: _description_, defaults to "Sample Name"
+    :type sample_col: str, optional
+    :param marker_col: _description_, defaults to "Marker"
+    :type marker_col: str, optional
+    :param penta_fix: _description_, defaults to True
+    :type penta_fix: bool, optional
+    :param score_amel: _description_, defaults to False
+    :type score_amel: bool, optional
+    """
 
     # Make output directory and open file for logging.
     Path(output_dir).mkdir(parents=True, exist_ok=True)
