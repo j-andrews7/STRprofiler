@@ -164,6 +164,10 @@ def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_thresho
     tanabe_out = tanabe_out.tolist()
     tanabe_out = "; ".join(tanabe_out)
     
+    # Get the top hits.
+    top_hit = samp_df["Sample"].iloc[1] + ": " + samp_df["tanabe_score"].round(decimals=2).astype(str).iloc[1]
+    next_hit = samp_df["Sample"].iloc[2] + ": " + samp_df["tanabe_score"].round(decimals=2).astype(str).iloc[2]
+    
     masters_q_match = samp_df[samp_df["masters_query_score"] >= mas_q_threshold]
     masters_q_out = masters_q_match["Sample"] + ": " + masters_q_match["masters_query_score"].round(decimals=2).astype(str)
     masters_q_out = masters_q_out.tolist()
@@ -174,7 +178,7 @@ def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_thresho
     masters_r_out = masters_r_out.tolist()
     masters_r_out = "; ".join(masters_r_out)
     
-    summ_out = OrderedDict({"Sample": s_name, "mixed": mixed, "tanabe_matches": tanabe_out, 
+    summ_out = OrderedDict({"Sample": s_name, "mixed": mixed, "top_hit": top_hit, "next_best": next_hit, "tanabe_matches": tanabe_out, 
                             "masters_query_matches": masters_q_out, "masters_ref_matches": masters_r_out})
     summ_out.update(alleles)
     
