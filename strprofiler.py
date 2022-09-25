@@ -6,14 +6,12 @@ import numpy as np
 from collections import OrderedDict
 from math import nan
 
-def str_ingress(paths, f_format="long", sample_col="Sample", marker_col="Marker", 
+def str_ingress(paths, sample_col="Sample", marker_col="Marker", 
                 sample_map=None, penta_fix=False):
     """Reads in a list of paths and returns a pandas DataFrame of STR alleles in long format.
 
     :param paths: _description_
     :type paths: _type_
-    :param f_format: _description_, defaults to "long"
-    :type f_format: str, optional
     :param sample_col: Name of sample column in each STR profile, defaults to "Sample"
     :type sample_col: str, optional
     :param marker_col: Name of marker identifier column in each STR profile, 
@@ -46,35 +44,50 @@ def str_ingress(paths, f_format="long", sample_col="Sample", marker_col="Marker"
 
         # Collapse allele columns for each marker into a single column if in wide format.
         # ".0" strip handles edgecase where some alleles have a trailing ".0".
-        df['Alleles'] = df.filter(like='Allele').apply(lambda x: 
-            ','.join([str(y).strip().rstrip(".0") for y in x if str(y) != "nan"]), axis=1).str.strip(",")
+        if len(df.filter(like='Allele').columns) > 0:
+            df['Alleles'] = df.filter(like='Allele').apply(lambda x: 
+                ','.join([str(y).strip().rstrip(".0") for y in x if str(y) != "nan"]), axis=1).str.strip(",")
 
-        # Group and collect dict from each sample for markers and alleles.
-        grouped = df.groupby(sample_col)
+            # Group and collect dict from each sample for markers and alleles.
+            grouped = df.groupby(sample_col)
 
-        for samp in grouped.groups.keys():
-            samp_df = grouped.get_group(samp)
-            samps_dict = samp_df.set_index(marker_col).to_dict()["Alleles"]
-            samps_dict["Sample"] = samp
-            
-            # Remove duplicate alleles.
-            for k in samps_dict.keys():
-                if k != "Sample":
-                    samps_dict[k] = ','.join(OrderedDict.fromkeys(samps_dict[k].split(',')))
-            
-            # Rename PentaD and PentaE from common spellings.
-            if penta_fix:
-                if "Penta D" in samps_dict.keys():
-                    samps_dict["PentaD"] = samps_dict.pop("Penta D")
-                elif "Penta_D" in samps_dict.keys():
-                    samps_dict["PentaD"] = samps_dict.pop("Penta_D")
-                    
-                if "Penta E" in samps_dict.keys():
-                    samps_dict["PentaE"] = samps_dict.pop("Penta E")
-                elif "Penta_E" in samps_dict.keys():
-                    samps_dict["PentaE"] = samps_dict.pop("Penta_E")
-            
-            samps_dicts.append(samps_dict)
+            for samp in grouped.groups.keys():
+                samp_df = grouped.get_group(samp)
+                samps_dict = samp_df.set_index(marker_col).to_dict()["Alleles"]
+                samps_dict["Sample"] = samp
+                
+                # Remove duplicate alleles.
+                for k in samps_dict.keys():
+                    if k != "Sample":
+                        samps_dict[k] = ','.join(OrderedDict.fromkeys(samps_dict[k].split(',')))
+                
+                # Rename PentaD and PentaE from common spellings.
+                if penta_fix:
+                    if "Penta D" in samps_dict.keys():
+                        samps_dict["PentaD"] = samps_dict.pop("Penta D")
+                    elif "Penta_D" in samps_dict.keys():
+                        samps_dict["PentaD"] = samps_dict.pop("Penta_D")
+                        
+                    if "Penta E" in samps_dict.keys():
+                        samps_dict["PentaE"] = samps_dict.pop("Penta E")
+                    elif "Penta_E" in samps_dict.keys():
+                        samps_dict["PentaE"] = samps_dict.pop("Penta_E")
+
+                samps_dicts.append(samps_dict)
+        # If in long format, just collect dict from each sample for markers and alleles.
+        else:
+            df = df.replace(np.nan, "")
+            df = df.astype(str)
+            samps_list = df.to_dict("records")
+            for s in samps_list:
+                s["Sample"] = s.pop(sample_col)
+                
+                # Remove duplicate alleles, trim trailing ".0".
+                for k in s.keys():
+                    if k != "Sample":
+                        s[k] = _clean_element(s[k])
+
+                samps_dicts.append(s)
 
     allele_df = pd.DataFrame(samps_dicts)
     
@@ -91,6 +104,13 @@ def str_ingress(paths, f_format="long", sample_col="Sample", marker_col="Marker"
     
     return allele_df
 
+
+def _clean_element(x):
+    """Takes a string of alleles, removes duplicates, trims trailing .0, and returns a cleaned string."""
+    elements = [s.strip().rstrip(".0") for s in x.split(',')]
+    # Remove duplicates.
+    elements = list(set(elements))
+    return(",".join(elements))
 
 def detect_format(allele_df):
     """Detects the format of the STR DataFrame.
@@ -247,11 +267,6 @@ def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_thresho
 @click.option("-mix", "--mix_threshold", default=3, 
               help="Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing.", 
               show_default=True, type=int)
-@click.option("-f", "--fmt", 
-              help="""Format of STR profile(s). Can be 'long' or 'wide'. 
-              If 'long', all columns except the sample column are presumed to be markers.""", 
-              default = "long", show_default=True, 
-              type=click.Choice(['long', 'wide'], case_sensitive=False))
 @click.option("-sm", "--sample_map", help="""Path to sample map in csv format for renaming.
               First column should be sample names as given in STR file(s), 
               second should be new names to assign. No header.""", type=click.Path())
@@ -272,7 +287,7 @@ def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_thresho
 @click.version_option()
 def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler", 
                 tan_threshold = 80, mas_q_threshold = 80, 
-                mas_r_threshold = 80, mix_threshold = 4, fmt = "long", 
+                mas_r_threshold = 80, mix_threshold = 4, 
                 amel_col = "AMEL", sample_col = "Sample Name", 
                 marker_col = "Marker", penta_fix = True, score_amel = False):
     """STRprofiler compares STR profiles to each other.
@@ -291,8 +306,6 @@ def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler",
     :type mas_r_threshold: int, optional
     :param mix_threshold: _description_, defaults to 4
     :type mix_threshold: int, optional
-    :param fmt: _description_, defaults to "long"
-    :type fmt: str, optional
     :param amel_col: _description_, defaults to "AMEL"
     :type amel_col: str, optional
     :param sample_col: _description_, defaults to "Sample Name"
@@ -316,7 +329,6 @@ def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler",
     print("Masters (vs. query) threshold: " + str(mas_q_threshold), file=log_file)
     print("Masters (vs. reference) threshold: " + str(mas_r_threshold), file=log_file)
     print("Mix threshold: " + str(mix_threshold), file=log_file)
-    print("Format: " + fmt, file=log_file)
     print("Sample map: " + sample_map, file=log_file)
     print("Amelogenin column: " + amel_col, file=log_file)
     print("Sample column: " + sample_col, file=log_file)
@@ -329,7 +341,7 @@ def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler",
         sample_map = pd.read_csv(sample_map, header=None, encoding= "unicode_escape")
     
     # Data ingress.
-    df = str_ingress(paths = input_files, f_format = fmt, sample_col = sample_col, 
+    df = str_ingress(paths = input_files, sample_col = sample_col, 
                      marker_col = marker_col, sample_map = sample_map, penta_fix = penta_fix)
     
     samps = df.to_dict(orient = "index")

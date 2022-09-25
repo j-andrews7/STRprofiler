@@ -1,5 +1,6 @@
 # strprofiler
- **strprofiler** is a simple python utility to compare short tandem repeat (STR) profiles. In particular, it is designed to aid research labs in comparing models (e.g. cell lines & xenografts) generated from primary tissue samples to ensure contamination has not occurred. It includes basic checks for sample mixing and contamination.
+
+**strprofiler** is a simple python utility to compare short tandem repeat (STR) profiles. In particular, it is designed to aid research labs in comparing models (e.g. cell lines & xenografts) generated from primary tissue samples to ensure contamination has not occurred. It includes basic checks for sample mixing and contamination.
 
 For each STR profile provided, **strprofiler** will generate a sample-specific report that includes the following similarity scores as compared to every other profile:
 
@@ -27,7 +28,7 @@ pip install strprofiler
 
 ## Usage
 
-**strprofiler** can be run from the command line. Full usage information can be found by running `strprofiler --help`.
+**strprofiler** can be run directly from the command line. Full usage information can be found by running `strprofiler --help`.
 
 
 
@@ -41,8 +42,6 @@ pip install strprofiler
 │ --mas_q_threshold  -masqth  FLOAT        Minimum Masters (vs. query) score to report as potential matches in summary table. [default: 80]             │
 │ --mas_r_threshold  -masrth  FLOAT        Minimum Masters (vs. reference) score to report as potential matches in summary table. [default: 80]         │
 │ --mix_threshold    -mix     INTEGER      Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing. [default: 3]    │
-│ --fmt              -f       [long|wide]  Format of STR profile(s). Can be 'long' or 'wide'.                                                           |
-|                                            If 'long', all columns except the sample column are presumed to be markers. [default: long]                │
 │ --sample_map       -sm      PATH         Path to sample map in csv format for renaming. First column should be sample names as given                  |
 |                                            in STR file(s),  second should be new names to assign. No header.                                          │
 │ --amel_col         -acol    TEXT         Name of Amelogenin column in STR file(s). [default: AMEL]                                                    │
