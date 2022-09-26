@@ -7,19 +7,20 @@ from collections import OrderedDict
 from math import nan
 
 def str_ingress(paths, sample_col="Sample", marker_col="Marker", 
-                sample_map=None, penta_fix=False):
+                sample_map=None, penta_fix=True):
     """Reads in a list of paths and returns a pandas DataFrame of STR alleles in long format.
 
-    :param paths: _description_
-    :type paths: _type_
+    :param paths: STR profile files to read in.
+    :type paths: list of pathlib.Path
     :param sample_col: Name of sample column in each STR profile, defaults to "Sample"
     :type sample_col: str, optional
     :param marker_col: Name of marker identifier column in each STR profile, 
         defaults to "Marker". Ignored if f_format is "long".
     :type marker_col: str, optional
-    :param sample_map: _description_, defaults to None
+    :param sample_map: Two column DataFrame containing sample identifiers in first column 
+        and new sample names to apply in second column, defaults to None
     :type sample_map: pandas.DataFrame, optional
-    :param penta_fix: _description_, defaults to False
+    :param penta_fix: Whether to try to coerce "Penta" alleles to a common spelling, defaults to True
     :type penta_fix: bool, optional
     :return: A pandas DataFrame of STR alleles in long format.
     :rtype: pandas.DataFrame
@@ -112,34 +113,20 @@ def _clean_element(x):
     elements = list(set(elements))
     return(",".join(elements))
 
-def detect_format(allele_df):
-    """Detects the format of the STR DataFrame.
-
-    :param allele_df: _description_
-    :type allele_df: pandas.DataFrame
-    :return: _description_
-    :rtype: str
-    """    """"""
-
-    if "Allele" in allele_df.columns:
-        return "long"
-    else:
-        return "wide"
-
 
 def score_query(query, reference, use_amel=False, amel_col = "AMEL"):
     """Calculates the Tanabe and Masters scores for a query sample against a reference sample.
 
-    :param query: _description_
-    :type query: _type_
-    :param reference: _description_
-    :type reference: _type_
-    :param use_amel: _description_, defaults to False
+    :param query: Alleles for query sample.
+    :type query: dict
+    :param reference: Alleles for reference sample.
+    :type reference: dict
+    :param use_amel: Whether to include amelogenin in scoring, defaults to False
     :type use_amel: bool, optional
-    :param amel_col: _description_, defaults to "AMEL"
+    :param amel_col: Name of amelogenin column, defaults to "AMEL"
     :type amel_col: str, optional
-    :return: _description_
-    :rtype: _type_
+    :return: Dictionary of scores for query sample against reference sample.
+    :rtype: dict
     """
     
     n_r_alleles = 0
@@ -185,18 +172,19 @@ def score_query(query, reference, use_amel=False, amel_col = "AMEL"):
 def mixing_check(alleles, three_allele_threshold = 3):
     """Checks for potential sample mixing.
 
-    :param alleles: _description_
-    :type alleles: _type_
-    :param three_allele_threshold: _description_, defaults to 3
+    :param alleles: Alleles for sample.
+    :type alleles: dict
+    :param three_allele_threshold: Number of markers with >2 alleles allowed before
+        sample is flagged for potential mixing, defaults to 3
     :type three_allele_threshold: int, optional
-    :return: _description_
-    :rtype: _type_
+    :return: Whether sample is potentially mixed.
+    :rtype: bool
     """
 
     mixed = False
     past_th = 0
     
-    for a in alleles:
+    for a in alleles.keys():
         all_a = alleles[a].split(",")
         if len(all_a) > 2:
             past_th += 1
@@ -207,25 +195,26 @@ def mixing_check(alleles, three_allele_threshold = 3):
     return mixed
 
 
-def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_threshold, mixed, s_name):
+def make_summary(samp_df, alleles, tan_threshold, mas_q_threshold, mas_r_threshold, 
+                 mixed, s_name):
     """Generate summary line from full sample-specific output.
 
-    :param samp_df: _description_
-    :type samp_df: _type_
-    :param alleles: _description_
-    :type alleles: _type_
-    :param tan_threshold: _description_
-    :type tan_threshold: _type_
-    :param mas_q_threshold: _description_
-    :type mas_q_threshold: _type_
-    :param mas_r_threshold: _description_
-    :type mas_r_threshold: _type_
-    :param mixed: _description_
-    :type mixed: _type_
-    :param s_name: _description_
-    :type s_name: _type_
-    :return: _description_
-    :rtype: _type_
+    :param samp_df: Sample-specific output DataFrame containing all comparisons to other samples.
+    :type samp_df: pandas.DataFrame
+    :param alleles: Alleles for sample.
+    :type alleles: dict
+    :param tan_threshold: Tanabe score threshold to report matching samples.
+    :type tan_threshold: float
+    :param mas_q_threshold: Masters (query) score threshold to report matching samples.
+    :type mas_q_threshold: float
+    :param mas_r_threshold: Masters (reference) score threshold to report matching samples.
+    :type mas_r_threshold: float
+    :param mixed: Flag for whether sample is potentially mixed.
+    :type mixed: bool
+    :param s_name: Sample name.
+    :type s_name: str
+    :return: Dictonary of summary line output for sample.
+    :rtype: OrderedDict
     """
     
     tanabe_match = samp_df[samp_df["tanabe_score"] >= tan_threshold]
@@ -292,29 +281,32 @@ def strprofiler(input_files, sample_map = None, output_dir = "./STRprofiler",
                 marker_col = "Marker", penta_fix = True, score_amel = False):
     """STRprofiler compares STR profiles to each other.
 
-    :param input_files: _description_
-    :type input_files: _type_
-    :param sample_map: _description_, defaults to None
-    :type sample_map: _type_, optional
-    :param output_dir: _description_, defaults to "./STRprofiler"
+    :param input_files: List of input STR files in csv, xlsx, tsv, or txt format.
+    :type input_files: click.Path
+    :param sample_map: Path to sample map in csv format for renaming.
+        First column should be sample names as given in STR file(s), 
+        second should be new names to assign. No header., defaults to None
+    :type sample_map: str, optional
+    :param output_dir: Path to output directory, defaults to "./STRprofiler"
     :type output_dir: str, optional
-    :param tan_threshold: _description_, defaults to 80
+    :param tan_threshold: Minimum Tanabe score to report as potential matches in summary table, defaults to 80
     :type tan_threshold: int, optional
-    :param mas_q_threshold: _description_, defaults to 80
+    :param mas_q_threshold: Minimum Masters (vs. query) score to report as potential matches in summary table, defaults to 80
     :type mas_q_threshold: int, optional
-    :param mas_r_threshold: _description_, defaults to 80
+    :param mas_r_threshold: Minimum Masters (vs. reference) score to report as potential matches in summary table, defaults to 80
     :type mas_r_threshold: int, optional
-    :param mix_threshold: _description_, defaults to 4
+    :param mix_threshold: Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing, defaults to 4
     :type mix_threshold: int, optional
-    :param amel_col: _description_, defaults to "AMEL"
+    :param amel_col: Name of Amelogenin column in STR file(s), defaults to "AMEL"
     :type amel_col: str, optional
-    :param sample_col: _description_, defaults to "Sample Name"
+    :param sample_col: Name of sample column in STR file(s), defaults to "Sample Name"
     :type sample_col: str, optional
-    :param marker_col: _description_, defaults to "Marker"
+    :param marker_col: Name of marker column in STR file(s).
+        Only used if format is 'wide', defaults to "Marker"
     :type marker_col: str, optional
-    :param penta_fix: _description_, defaults to True
+    :param penta_fix: Whether to try to harmonize PentaE/D allele spelling, defaults to True
     :type penta_fix: bool, optional
-    :param score_amel: _description_, defaults to False
+    :param score_amel: Use Amelogenin for similarity scoring., defaults to False
     :type score_amel: bool, optional
     """
 
