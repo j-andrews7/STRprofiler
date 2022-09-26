@@ -20,7 +20,7 @@ Amelogenin is not included in the score computation by default but can be includ
 
 ## Installation
 
-strprofiler is available on PyPI and can be installed with pip:
+**strprofiler** is available on PyPI and can be installed with pip:
 
 ```bash
 pip install strprofiler
@@ -28,9 +28,11 @@ pip install strprofiler
 
 ## Usage
 
-**strprofiler** can be run directly from the command line. Full usage information can be found by running `strprofiler --help`.
+**strprofiler** can be run directly from the command line. 
 
+`strprofiler -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
 
+Full usage information can be found by running `strprofiler --help`.
 
 ```bash
  Usage: strprofiler [OPTIONS] INPUT_FILES...   
@@ -57,7 +59,7 @@ pip install strprofiler
 
 ## Input Files(s)
 
-**strprofiler** can take either a single STR file or multiple STR files as input. The STR file(s) should be in either 'wide' or 'long' format. The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
+**strprofiler** can take either a single STR file or multiple STR files as input. These files can be csv, tsv, tab-separated text, or xlsx (first sheet used) files. The STR file(s) should be in either 'wide' or 'long' format. The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
 
 | Sample | D1S1656 |  DYS391 | D3S1358 | D2S441 | D16S539 | D5S818 | D8S1179 | D22S1045 | D18S51 |
 |:------:|:-------:|:-------:|:-------:|:------:|:-------:|:------:|:-------:|:--------:|:------:|
@@ -102,7 +104,7 @@ The wide format expects a line for each marker for each sample, e.g.:
 | Sample2      |  DYS391   | 10          | 468.83  | 6722        |             |         |             |             |
 | Sample2      |  FGA      | 21          | 294.67  | 11941       |             |         |             |             |
 
-In this format, the `marker_col` must be specified. Only columns beginning with "Allele" will be used to parse the alleles for each sample/marker. The any size or height columns will be ignored.
+In this format, the `marker_col` must be specified. Only columns beginning with "Allele" will be used to parse the alleles for each sample/marker. Any other size or height columns will be ignored.
 
 ## Output Files
 
@@ -134,6 +136,9 @@ In addition to the marker columns, this output contains the following columns:
 | **tanabe_score**        | Tanabe similarity score.                                     |
 | **masters_query_score** | Masters (vs query) similarity score.                         |
 | **masters_ref_score**   | Masters (vs reference) similarity score.                     |
+
+## Contributing
+You can contribute by creating [issues](https://github.com/j-andrews7/strprofiler/issues) to highlight bugs and make suggestions for additional features. [Pull requests](https://github.com/j-andrews7/strprofiler/pulls) are also very welcome.
 
 ## License
 
