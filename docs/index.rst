@@ -19,19 +19,19 @@ For each STR profile provided, **strprofiler** will generate a sample-specific r
 
 .. math::
 
-   score = \\frac{2 * no.shared.alleles}{no.query.alleles + no.reference.alleles} 
+   score = \frac{2 * no.shared.alleles}{no.query.alleles + no.reference.alleles} 
 
 `Masters (vs. query) <https://www.ncbi.nlm.nih.gov/pubmed/11416159>`_: 
 
 .. math::
 
-   score = \\frac{no.shared.alleles}{no.query.alleles}
+   score = \frac{no.shared.alleles}{no.query.alleles}
 
 `Masters (vs. reference) <https://www.ncbi.nlm.nih.gov/pubmed/11416159>`_:
 
 .. math::
 
-   score = \\frac{no.shared.alleles}{no.reference.alleles}
+   score = \frac{no.shared.alleles}{no.reference.alleles}
 
 Amelogenin is not included in the score computation by default but can be included by passing the `--score_amel` flag.
 
