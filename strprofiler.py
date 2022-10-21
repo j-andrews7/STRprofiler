@@ -5,6 +5,7 @@ from datetime import datetime
 import numpy as np
 from collections import OrderedDict
 from math import nan
+import sys
 
 
 def str_ingress(
@@ -447,7 +448,10 @@ def strprofiler(
     print("Sample column: " + sample_col, file=log_file)
     print("Marker column: " + marker_col, file=log_file)
     print("Penta fix: " + str(penta_fix), file=log_file)
-    print("Use amelogenin for scoring: " + str(score_amel), file=log_file)
+    print("Use amelogenin for scoring: " + str(score_amel) + "\n", file=log_file)
+    print("Full command: ", file=log_file)
+    
+    print(sys.argv[0], file=log_file)
 
     # Check for sample map.
     if sample_map is not None:
