@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest
+          pip install flake8 pytest pytest-cov
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - uses: snok/install-poetry@v1
@@ -60,3 +60,8 @@ jobs:
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics ./strprofiler.py
 
+      - name: Build coverage file
+        run: |
+          pytest --cache-clear --cov=app test/ > pytest-coverage.txt
+      - name: Comment coverage
+        uses: coroo/pytest-coverage-commentator@v1.0.2

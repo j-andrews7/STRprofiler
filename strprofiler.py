@@ -18,7 +18,7 @@ def str_ingress(
     :param sample_col: Name of sample column in each STR profile, defaults to "Sample"
     :type sample_col: str, optional
     :param marker_col: Name of marker identifier column in each STR profile,
-        defaults to "Marker". Ignored if f_format is "long".
+        defaults to "Marker". Ignored if file in long format.
     :type marker_col: str, optional
     :param sample_map: Two column DataFrame containing sample identifiers in first column
         and new sample names to apply in second column, defaults to None
