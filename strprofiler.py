@@ -414,10 +414,10 @@ def strprofiler(
     :type tan_threshold: int, optional
     :param mas_q_threshold: Minimum Masters (vs. query) score to report as potential matches in summary table, defaults to 80
     :type mas_q_threshold: int, optional
-    :param mas_r_threshold: Minimum Masters (vs. reference) score to report as potential matches in summary table, 
+    :param mas_r_threshold: Minimum Masters (vs. reference) score to report as potential matches in summary table,
         defaults to 80
     :type mas_r_threshold: int, optional
-    :param mix_threshold: Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing, 
+    :param mix_threshold: Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing,
         defaults to 4
     :type mix_threshold: int, optional
     :param amel_col: Name of Amelogenin column in STR file(s), defaults to "AMEL"
