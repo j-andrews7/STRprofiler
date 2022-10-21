@@ -156,7 +156,7 @@ def score_query(query, reference, use_amel=False, amel_col="AMEL"):
     markers = list(set(query.keys()) & set(reference.keys()))
 
     # Remove amelogenin markers if use_amel is False.
-    if use_amel == False:
+    if use_amel is False:
         if amel_col in markers:
             markers.remove(amel_col)
 
@@ -329,7 +329,7 @@ def make_summary(
     "-sm",
     "--sample_map",
     help="""Path to sample map in csv format for renaming.
-              First column should be sample names as given in STR file(s), 
+              First column should be sample names as given in STR file(s),
               second should be new names to assign. No header.""",
     type=click.Path(),
 )
@@ -412,9 +412,11 @@ def strprofiler(
     :type tan_threshold: int, optional
     :param mas_q_threshold: Minimum Masters (vs. query) score to report as potential matches in summary table, defaults to 80
     :type mas_q_threshold: int, optional
-    :param mas_r_threshold: Minimum Masters (vs. reference) score to report as potential matches in summary table, defaults to 80
+    :param mas_r_threshold: Minimum Masters (vs. reference) score to report as potential matches in summary table, 
+        defaults to 80
     :type mas_r_threshold: int, optional
-    :param mix_threshold: Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing, defaults to 4
+    :param mix_threshold: Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing, 
+        defaults to 4
     :type mix_threshold: int, optional
     :param amel_col: Name of Amelogenin column in STR file(s), defaults to "AMEL"
     :type amel_col: str, optional
