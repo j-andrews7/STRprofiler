@@ -125,6 +125,7 @@ def _clean_element(x):
     elements = [s.strip().rstrip(".0") for s in x.split(",")]
     # Remove duplicates.
     elements = list(set(elements))
+    elements.sort()
     return ",".join(elements)
 
 
