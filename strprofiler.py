@@ -8,6 +8,36 @@ from math import nan
 import sys
 
 
+### Utility functions ###
+
+
+def _clean_element(x):
+    """Takes a string of alleles, removes duplicates, trims trailing .0, and returns a cleaned string."""
+    elements = [s.strip().rstrip(".0") for s in x.split(",")]
+    # Remove duplicates.
+    elements = list(set(elements))
+    elements.sort()
+    return ",".join(elements)
+
+
+def _pentafix(samps_dict):
+    """Takes a dictionary of alleles and returns a dictionary with common Penta markers renamed for consistency."""
+    if "Penta D" in samps_dict.keys():
+        samps_dict["PentaD"] = samps_dict.pop("Penta D")
+    elif "Penta_D" in samps_dict.keys():
+        samps_dict["PentaD"] = samps_dict.pop("Penta_D")
+
+    if "Penta E" in samps_dict.keys():
+        samps_dict["PentaE"] = samps_dict.pop("Penta E")
+    elif "Penta_E" in samps_dict.keys():
+        samps_dict["PentaE"] = samps_dict.pop("Penta_E")
+
+    return samps_dict
+
+
+### Main functions ###
+
+
 def str_ingress(
     paths, sample_col="Sample", marker_col="Marker", sample_map=None, penta_fix=True
 ):
@@ -77,15 +107,7 @@ def str_ingress(
 
                 # Rename PentaD and PentaE from common spellings.
                 if penta_fix:
-                    if "Penta D" in samps_dict.keys():
-                        samps_dict["PentaD"] = samps_dict.pop("Penta D")
-                    elif "Penta_D" in samps_dict.keys():
-                        samps_dict["PentaD"] = samps_dict.pop("Penta_D")
-
-                    if "Penta E" in samps_dict.keys():
-                        samps_dict["PentaE"] = samps_dict.pop("Penta E")
-                    elif "Penta_E" in samps_dict.keys():
-                        samps_dict["PentaE"] = samps_dict.pop("Penta_E")
+                    samps_dict = _pentafix(samps_dict)
 
                 samps_dicts.append(samps_dict)
         # If in long format, just collect dict from each sample for markers and alleles.
@@ -100,6 +122,10 @@ def str_ingress(
                 for k in s.keys():
                     if k != "Sample":
                         s[k] = _clean_element(s[k])
+
+                # Rename PentaD and PentaE from common spellings.
+                if penta_fix:
+                    s = _pentafix(s)
 
                 samps_dicts.append(s)
 
@@ -119,15 +145,6 @@ def str_ingress(
     allele_df = allele_df.replace({np.nan: ""})
 
     return allele_df
-
-
-def _clean_element(x):
-    """Takes a string of alleles, removes duplicates, trims trailing .0, and returns a cleaned string."""
-    elements = [s.strip().rstrip(".0") for s in x.split(",")]
-    # Remove duplicates.
-    elements = list(set(elements))
-    elements.sort()
-    return ",".join(elements)
 
 
 def score_query(query, reference, use_amel=False, amel_col="AMEL"):
@@ -450,7 +467,7 @@ def strprofiler(
     print("Penta fix: " + str(penta_fix), file=log_file)
     print("Use amelogenin for scoring: " + str(score_amel) + "\n", file=log_file)
     print("Full command: ", file=log_file)
-    
+
     print(sys.argv[0], file=log_file)
 
     # Check for sample map.
