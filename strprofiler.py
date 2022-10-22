@@ -460,15 +460,17 @@ def strprofiler(
     print("Masters (vs. query) threshold: " + str(mas_q_threshold), file=log_file)
     print("Masters (vs. reference) threshold: " + str(mas_r_threshold), file=log_file)
     print("Mix threshold: " + str(mix_threshold), file=log_file)
-    print("Sample map: " + sample_map, file=log_file)
+    print("Sample map: " + str(sample_map), file=log_file)
     print("Amelogenin column: " + amel_col, file=log_file)
     print("Sample column: " + sample_col, file=log_file)
     print("Marker column: " + marker_col, file=log_file)
     print("Penta fix: " + str(penta_fix), file=log_file)
     print("Use amelogenin for scoring: " + str(score_amel) + "\n", file=log_file)
-    print("Full command: ", file=log_file)
+    print("Full command:", file=log_file)
 
-    print(sys.argv[0], file=log_file)
+    print(" ".join(sys.argv) + "\n", file=log_file)
+    
+    print("Comparisons:", file=log_file)
 
     # Check for sample map.
     if sample_map is not None:
