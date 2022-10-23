@@ -5,6 +5,7 @@ description = "A simple python utility to compare short tandem repeat (STR) prof
 authors = ["Jared Andrews"]
 license = "MIT"
 repository = "https://github.com/j-andrews7/strprofiler"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
