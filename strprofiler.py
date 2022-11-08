@@ -65,7 +65,7 @@ def _make_html(dataframe: pd.DataFrame):
             text-align: center; 
             background-color: #111111; 
             color: white; 
-            padding: 10px;
+            padding: 10px 0px;
             width: 100%;
             margin: 0px;
             margin-bottom: 10px;
