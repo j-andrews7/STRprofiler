@@ -1,5 +1,5 @@
 ---
-title: 'strprofiler: A Python package for comparing short tandem repeat profiles'
+title: 'strprofiler: A Python package and CLI tool for short tandem repeat profile comparisons'
 tags:
   - python
   - cli
