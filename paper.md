@@ -53,6 +53,8 @@ The first is a summary file containing a record for each STR profile, its top ma
 The second is a profile-specific file with that profile queried against all others. 
 This file allows for closer interrogation of samples with potential mixing.
 
+Full descriptions of input/output formats and additional parameters are available at https://strprofiler.readthedocs.io/en/latest/.
+
 # Similarity Scoring Algorithms
 
 `strprofiler` utilizes three similarity scoring algorithms for comparing STR profiles:
