@@ -2,11 +2,11 @@
 
 ## v0.1.1
 
-**Release date: 10/23/2022**
+**Release date: 11/08/2022**
 
  - Multiple minor bug fixes, particularly with regard to making "penta" marker names consistent.
  - Add basic unit tests and test coverage, better organization/simplification of test data.
- - Addition of GH Actions for CI/CD.
+ - Add HTML summary output table.
 
 
 ## v0.1.0 - Initial Release
