@@ -53,7 +53,7 @@ The first is a summary file containing a record for each STR profile, its top ma
 The second is a profile-specific file with that profile queried against all others. 
 This file allows for closer interrogation of samples with potential mixing.
 
-Full descriptions of input/output formats and additional parameters are available at https://strprofiler.readthedocs.io/en/latest/.
+Full descriptions of input/output formats and additional parameters are available at [ReadTheDocs](https://strprofiler.readthedocs.io/en/latest/). `strprofiler` is available on [PyPI](https://pypi.org/project/strprofiler/).
 
 # Similarity Scoring Algorithms
 
@@ -76,6 +76,6 @@ The Masters algorithms are particularly useful for determining the potential con
 
 # Acknowledgements
 
-We would like to acknowledge Lawryn Kasper for helpful feedback and testing of this project.
+We would like to acknowledge Lawryn Kasper for helpful feedback and testing of this project. We acknowledge support from the National Cancer Insitute (NCI) of the National Institutes of Health under award number P01CA096832.
 
 # References
