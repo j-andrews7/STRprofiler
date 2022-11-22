@@ -10,6 +10,8 @@ strprofiler
    :maxdepth: 2
    :caption: Contents:
 
+.. image:: https://zenodo.org/badge/523477912.svg
+   :target: https://zenodo.org/badge/latestdoi/523477912
 
 **strprofiler** is a simple python utility to compare short tandem repeat (STR) profiles. 
 In particular, it is designed to aid research labs in comparing models (e.g. cell lines) generated from primary tissue samples to ensure authenticity. 
@@ -203,6 +205,12 @@ License
 =======
 
 **strprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. It is released with zero warranty for any purpose and I retain no liability for its use. `Read the full license <https://github.com/j-andrews7/strprofiler/blob/master/LICENSE>`_ for additional details.
+
+Reference
+=========
+
+If you use **strprofiler** in your research, please cite the following:
+Jared Andrews, & Sam Culley. (2022). j-andrews7/strprofiler: v0.1.1 (v0.1.1). Zenodo. https://doi.org/10.5281/zenodo.7348387
 
 Indices and tables
 ==================
