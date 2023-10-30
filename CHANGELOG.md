@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.1.3
+
+**Release date: 10/30/2023**
+
+ - Additional bug fix for [#10](https://github.com/j-andrews7/strprofiler/issues/10), which
+ was causing alleles ending in 0 to be truncated, e.g. 10 -> 1. 
+ This was due to a parsing error when trailing ".0"s were being removed.
+
 ## v0.1.2
 
 **Release date: 10/17/2023**

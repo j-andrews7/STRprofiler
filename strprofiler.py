@@ -204,9 +204,9 @@ def str_ingress(
                 df.filter(like="Allele")
                 .apply(
                     lambda x: ",".join(
-                        [str(y).strip().rstrip(".0") for y in x if str(y) != "nan"]
+                        [str(y).strip() for y in x if str(y) != "nan"]
                     ),
-                    axis=1,
+                    axis=1
                 )
                 .str.strip(",")
             )
@@ -222,9 +222,8 @@ def str_ingress(
                 # Remove duplicate alleles.
                 for k in samps_dict.keys():
                     if k != "Sample":
-                        samps_dict[k] = ",".join(
-                            OrderedDict.fromkeys(samps_dict[k].split(","))
-                        )
+                        samps_dict[k] = _clean_element(samps_dict[k])
+                        
 
                 # Rename PentaD and PentaE from common spellings.
                 if penta_fix:
