@@ -74,3 +74,10 @@ def test_ingress_mixed(paths, sample_map):
             "SampleA",
         ]
     ) == ["12,14", "12", "13", "9,10", "12,14", "X", "", ""]
+    
+    # Check the samples are being parsed properly.
+    assert list(
+        df.loc[
+            "Sample33",
+        ]
+    ) == ["12,18,19", "20,25,29", "", "", "10,13,18", "X,Y", "10,11,16", "10,11,12"]
