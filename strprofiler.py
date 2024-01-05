@@ -192,6 +192,8 @@ def str_ingress(
             df = pd.read_csv(path, sep="\t")
         elif path.suffix == ".txt":
             df = pd.read_csv(path, sep="\t")
+        else:
+            sys.exit('File extension: ' + path.suffix + ' in file: ' + str(path) + ' is not supported.')
 
         df = df.applymap(lambda x: x.strip() if type(x) == str else x)
 
@@ -473,6 +475,12 @@ def make_summary(
     type=click.Path(),
 )
 @click.option(
+    "-db",
+    "--database",
+    help="Path to an STR database file in csv, xlsx, tsv, or txt format.",
+    type=click.Path(exists=True),
+)
+@click.option(
     "-acol",
     "--amel_col",
     help="Name of Amelogenin column in STR file(s).",
@@ -526,6 +534,7 @@ def make_summary(
 def strprofiler(
     input_files,
     sample_map=None,
+    database=None,
     output_dir="./STRprofiler",
     tan_threshold=80,
     mas_q_threshold=80,
@@ -545,6 +554,8 @@ def strprofiler(
         First column should be sample names as given in STR file(s),
         second should be new names to assign. No header., defaults to None
     :type sample_map: str, optional
+    :param database: Path to a database file in csv, xlsx, tsv, or txt format. If provided, input files are quried against this database, defaults to None
+    :type database: str, optional
     :param output_dir: Path to output directory, defaults to "./STRprofiler"
     :type output_dir: str, optional
     :param tan_threshold: Minimum Tanabe score to report as potential matches in summary table, defaults to 80
@@ -596,6 +607,7 @@ def strprofiler(
     if sample_map is not None:
         sample_map = pd.read_csv(sample_map, header=None, encoding="unicode_escape")
 
+
     # Data ingress.
     df = str_ingress(
         paths=input_files,
@@ -608,7 +620,23 @@ def strprofiler(
     samps = df.to_dict(orient="index")
     summaries = []
 
+    # Database ingress, if present
+    # Set 'reference' for subsequent query to either database or inputs all to all
+    if database is not None:
+        # load_database(database)
+        df_db = str_ingress(
+            paths=[database],
+            sample_col=sample_col,
+            marker_col=marker_col,
+            sample_map=None,
+            penta_fix=penta_fix,
+        )
+        reference_samps = df_db.to_dict(orient="index")
+    else:
+        reference_samps = samps
+
     # Iterate through samples and compare to each other.
+    # comparing either to inputs to database or inputs all to all
     for s in samps.keys():
         q = samps[s]
         # Check for sample mixing.
@@ -631,9 +659,9 @@ def strprofiler(
         # Put query sample first.
         samp_comps = [q_out]
 
-        for sa in samps.keys():
+        for sa in reference_samps.keys():
             if sa != s:
-                r = samps[sa]
+                r = reference_samps[sa]
                 print("Comparing " + s + " to " + sa, file=log_file)
                 scores = score_query(query=q, reference=r, use_amel=score_amel)
 
