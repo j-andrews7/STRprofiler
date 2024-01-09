@@ -55,6 +55,7 @@ Full usage information can be found by running `strprofiler --help`.
 │ --mix_threshold    -mix     INTEGER      Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing. [default: 3]    │
 │ --sample_map       -sm      PATH         Path to sample map in csv format for renaming. First column should be sample names as given                  |
 |                                            in STR file(s),  second should be new names to assign. No header.                                          │
+│ --database         -db      PATH         Path to an STR database file in csv, xlsx, tsv, or txt format.                                               │
 │ --amel_col         -acol    TEXT         Name of Amelogenin column in STR file(s). [default: AMEL]                                                    │
 │ --sample_col       -scol    TEXT         Name of sample column in STR file(s). [default: Sample]                                                      │
 │ --marker_col       -mcol    TEXT         Name of marker column in STR file(s). Only used if format is 'wide'. [default: Marker]                       │
@@ -145,6 +146,14 @@ In addition to the marker columns, this output contains the following columns:
 | **tanabe_score**        | Tanabe similarity score.                                     |
 | **masters_query_score** | Masters (vs query) similarity score.                         |
 | **masters_ref_score**   | Masters (vs reference) similarity score.                     |
+
+## Database Comparison
+
+**strprofiler** can be also used to compare batches of samples against a larger database of samples. 
+
+`strprofiler -db ExampleSTR_database.csv -o ./strprofiler_output STR1.xlsx`
+
+In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s). 
 
 ## Contributing
 You can contribute by creating [issues](https://github.com/j-andrews7/strprofiler/issues) to highlight bugs and make suggestions for additional features. [Pull requests](https://github.com/j-andrews7/strprofiler/pulls) are also very welcome.
