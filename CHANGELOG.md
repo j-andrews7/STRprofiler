@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.1.4
+
+**Release date: 01/20/2024**
+
+ - A new feature to allow one (or few) to many comparisons, as described in 
+ [#11](https://github.com/j-andrews7/strprofiler/issues/11). Thanks to
+ [MikeWLloyd](https://github.com/MikeWLloyd) for the contribution.
+
 ## v0.1.3
 
 **Release date: 10/30/2023**
