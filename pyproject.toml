@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "strprofiler"
-version = "0.1.3"
+version = "0.1.4"
 description = "A simple python utility to compare short tandem repeat (STR) profiles."
 authors = ["Jared Andrews"]
 license = "MIT"
