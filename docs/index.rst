@@ -193,7 +193,7 @@ In addition to the marker columns, this output contains the following columns:
 Other Functions
 ===============
 
-.. automodule:: strprofiler.strprofiler
+.. automodule:: strprofiler
    :members:
 
 Contributing
