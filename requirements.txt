@@ -1,3 +1,6 @@
 pandas
 rich_click
 numpy
+shiny
+shinyswatch
+openpyxl

@@ -1,8 +1,9 @@
 [tool.poetry]
 name = "strprofiler"
-version = "0.1.4"
+version = "0.1.5"
 description = "A simple python utility to compare short tandem repeat (STR) profiles."
-authors = ["Jared Andrews"]
+authors = ["Jared Andrews <jared.andrews07@gmail.com>",
+           "Mike Lloyd <mike.lloyd@jax.org>"]
 license = "MIT"
 repository = "https://github.com/j-andrews7/strprofiler"
 readme = "README.md"
@@ -13,11 +14,14 @@ pandas = "^1.4.3"
 rich-click = "^1.5.2"
 numpy = "^1.23.3"
 openpyxl = "^3.0.10"
+shiny = "^0.7.0"
+shinyswatch = "^0.4.2"
 
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
-strprofiler = 'strprofiler:strprofiler'
+strprofiler = 'strprofiler.strprofiler:strprofiler'
+strprofiler-app = 'strprofiler.strprofiler:app'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
