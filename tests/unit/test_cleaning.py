@@ -1,4 +1,4 @@
-import strprofiler as sp
+import strprofiler.strprofiler as sp
 import pytest
 
 inp = "10.0,10,13,13.0,14,14 "

@@ -1,4 +1,4 @@
-import strprofiler as sp
+import strprofiler.strprofiler as sp
 import pytest
 from pathlib import Path
 import pandas as pd
