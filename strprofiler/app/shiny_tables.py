@@ -11,21 +11,6 @@ def _clean_header_names(x):
     return x
 
 
-# def process_header_class(col_name, header_style_dict, active=False):
-#     if not active:
-#         return
-#     style = ""
-#     if cell_style_entry := header_style_dict.get(col_name):
-#         if callable(cell_style_entry):
-#             if theStyle := cell_style_entry(col_name):
-#                 assert isinstance(
-#                     theStyle, dict), "cell_style Callable must return a dict"
-#                 style = theStyle
-#     if the_class := style.get('className'):
-#         return the_class
-#     return None
-
-
 def process_header_style(col_name, header_style_dict, active=False):
     if not active:
         return
@@ -119,24 +104,6 @@ def enhanced_from_dataframe(
             for x in col_names
             if not str(x).endswith(link_column_suffix)
         ]
-
-    # if header_callable is None:
-    #     header_column_cells = [
-    #         ui.tags.th(_clean_header_names(x),
-    #                    className=process_header_class(
-    #                        x,
-    #                        cell_style_dict=cell_style_dict,
-    #                        active=process_header_classes)) for x in col_names
-    #         if not str(x).endswith(link_column_suffix)
-    #     ]
-    # else:
-    #     assert callable(header_callable), "header_callable must be callable"
-    #     header_column_cells = [
-    #         ui.tags.th(header_callable(_clean_header_names(x)),
-    #                    className=process_header_class(
-    #                        x, cell_style_dict, active=process_header_classes))
-    #         for x in col_names if not str(x).endswith(link_column_suffix)
-    #     ]
 
     table_header = [ui.tags.thead(ui.tags.tr(header_column_cells))]
     table_body = [

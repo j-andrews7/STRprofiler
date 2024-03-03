@@ -210,7 +210,7 @@ Reference
 =========
 
 If you use **strprofiler** in your research, please cite the following:
-Jared Andrews, & Sam Culley. (2024). j-andrews7/strprofiler: v0.1.5 (v0.1.5). Zenodo. https://doi.org/10.5281/zenodo.7348387
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.1.5 (v0.1.5). Zenodo. https://doi.org/10.5281/zenodo.7348386
 
 Indices and tables
 ==================
