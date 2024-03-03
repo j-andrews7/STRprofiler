@@ -11,9 +11,9 @@ import sys
 sys.path.insert(0, os.path.abspath('../'))
 
 project = 'strprofiler'
-copyright = '2022, Jared Andrews'
+copyright = '2024, Jared Andrews'
 author = 'Jared Andrews'
-release = '0.1.0'
+release = '0.1.5'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
