@@ -7,7 +7,7 @@ from collections import OrderedDict
 from math import nan
 import sys
 from importlib.metadata import version
-
+from shiny import run_app
 
 ### Utility functions ###
 
@@ -577,7 +577,7 @@ def strprofiler(
     :type marker_col: str, optional
     :param penta_fix: Whether to try to harmonize PentaE/D allele spelling, defaults to True
     :type penta_fix: bool, optional
-    :param score_amel: Use Amelogenin for similarity scoring., defaults to False
+    :param score_amel: Use Amelogenin for similarity scoring, defaults to False
     :type score_amel: bool, optional
     """
 
@@ -710,3 +710,24 @@ def strprofiler(
     ).write(html_df)
 
     log_file.close()
+
+
+@click.command()
+@click.option(
+    "-db",
+    "--database",
+    help="Path to an STR database file in csv, xlsx, tsv, or txt format.",
+    type=click.Path(exists=True),
+)
+@click.version_option()
+def app(
+    database=None,
+):
+    """STRprofiler shiny application for interactive comparisons & querying of STR profiles.
+
+    :param database: Path to a database file in csv, xlsx, tsv, or txt format. If provided, will be loaded into the app, defaults to None
+    :type database: str, optional
+    """
+    app_path = Path(__file__).parent / "app/app.py"
+    run_app(app_path.as_posix())
+
