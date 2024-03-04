@@ -67,6 +67,18 @@ demo_vals = [
 ]
 
 def database_load(file):
+    """
+    Load a database from a file and return it as a dictionary.
+
+    Args:
+        file (str): The path to the file containing the database.
+
+    Returns:
+        dict: The loaded database as a dictionary.
+
+    Raises:
+        ValueError: If the file fails to load or if sample ID names are duplicated.
+    """
     try:
         str_database = sp.str_ingress(
             file,
@@ -220,7 +232,7 @@ app_ui = ui.page_fluid(
                             ui.tags.h3("Options"),
                             ui.tags.hr(),
                             ui.card(
-                                ui.input_checkbox("score_amel_batch", "Score Amelogenin", value=True),
+                                ui.input_checkbox("score_amel_batch", "Score Amelogenin", value=False),
                                 ui.input_numeric("mix_threshold_batch", "'Mixed' Sample Threshold", value=3, width="100%"),
                                 ui.input_numeric("tan_threshold_batch", "Tanabe Filter Threshold", value=80, width="100%"),
                                 ui.input_numeric("mas_q_threshold_batch", "Masters (vs. query) Filter Threshold", value=80, width="100%"),
