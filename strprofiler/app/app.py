@@ -172,7 +172,7 @@ app_ui = ui.page_fluid(
                             ui.tags.h3("Options"),
                             ui.tags.hr(),
                             ui.card(
-                                ui.input_switch("score_amel_query", "Score Amelogenin", value=True),
+                                ui.input_switch("score_amel_query", "Score Amelogenin", value=False),
                                 ui.input_numeric("mix_threshold_query", "'Mixed' Sample Threshold", value=3, width="100%"),
                                 ui.input_selectize("query_filter", "Similarity Score Filter",
                                     choices=[
