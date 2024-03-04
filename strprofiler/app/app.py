@@ -287,7 +287,7 @@ app_ui = ui.page_fluid(
                         {"id": "novel_query_sidebar"},
                         ui.tags.h3("Options"),
                         ui.card(
-                            ui.input_checkbox("score_amel_file", "Score Amelogenin", value=True),
+                            ui.input_checkbox("score_amel_file", "Score Amelogenin", value=False),
                             ui.input_numeric("mix_threshold_file", "'Mixed' Sample Threshold", value=3, width="100%"),
                             ui.input_numeric("tan_threshold_file", "Tanabe Filter Threshold", value=80, width="100%"),
                             ui.input_numeric("mas_q_threshold_file", "Masters (vs. query) Filter Threshold", value=80, width="100%"),
@@ -392,21 +392,21 @@ def server(input, output, session):
     def image():
         if input.query_filter() == "Tanabe":
             img: ImgData = {
-                "src": str("www/tanabe_inverted.png"),
+                "src": str(Path(__file__).parent / "www/tanabe_inverted.png"),
                 "width": "320px",
                 "height": "45px",
             }
             return img
         elif input.query_filter() == "Masters Query":
             img: ImgData = {
-                "src": str("www/masters_query_inverted.png"),
+                "src": str(Path(__file__).parent / "www/masters_query_inverted.png"),
                 "width": "200px",
                 "height": "45px",
             }
             return img
         elif input.query_filter() == "Masters Reference":
             img: ImgData = {
-                "src": str("www/masters_ref_inverted.png"),
+                "src": str(Path(__file__).parent / "www/masters_ref_inverted.png"),
                 "width": "200px",
                 "height": "45px",
             }
@@ -599,7 +599,7 @@ def server(input, output, session):
     # Dealing with passing example file to user.
     @render.download()
     def example_file1():
-        path = "www/Example_Batch_File.csv"
+        path = str(Path(__file__).parent / "www/Example_Batch_File.csv")
         return str(path)
 
     ################
@@ -664,7 +664,7 @@ def server(input, output, session):
     # Dealing with passing example file to user.
     @render.download()
     def example_file2():
-        path = "www/Example_Batch_File.csv"
+        path = str(Path(__file__).parent / "www/Example_Batch_File.csv")
         return str(path)
 
 
