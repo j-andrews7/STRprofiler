@@ -1,4 +1,5 @@
-# https://github.com/astrowonk/shiny_tables
+# This code is largely taken verbatim from: https://github.com/astrowonk/shiny_tables
+# Some edits have been made to remove unused code.
 
 from shiny import ui
 from numpy import nan_to_num
@@ -38,14 +39,14 @@ def enhanced_from_dataframe(
     # process_header_classes=False,
     process_header_styles=False,
     className="table table-striped",
-    style="width: 100%",  ## if true the cell style dict callable  will apply to header
+    style="width: 100%",  # if true the cell style dict callable  will apply to header
     **table_kwargs,
 ):
     """make a shiny bootstrap table from a pandas dataframe but add hyperlinks based on matching column names. Conditionally style a column or columns
 
     cell_style_dict: dict of {column_name: {condition: style_dict}}
 
-    condition can be astring or a function that returns a boolean
+    condition can be a string or a function that returns a boolean
 
     if condition is a string, it must match the value of the column exactly.
 
@@ -160,7 +161,7 @@ def _make_row(
         """Add links to tables in the right way and handle nan strings."""
         shiny_style_class_dict = {}
 
-        ## handle styles and classes
+        # handle styles and classes
         if cell_style_entry := cell_style_dict.get(col_name):
             if isinstance(cell_style_entry, list):
                 for item in cell_style_entry:
