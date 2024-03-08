@@ -12,7 +12,7 @@ def _clean_header_names(x):
     return x
 
 
-def process_header_style(col_name, header_style_dict, active=False):
+def _process_header_style(col_name, header_style_dict, active=False):
     if not active:
         return
     style = ""
@@ -22,7 +22,7 @@ def process_header_style(col_name, header_style_dict, active=False):
     return None
 
 
-def enhanced_from_dataframe(
+def _enhanced_from_dataframe(
     df,
     columns=None,
     link_column_suffix="_HREF",
@@ -86,7 +86,7 @@ def enhanced_from_dataframe(
         header_column_cells = [
             ui.tags.th(
                 _clean_header_names(x),
-                style=process_header_style(
+                style=_process_header_style(
                     x, header_style_dict=header_style_dict, active=process_header_styles
                 ),
             )
@@ -98,7 +98,7 @@ def enhanced_from_dataframe(
         header_column_cells = [
             ui.tags.th(
                 header_callable(_clean_header_names(x)),
-                style=process_header_style(
+                style=_process_header_style(
                     x, header_style_dict, active=process_header_styles
                 ),
             )
@@ -153,7 +153,7 @@ def _make_row(
     if cell_style_dict is None:
         cell_style_dict = {}
 
-    def process_table_cell(
+    def _process_table_cell(
         col_name,
         link_names,
         column_callable_dict,
@@ -234,7 +234,7 @@ def _make_row(
     link_names = [x for x in col_names if str(x).endswith(link_column_suffix)]
     return ui.tags.tr(
         [
-            process_table_cell(x, link_names, column_callable_dict=column_callable_dict)
+            _process_table_cell(x, link_names, column_callable_dict=column_callable_dict)
             for x in col_names
             if not str(x).endswith(link_column_suffix)
         ]

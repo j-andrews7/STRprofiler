@@ -6,12 +6,12 @@ import pandas as pd
 from pathlib import Path
 
 import strprofiler.strprofiler as sp
-from calc_functions import single_query, batch_query, file_query
+from calc_functions import _single_query, _batch_query, _file_query
 
 from datetime import date
 import time
 
-from shiny_tables import enhanced_from_dataframe
+from shiny_tables import _enhanced_from_dataframe
 import importlib.resources
 
 # To add new markers:
@@ -168,7 +168,7 @@ stack = ui.HTML(
 
 
 # UI Generation
-def marker_ui(id):
+def _marker_ui(id):
     return ui.column(2, ui.input_text(id, id, placeholder=""))
 
 
@@ -239,7 +239,7 @@ app_ui = ui.page_fluid(
                             ui.card(
                                 ui.column(
                                     12,
-                                    ui.row([marker_ui(marker) for marker in markers]),
+                                    ui.row([_marker_ui(marker) for marker in markers]),
                                 ),
                                 full_screen=False,
                                 fill=False,
@@ -640,7 +640,7 @@ def server(input, output, session):
             )
             res_click = 1
 
-        return single_query(
+        return _single_query(
             query,
             str_database,
             input.score_amel_query(),
@@ -656,7 +656,7 @@ def server(input, output, session):
         output_df = output_results()
         if output_df is not None:
             output_df.fillna("", inplace=True)
-            return enhanced_from_dataframe(
+            return _enhanced_from_dataframe(
                 output_df,
                 cell_style_dict=cell_style_dict,
                 header_style_dict=header_style_dict,
@@ -737,7 +737,7 @@ def server(input, output, session):
                 where="beforeEnd",
             )
             res_click_file = 1
-        return batch_query(
+        return _batch_query(
             query_df,
             str_database,
             input.score_amel_batch(),
@@ -809,7 +809,7 @@ def server(input, output, session):
                 where="beforeEnd",
             )
             res_click_batch = 1
-        return file_query(
+        return _file_query(
             query_df,
             input.score_amel_file(),
             input.mix_threshold_file(),

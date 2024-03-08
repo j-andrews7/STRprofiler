@@ -5,7 +5,7 @@ from collections import OrderedDict
 import time
 
 
-def single_query(
+def _single_query(
     query,
     str_database,
     use_amel,
@@ -110,7 +110,7 @@ def single_query(
     return full_samp_out
 
 
-def batch_query(
+def _batch_query(
     query_df,
     str_database,
     use_amel,
@@ -207,7 +207,7 @@ def batch_query(
     return summaries_ret
 
 
-def file_query(
+def _file_query(
     query_df,
     use_amel,
     three_allele_threshold,
