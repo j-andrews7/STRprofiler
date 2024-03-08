@@ -12,6 +12,7 @@ from datetime import date
 import time
 
 from shiny_tables import enhanced_from_dataframe
+import importlib.resources
 
 # To add new markers:
 # 1. add new marker to `markers` list below.
@@ -68,26 +69,26 @@ demo_vals = [
 
 def database_load(file):
     """
-    Load a database from a file and return it as a dictionary.
+    Load a database from a file and return it as a pandas dataframe.
 
     Args:
-        file (str): The path to the file containing the database.
+        file (str): Path to the database file.
 
     Returns:
-        dict: The loaded database as a dictionary.
+        str_database: A pandas dataframe of STR profiles in long format.
 
     Raises:
-        ValueError: If the file fails to load or if sample ID names are duplicated.
+        Exception: If the file fails to load or if sample ID names are duplicated.
     """
     try:
         str_database = sp.str_ingress(
-            file,
+            [file], # expects list
             sample_col="Sample",
             marker_col="Marker",
             sample_map=None,
             penta_fix=True,
         ).to_dict(orient="index")
-    except ValueError as e:
+    except Exception as e:
         m = ui.modal(
             ui.HTML(
                 "The file failed to load.<br>Check if sample ID names are duplicated.<br><br>Reported error:<br>"
@@ -102,12 +103,16 @@ def database_load(file):
             footer=None,
         )
         ui.modal_show(m)
-        str_database = database_load([Path(__file__).parent / "www/jax_database.csv"])
+
+        f = importlib.resources.files("strprofiler.app")
+        str_database = database_load(f.joinpath("www/jax_database.csv"))
+            
     return str_database
 
 
-str_database = database_load([Path(__file__).parent / "www/jax_database.csv"])
-html_path = str(Path(__file__).parent / "help.html")
+f = importlib.resources.files("strprofiler.app")
+str_database = database_load(f.joinpath("www/jax_database.csv"))
+html_path = f.joinpath("www/help.html")
 
 
 def generate_marker_function(marker):
@@ -350,7 +355,9 @@ def server(input, output, session):
     def _():
         global str_database
         file_check.set(not file_check())
-        str_database = database_load([Path(__file__).parent / "www/jax_database.csv"])
+        f = importlib.resources.files("strprofiler.app")
+        with f:
+            str_database = database_load(f.joinpath("www/jax_database.csv"))
 
         @output
         @render.text
@@ -390,23 +397,25 @@ def server(input, output, session):
     # Single sample query
     @render.image
     def image():
+        f = importlib.resources.files("strprofiler.app")
+
         if input.query_filter() == "Tanabe":
             img: ImgData = {
-                "src": str(Path(__file__).parent / "www/tanabe_inverted.png"),
+                "src": f.joinpath("www/tanabe_inverted.png"),
                 "width": "320px",
                 "height": "45px",
             }
             return img
         elif input.query_filter() == "Masters Query":
             img: ImgData = {
-                "src": str(Path(__file__).parent / "www/masters_query_inverted.png"),
+                "src": f.joinpath("www/masters_query_inverted.png"),
                 "width": "200px",
                 "height": "45px",
             }
             return img
         elif input.query_filter() == "Masters Reference":
             img: ImgData = {
-                "src": str(Path(__file__).parent / "www/masters_ref_inverted.png"),
+                "src": f.joinpath("www/masters_ref_inverted.png"),
                 "width": "200px",
                 "height": "45px",
             }
@@ -599,8 +608,8 @@ def server(input, output, session):
     # Dealing with passing example file to user.
     @render.download()
     def example_file1():
-        path = str(Path(__file__).parent / "www/Example_Batch_File.csv")
-        return str(path)
+        path = str(f.joinpath("www/Example_Batch_File.csv"))
+        return path
 
     ################
     # File many to many query
@@ -664,8 +673,8 @@ def server(input, output, session):
     # Dealing with passing example file to user.
     @render.download()
     def example_file2():
-        path = str(Path(__file__).parent / "www/Example_Batch_File.csv")
-        return str(path)
+        path = str(f.joinpath("www/Example_Batch_File.csv"))
+        return path
 
 
 app = App(app_ui, server, static_assets=www_dir)
