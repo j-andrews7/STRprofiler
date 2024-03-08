@@ -67,6 +67,7 @@ demo_vals = [
     "16,18",
 ]
 
+
 def database_load(file):
     """
     Load a database from a file and return it as a pandas dataframe.
@@ -82,7 +83,7 @@ def database_load(file):
     """
     try:
         str_database = sp.str_ingress(
-            [file], # expects list
+            [file],  # expects list
             sample_col="Sample",
             marker_col="Marker",
             sample_map=None,
@@ -106,7 +107,7 @@ def database_load(file):
 
         f = importlib.resources.files("strprofiler.app")
         str_database = database_load(f.joinpath("www/jax_database.csv"))
-            
+
     return str_database
 
 
@@ -154,16 +155,28 @@ header_style_dict = {
 }
 
 stack = ui.HTML(
-    '<svg xmlns="http://www.w3.org/2000/svg" height="100%" fill="currentColor" class="bi bi-stack" viewBox="0 0 16 16"> <path d="m14.12 10.163 1.715.858c.22.11.22.424 0 .534L8.267 15.34a.6.6 0 0 1-.534 0L.165 11.555a.299.299 0 0 1 0-.534l1.716-.858 5.317 2.659c.505.252 1.1.252 1.604 0l5.317-2.66zM7.733.063a.6.6 0 0 1 .534 0l7.568 3.784a.3.3 0 0 1 0 .535L8.267 8.165a.6.6 0 0 1-.534 0L.165 4.382a.299.299 0 0 1 0-.535z"/> <path d="m14.12 6.576 1.715.858c.22.11.22.424 0 .534l-7.568 3.784a.6.6 0 0 1-.534 0L.165 7.968a.299.299 0 0 1 0-.534l1.716-.858 5.317 2.659c.505.252 1.1.252 1.604 0z"/> </svg>'
+    (
+        '<svg xmlns="http://www.w3.org/2000/svg" height="100%" fill="currentColor"'
+        ' class="bi bi-stack" viewBox="0 0 16 16"> <path d="m14.12 10.163 1.715.858c.22.11.22.424 0'
+        " .534L8.267 15.34a.6.6 0 0 1-.534 0L.165 11.555a.299.299 0 0 1 0-.534l1.716-.858 5.317"
+        " 2.659c.505.252 1.1.252 1.604 0l5.317-2.66zM7.733.063a.6.6 0 0 1 .534 0l7.568"
+        " 3.784a.3.3 0 0 1 0 .535L8.267 8.165a.6.6 0 0 1-.534 0L.165 4.382a.299.299 0"
+        ' 0 1 0-.535z"/> <path d="m14.12 6.576 1.715.858c.22.11.22.424 0 .534l-7.568'
+        ' 3.784a.6.6 0 0 1-.534 0L.165 7.968a.299.299 0 0 1 0-.534l1.716-.858 5.317 2.659c.505.252 1.1.252 1.604 0z"/> </svg>'
+    )
 )
 
 
 # UI Generation
 def marker_ui(id):
-    return ui.column(3, ui.input_text(id, id, placeholder=""))
+    return ui.column(2, ui.input_text(id, id, placeholder=""))
 
 
 app_ui = ui.page_fluid(
+    ui.tags.style("#main {padding:12px !important} #sidebar {padding:12px}"),
+    ui.tags.style(
+        ".h3 {margin-bottom:0.1rem; line-height:1} .card-body {padding-top:6px; padding-bottom:6px}"
+    ),
     ui.page_navbar(
         shinyswatch.theme.superhero(),
         ui.nav_menu(
@@ -175,43 +188,90 @@ app_ui = ui.page_fluid(
                         ui.panel_sidebar(
                             {"id": "sidebar"},
                             ui.tags.h3("Options"),
-                            ui.tags.hr(),
                             ui.card(
-                                ui.input_switch("score_amel_query", "Score Amelogenin", value=False),
-                                ui.input_numeric("mix_threshold_query", "'Mixed' Sample Threshold", value=3, width="100%"),
-                                ui.input_selectize("query_filter", "Similarity Score Filter",
-                                    choices=[
-                                        "Tanabe",
-                                        "Masters Query",
-                                        "Masters Reference"
-                                    ],
+                                ui.input_switch(
+                                    "score_amel_query", "Score Amelogenin", value=False
+                                ),
+                                ui.row(
+                                    ui.column(
+                                        6,
+                                        ui.input_numeric(
+                                            "mix_threshold_query",
+                                            "'Mixed' Sample Threshold",
+                                            value=3,
+                                            width="100%",
+                                        ),
+                                    ),
+                                    ui.column(
+                                        6,
+                                        ui.input_selectize(
+                                            "query_filter",
+                                            "Similarity Score Filter",
+                                            choices=[
+                                                "Tanabe",
+                                                "Masters Query",
+                                                "Masters Reference",
+                                            ],
+                                            width="100%",
+                                        ),
+                                    ),
+                                ),
+                                ui.output_image(
+                                    "image", height="50px", fill=True, inline=True
+                                ),
+                                ui.input_numeric(
+                                    "query_filter_threshold",
+                                    "Similarity Score Filter Threshold",
+                                    value=80,
                                     width="100%",
                                 ),
-                                ui.output_image("image", height="50px", fill=True, inline=True),
-                                ui.input_numeric("query_filter_threshold", "Similarity Score Filter Threshold", value=80, width="100%"),
                             ),
                             position="right",
                         ),
                         ui.panel_main(
-                            ui.column(12,
+                            {"id": "main"},
+                            ui.column(
+                                12,
                                 ui.row(
                                     ui.column(4, ui.tags.h3("Sample Input")),
                                 ),
                             ),
                             ui.card(
-                                ui.column(12, ui.row([marker_ui(marker) for marker in markers])),
+                                ui.column(
+                                    12,
+                                    ui.row([marker_ui(marker) for marker in markers]),
+                                ),
                                 full_screen=False,
                                 fill=False,
                             ),
                             ui.row(
-                                ui.column(4, ui.input_action_button("demo_data", "Load Example Data", class_="btn-primary")),
+                                ui.column(
+                                    4,
+                                    ui.input_action_button(
+                                        "demo_data",
+                                        "Load Example Data",
+                                        class_="btn-primary",
+                                    ),
+                                ),
                                 ui.column(4, ui.output_ui("loaded_example_text")),
+                                ui.column(
+                                    4,
+                                    ui.input_action_button(
+                                        "search",
+                                        "Search",
+                                        class_="btn-success",
+                                        width="45%",
+                                    ),
+                                    ui.input_action_button(
+                                        "reset",
+                                        "Reset",
+                                        class_="btn-danger",
+                                        width="45%",
+                                    ),
+                                ),
                             ),
-                            ui.tags.hr(),
-                            ui.input_action_button("search", "Search", class_="btn-success"),
-                            ui.input_action_button("reset", "Reset Inputs / Results", class_="btn-danger"),
                         ),
-                    ),
+                    )
                 ),
                 ui.tags.hr(),
                 ui.card(
@@ -237,16 +297,54 @@ app_ui = ui.page_fluid(
                             ui.tags.h3("Options"),
                             ui.tags.hr(),
                             ui.card(
-                                ui.input_checkbox("score_amel_batch", "Score Amelogenin", value=False),
-                                ui.input_numeric("mix_threshold_batch", "'Mixed' Sample Threshold", value=3, width="100%"),
-                                ui.input_numeric("tan_threshold_batch", "Tanabe Filter Threshold", value=80, width="100%"),
-                                ui.input_numeric("mas_q_threshold_batch", "Masters (vs. query) Filter Threshold", value=80, width="100%"),
-                                ui.input_numeric("mas_r_threshold_batch", "Masters (vs. reference) Filter Threshold", value=80, width="100%"),
+                                ui.input_checkbox(
+                                    "score_amel_batch", "Score Amelogenin", value=False
+                                ),
+                                ui.input_numeric(
+                                    "mix_threshold_batch",
+                                    "'Mixed' Sample Threshold",
+                                    value=3,
+                                    width="100%",
+                                ),
+                                ui.input_numeric(
+                                    "tan_threshold_batch",
+                                    "Tanabe Filter Threshold",
+                                    value=80,
+                                    width="100%",
+                                ),
+                                ui.input_numeric(
+                                    "mas_q_threshold_batch",
+                                    "Masters (vs. query) Filter Threshold",
+                                    value=80,
+                                    width="100%",
+                                ),
+                                ui.input_numeric(
+                                    "mas_r_threshold_batch",
+                                    "Masters (vs. reference) Filter Threshold",
+                                    value=80,
+                                    width="100%",
+                                ),
                             ),
-                            ui.input_file("file1", "CSV Input File:", accept=[".csv"], multiple=False, width="100%"),
-                            ui.input_action_button("csv_query", "CSV Query", class_="btn-primary", width="100%"),
-                            ui.download_button("example_file1", "Download Example Batch File", class_="btn-secondary", width="100%"),
-                            position="left"
+                            ui.input_file(
+                                "file1",
+                                "CSV Input File:",
+                                accept=[".csv"],
+                                multiple=False,
+                                width="100%",
+                            ),
+                            ui.input_action_button(
+                                "csv_query",
+                                "CSV Query",
+                                class_="btn-primary",
+                                width="100%",
+                            ),
+                            ui.download_button(
+                                "example_file1",
+                                "Download Example Batch File",
+                                class_="btn-secondary",
+                                width="100%",
+                            ),
+                            position="left",
                         ),
                         ui.panel_main(
                             ui.row(
@@ -280,7 +378,9 @@ app_ui = ui.page_fluid(
                 ),
                 ui.hr(),
                 ui.output_ui("database_file"),
-                ui.input_action_button("reset_db", "Reset Custom Database", class_="btn-danger"),
+                ui.input_action_button(
+                    "reset_db", "Reset Custom Database", class_="btn-danger"
+                ),
                 col_widths=(-3, 6, -3),
             ),
         ),
@@ -292,15 +392,53 @@ app_ui = ui.page_fluid(
                         {"id": "novel_query_sidebar"},
                         ui.tags.h3("Options"),
                         ui.card(
-                            ui.input_checkbox("score_amel_file", "Score Amelogenin", value=False),
-                            ui.input_numeric("mix_threshold_file", "'Mixed' Sample Threshold", value=3, width="100%"),
-                            ui.input_numeric("tan_threshold_file", "Tanabe Filter Threshold", value=80, width="100%"),
-                            ui.input_numeric("mas_q_threshold_file", "Masters (vs. query) Filter Threshold", value=80, width="100%"),
-                            ui.input_numeric("mas_r_threshold_file", "Masters (vs. reference) Filter Threshold", value=80, width="100%"),
+                            ui.input_checkbox(
+                                "score_amel_file", "Score Amelogenin", value=False
+                            ),
+                            ui.input_numeric(
+                                "mix_threshold_file",
+                                "'Mixed' Sample Threshold",
+                                value=3,
+                                width="100%",
+                            ),
+                            ui.input_numeric(
+                                "tan_threshold_file",
+                                "Tanabe Filter Threshold",
+                                value=80,
+                                width="100%",
+                            ),
+                            ui.input_numeric(
+                                "mas_q_threshold_file",
+                                "Masters (vs. query) Filter Threshold",
+                                value=80,
+                                width="100%",
+                            ),
+                            ui.input_numeric(
+                                "mas_r_threshold_file",
+                                "Masters (vs. reference) Filter Threshold",
+                                value=80,
+                                width="100%",
+                            ),
                         ),
-                        ui.input_file("file2", "CSV Input File:", accept=[".csv"], multiple=False, width="100%"),
-                        ui.input_action_button("csv_query2", "CSV Query", class_="btn-primary", width="100%"),
-                        ui.download_button("example_file2", "Download Example Batch File", class_="btn-secondary", width="100%"),
+                        ui.input_file(
+                            "file2",
+                            "CSV Input File:",
+                            accept=[".csv"],
+                            multiple=False,
+                            width="100%",
+                        ),
+                        ui.input_action_button(
+                            "csv_query2",
+                            "CSV Query",
+                            class_="btn-primary",
+                            width="100%",
+                        ),
+                        ui.download_button(
+                            "example_file2",
+                            "Download Example Batch File",
+                            class_="btn-secondary",
+                            width="100%",
+                        ),
                         position="left",
                     ),
                     ui.panel_main(
@@ -321,11 +459,17 @@ app_ui = ui.page_fluid(
         ui.nav_panel(
             "About",
             ui.panel_main(
-                ui.tags.iframe(src="help.html", width="100%", style="height: 85vh;", scrolling="yes", frameborder="0")
+                ui.tags.iframe(
+                    src="help.html",
+                    width="100%",
+                    style="height: 85vh;",
+                    scrolling="yes",
+                    frameborder="0",
+                )
             ),
         ),
         title="STR Similarity",
-    )
+    ),
 )
 
 
@@ -363,6 +507,7 @@ def server(input, output, session):
         @render.text
         def current_db():
             return "jax_database.csv"
+
         @reactive.Calc
         @render.text
         def sample_count():
@@ -549,7 +694,11 @@ def server(input, output, session):
                 ui.div(
                     {"style": "font-size: 18px"},
                     ui.HTML(
-                        "There was a fatal error in the query.<br><br>Ensure marker names match expectation, and that no special characters (spaces, etc.) were used in sample names."
+                        (
+                            "There was a fatal error in the query.<br><br>"
+                            "Ensure marker names match expectation, and that"
+                            " no special characters (spaces, etc.) were used in sample names."
+                        )
                     ),
                 ),
                 title="Batch Query Error",
@@ -573,14 +722,16 @@ def server(input, output, session):
             sample_col="Sample",
             marker_col="Marker",
             sample_map=None,
-            penta_fix=True
+            penta_fix=True,
         ).to_dict(orient="index")
 
         if res_click_file == 0:
             ui.insert_ui(
                 ui.div(
                     {"id": "inserted-downloader2"},
-                    ui.download_button("download2", "Download CSV", width="25%", class_="btn-primary")
+                    ui.download_button(
+                        "download2", "Download CSV", width="25%", class_="btn-primary"
+                    ),
                 ),
                 selector="#res_card_batch",
                 where="beforeEnd",
@@ -593,13 +744,17 @@ def server(input, output, session):
             input.mix_threshold_batch(),
             input.tan_threshold_batch(),
             input.mas_q_threshold_batch(),
-            input.mas_r_threshold_batch()
+            input.mas_r_threshold_batch(),
         )
 
     # Dealing with dowloading results, when requested.
     # Note that output_results() is a reactive Calc result.
     @render.download(
-        filename="STR_Batch_Results_" + date.today().isoformat() + "_" + time.strftime("%Hh-%Mm", time.localtime()) + ".csv"
+        filename="STR_Batch_Results_"
+        + date.today().isoformat()
+        + "_"
+        + time.strftime("%Hh-%Mm", time.localtime())
+        + ".csv"
     )
     def download2():
         if batch_query_results() is not None:
@@ -646,10 +801,12 @@ def server(input, output, session):
             ui.insert_ui(
                 ui.div(
                     {"id": "inserted-downloader3"},
-                    ui.download_button("download3", "Download CSV", width="25%", class_="btn-primary"),
+                    ui.download_button(
+                        "download3", "Download CSV", width="25%", class_="btn-primary"
+                    ),
                 ),
                 selector="#res_card_file",
-                where="beforeEnd"
+                where="beforeEnd",
             )
             res_click_batch = 1
         return file_query(
@@ -664,7 +821,11 @@ def server(input, output, session):
     # Dealing with dowloading results, when requested.
     # Note that output_results() is a reactive Calc result.
     @render.download(
-        filename="STR_Results_" + date.today().isoformat() + "_" + time.strftime("%Hh-%Mm", time.localtime()) + ".csv"
+        filename="STR_Results_"
+        + date.today().isoformat()
+        + "_"
+        + time.strftime("%Hh-%Mm", time.localtime())
+        + ".csv"
     )
     def download3():
         if file_query_results() is not None:
