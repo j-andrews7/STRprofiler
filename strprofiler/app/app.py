@@ -297,7 +297,7 @@ app_ui = ui.page_fluid(
                             ui.tags.h3("Options"),
                             ui.tags.hr(),
                             ui.card(
-                                ui.input_checkbox(
+                                ui.input_switch(
                                     "score_amel_batch", "Score Amelogenin", value=False
                                 ),
                                 ui.input_numeric(
@@ -392,7 +392,7 @@ app_ui = ui.page_fluid(
                         {"id": "novel_query_sidebar"},
                         ui.tags.h3("Options"),
                         ui.card(
-                            ui.input_checkbox(
+                            ui.input_switch(
                                 "score_amel_file", "Score Amelogenin", value=False
                             ),
                             ui.input_numeric(
@@ -587,7 +587,7 @@ def server(input, output, session):
     @reactive.event(input.reset)
     def reset_clicked():
         [ui.update_text(marker, value="") for marker in markers]
-        ui.update_checkbox("score_amel_query", value=True)
+        ui.update_switch("score_amel_query", value=False)
         ui.update_numeric("mix_threshold_query", value="3")
 
         @output
