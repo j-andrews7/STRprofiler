@@ -152,7 +152,8 @@ def _batch_query(
 
                 try:
                     scores = sp.score_query(query=q, reference=r, use_amel=use_amel)
-                except:
+                except Exception as e:
+                    print(e)
                     return False
 
                 # Create dict of scores for each sample comparison.

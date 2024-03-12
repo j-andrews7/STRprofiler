@@ -35,7 +35,6 @@ def _enhanced_from_dataframe(
     link_target=None,
     markdown_columns=None,
     column_callable_dict={},
-    # process_header_classes=False,
     process_header_styles=False,
     className="table table-striped",
     style="width: 100%",  # if true the cell style dict callable  will apply to header

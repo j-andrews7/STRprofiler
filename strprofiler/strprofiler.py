@@ -8,6 +8,7 @@ from math import nan
 import sys
 from importlib.metadata import version
 from shiny import run_app
+from strprofiler.app.app import create_app
 
 ### Utility functions ###
 
@@ -144,7 +145,7 @@ def _make_html(dataframe: pd.DataFrame):
             <li>
                 <a href="https://pypi.org/project/strprofiler/"><i class="fa-brands fa-python"></i> PyPi</a>
             </li>
-            
+
             <li>
                 <a href="https://github.com/j-andrews7/strprofiler"><i class="fa-brands fa-github"></i> Github</a>
             </li>
@@ -195,7 +196,7 @@ def str_ingress(
         else:
             sys.exit('File extension: ' + path.suffix + ' in file: ' + str(path) + ' is not supported.')
 
-        df = df.applymap(lambda x: x.strip() if type(x) == str else x)
+        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
 
         df.columns = df.columns.str.strip()
 
@@ -225,7 +226,6 @@ def str_ingress(
                 for k in samps_dict.keys():
                     if k != "Sample":
                         samps_dict[k] = _clean_element(samps_dict[k])
-                        
 
                 # Rename PentaD and PentaE from common spellings.
                 if penta_fix:
@@ -554,7 +554,8 @@ def strprofiler(
         First column should be sample names as given in STR file(s),
         second should be new names to assign. No header., defaults to None
     :type sample_map: str, optional
-    :param database: Path to a database file in csv, xlsx, tsv, or txt format. If provided, input files are quried against this database, defaults to None
+    :param database: Path to a database file in csv, xlsx, tsv, or txt format.
+        If provided, input files are quried against this database, defaults to None
     :type database: str, optional
     :param output_dir: Path to output directory, defaults to "./STRprofiler"
     :type output_dir: str, optional
@@ -606,7 +607,6 @@ def strprofiler(
     # Check for sample map.
     if sample_map is not None:
         sample_map = pd.read_csv(sample_map, header=None, encoding="unicode_escape")
-
 
     # Data ingress.
     df = str_ingress(
@@ -728,6 +728,5 @@ def app(
     :param database: Path to a database file in csv, xlsx, tsv, or txt format. If provided, will be loaded into the app, defaults to None
     :type database: str, optional
     """
-    app_path = Path(__file__).parent / "app/app.py"
-    run_app(app_path.as_posix())
-
+    str_app = create_app(db=database)
+    run_app(str_app)
