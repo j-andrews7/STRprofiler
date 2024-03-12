@@ -15,7 +15,6 @@ def _clean_header_names(x):
 def _process_header_style(col_name, header_style_dict, active=False):
     if not active:
         return
-    style = ""
     if cell_style_entry := header_style_dict.get(col_name):
         if theStyle := cell_style_entry["style"]:
             return theStyle

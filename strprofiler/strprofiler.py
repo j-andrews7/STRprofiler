@@ -11,13 +11,14 @@ from shiny import run_app
 
 ### Utility functions ###
 
+
 def _clean_element(x):
     """
     Takes a string of alleles, removes duplicates, trims trailing .0, and returns a cleaned string.
     Sorts elements in ascending numeric order, with strings coming after numbers.
     """
     elements = [s.strip() for s in x.split(",")]
-    
+
     # Separate elements into numeric and string categories
     numeric_elements = []
     string_elements = []
@@ -26,18 +27,17 @@ def _clean_element(x):
             numeric_elements.append(float(e))
         except ValueError:
             string_elements.append(e)
-    
+
     # Remove duplicates and sort numeric elements in ascending order
     numeric_elements = sorted(list(set(numeric_elements)))
     string_elements = sorted(list(set(string_elements)))
-    
+
     # Convert numeric elements back to string and remove trailing .0 if needed
     numeric_elements = [str(e)[:-2] if str(e).endswith('.0') else str(e) for e in numeric_elements]
-    
-    sorted_elements = numeric_elements + string_elements
-    
-    return ",".join(sorted_elements)
 
+    sorted_elements = numeric_elements + string_elements
+
+    return ",".join(sorted_elements)
 
 
 def _pentafix(samps_dict):

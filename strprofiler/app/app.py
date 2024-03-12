@@ -3,7 +3,6 @@ from shiny import App, Inputs, Outputs, Session, reactive, render, ui
 from shiny.types import FileInfo, ImgData
 
 import pandas as pd
-from pathlib import Path
 
 import strprofiler.strprofiler as sp
 from calc_functions import _single_query, _batch_query, _file_query
@@ -519,7 +518,7 @@ def server(input, output, session):
             file: list[FileInfo] | None = input.database_upload()
         else:
             return
-        str_database = database_load([file[0]["datapath"]])
+        str_database = database_load(file[0]["datapath"])
 
         @output
         @render.text
