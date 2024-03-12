@@ -18,7 +18,8 @@ import importlib.resources
 # 1. add new marker to `markers` list below.
 # 2. add new demo value in `demo_vals` list for marker.
 
-www_dir = Path(__file__).parent / "www"
+f = importlib.resources.files("strprofiler.app")
+www_dir = str(f.joinpath("www"))
 
 reset_count = 0
 res_click = 0
@@ -111,12 +112,11 @@ def database_load(file):
     return str_database
 
 
-f = importlib.resources.files("strprofiler.app")
 str_database = database_load(f.joinpath("www/jax_database.csv"))
 html_path = f.joinpath("www/help.html")
 
 
-def generate_marker_function(marker):
+def _generate_marker_function(marker):
     def marker_function(val):
         if val != output_df[marker][0]:
             return {"style": "text-align:center;background-color:#ec7a80"}
@@ -127,7 +127,7 @@ def generate_marker_function(marker):
 
 
 for marker in markers:
-    globals()[marker] = generate_marker_function(marker)
+    globals()[marker] = _generate_marker_function(marker)
 
 cell_style_dict = {
     marker: (
@@ -499,9 +499,7 @@ def server(input, output, session):
     def _():
         global str_database
         file_check.set(not file_check())
-        f = importlib.resources.files("strprofiler.app")
-        with f:
-            str_database = database_load(f.joinpath("www/jax_database.csv"))
+        str_database = database_load(f.joinpath("www/jax_database.csv"))
 
         @output
         @render.text
@@ -542,7 +540,6 @@ def server(input, output, session):
     # Single sample query
     @render.image
     def image():
-        f = importlib.resources.files("strprofiler.app")
 
         if input.query_filter() == "Tanabe":
             img: ImgData = {

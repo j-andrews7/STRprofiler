@@ -183,7 +183,7 @@ def _make_row(
             return ui.tags.td(
                 cell_callablle(
                     data_dict_entry, col_name
-                )  ##need to be on the entire data_dict in case a tool tip or other functionality is
+                )  # need to be on the entire data_dict in case a tool tip or other functionality is
                 # linked to data in the same row but on another column
             )
 
