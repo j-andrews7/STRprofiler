@@ -113,9 +113,11 @@ def create_app(db=None):
     ]
 
     if db is not None:
-        str_database = database_load(db)
+        init_db = database_load(db)
+        init_db_name = db
     else:
-        str_database = database_load(f.joinpath("www/jax_database.csv"))
+        init_db = database_load(f.joinpath("www/jax_database.csv"))
+        init_db_name = "jax_database.csv"
 
     def _generate_marker_function(marker):
         def marker_function(val):
@@ -474,11 +476,13 @@ def create_app(db=None):
         res_click = reactive.value(0)
         res_click_batch = reactive.value(0)
         res_click_file = reactive.value(0)
+        str_database = reactive.value(init_db)
+        db_name = reactive.value(init_db_name)
 
         @output
         @render.text
         def current_db():
-            return "jax_database.csv"
+            return db_name()
 
         @render.ui
         @reactive.event(file_check)
@@ -495,44 +499,44 @@ def create_app(db=None):
         @reactive.effect
         @reactive.event(input.reset_db)
         def _():
-            global str_database
             file_check.set(not file_check())
-            str_database = database_load(f.joinpath("www/jax_database.csv"))
+            str_database.set(init_db)
+            db_name.set(init_db_name)
 
             @output
             @render.text
             def current_db():
-                return "jax_database.csv"
+                return db_name()
 
             @reactive.Calc
             @render.text
             def sample_count():
-                return "Number of Database Samples: " + str(len(str_database))
+                return "Number of Database Samples: " + str(len(str_database()))
 
         @reactive.effect
         @reactive.event(input.database_upload)
         def _():
-            global str_database
             if input.database_upload():
                 file: list[FileInfo] | None = input.database_upload()
             else:
                 return
-            str_database = database_load(file[0]["datapath"])
+            str_database.set(database_load(file[0]["datapath"]))
 
             @output
             @render.text
             def current_db():
-                return file[0]["name"]
+                db_name.set(file[0]["name"])
+                return db_name()
 
             @reactive.calc
             @render.text
             def sample_count():
-                return "Number of Database Samples: " + str(len(str_database))
+                return "Number of Database Samples: " + str(len(str_database()))
 
         @reactive.calc
         @render.text
         def sample_count():
-            return "Number of Database Samples: " + str(len(str_database))
+            return "Number of Database Samples: " + str(len(str_database()))
 
         ################
         # Single sample query
@@ -635,7 +639,7 @@ def create_app(db=None):
 
             return _single_query(
                 query,
-                str_database,
+                str_database(),
                 input.score_amel_query(),
                 input.mix_threshold_query(),
                 input.query_filter(),
@@ -679,7 +683,7 @@ def create_app(db=None):
         @output
         @render.data_frame
         def out_batch_df():
-            output_df = batch_query_results()
+            output_df.set(batch_query_results())
             try:
                 return render.DataTable(output_df)
             except Exception:
@@ -732,7 +736,7 @@ def create_app(db=None):
                 res_click_file.set(1)
             return _batch_query(
                 query_df,
-                str_database,
+                str_database(),
                 input.score_amel_batch(),
                 input.mix_threshold_batch(),
                 input.tan_threshold_batch(),
