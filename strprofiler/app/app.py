@@ -15,12 +15,6 @@ import importlib.resources
 # 1. add new marker to `markers` list below.
 # 2. add new demo value in `demo_vals` list for marker.
 
-# TODO make these reactives to avoid global variables
-reset_count = 0
-res_click = 0
-res_click_batch = 0
-res_click_file = 0
-
 
 def database_load(file):
     """
@@ -476,6 +470,10 @@ def create_app(db=None):
     def server(input, output, session):
 
         file_check = reactive.value(False)
+        reset_count = reactive.value(0)
+        res_click = reactive.value(0)
+        res_click_batch = reactive.value(0)
+        res_click_file = reactive.value(0)
 
         @output
         @render.text
@@ -493,6 +491,7 @@ def create_app(db=None):
                 width="100%",
             )
 
+        # TODO change this to reset to the db passed to the app (sample db if none provided)
         @reactive.effect
         @reactive.event(input.reset_db)
         def _():
@@ -604,15 +603,13 @@ def create_app(db=None):
         @reactive.calc
         @reactive.event(input.search, input.reset)
         def output_results():
-            global reset_count
-            global res_click
 
-            if input.reset() != reset_count:
+            if input.reset() != reset_count():
                 query = {m: "" for m in markers}
             else:
                 query = {m: input[m]() for m in markers}
 
-            reset_count = input.reset()
+            reset_count.set(input.reset())
             if not any(query.values()):
 
                 @output
@@ -621,9 +618,9 @@ def create_app(db=None):
                     return ""
 
                 ui.remove_ui("#inserted-downloader")
-                res_click = 0
+                res_click.set(0)
                 return None
-            if res_click == 0:
+            if res_click() == 0:
                 ui.insert_ui(
                     ui.div(
                         {"id": "inserted-downloader"},
@@ -634,7 +631,7 @@ def create_app(db=None):
                     selector="#res_card",
                     where="afterEnd",
                 )
-                res_click = 1
+                res_click.set(1)
 
             return _single_query(
                 query,
@@ -708,7 +705,7 @@ def create_app(db=None):
         @reactive.calc
         @reactive.event(input.csv_query)
         def batch_query_results():
-            global res_click_file
+
             file: list[FileInfo] | None = input.file1()
             if file is None:
                 ui.remove_ui("#inserted-downloader2")
@@ -721,7 +718,7 @@ def create_app(db=None):
                 penta_fix=True,
             ).to_dict(orient="index")
 
-            if res_click_file == 0:
+            if res_click_file() == 0:
                 ui.insert_ui(
                     ui.div(
                         {"id": "inserted-downloader2"},
@@ -732,7 +729,7 @@ def create_app(db=None):
                     selector="#res_card_batch",
                     where="beforeEnd",
                 )
-                res_click_file = 1
+                res_click_file.set(1)
             return _batch_query(
                 query_df,
                 str_database,
@@ -780,7 +777,7 @@ def create_app(db=None):
         @reactive.calc
         @reactive.event(input.csv_query2)
         def file_query_results():
-            global res_click_batch
+
             file: list[FileInfo] | None = input.file2()
             if file is None:
                 ui.remove_ui("#inserted-downloader3")
@@ -793,7 +790,7 @@ def create_app(db=None):
                 penta_fix=True,
             ).to_dict(orient="index")
 
-            if res_click_batch == 0:
+            if res_click_batch() == 0:
                 ui.insert_ui(
                     ui.div(
                         {"id": "inserted-downloader3"},
@@ -804,7 +801,7 @@ def create_app(db=None):
                     selector="#res_card_file",
                     where="beforeEnd",
                 )
-                res_click_batch = 1
+                res_click_batch.set(1)
             return _file_query(
                 query_df,
                 input.score_amel_file(),
