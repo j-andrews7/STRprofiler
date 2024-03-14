@@ -5,7 +5,6 @@ import pandas as pd
 
 import strprofiler.strprofiler as sp
 from strprofiler.app.calc_functions import _single_query, _batch_query, _file_query
-from strprofiler.app.shiny_tables import _enhanced_from_dataframe
 
 from datetime import date
 import time
@@ -63,6 +62,13 @@ def _marker_ui(id):
     return ui.column(2, ui.input_text(id, id, placeholder=""))
 
 
+def _highlight_non_matches(s):
+    """
+    Highlight the cells that do not match the first row's value in their respective columns.
+    """
+    is_match = s == s.iloc[0]
+    return ["text-align:center;background-color:#ec7a80" if not v else "text-align:center" for v in is_match]
+
 ### App Generation ###
 
 def create_app(db=None):
@@ -118,43 +124,6 @@ def create_app(db=None):
     else:
         init_db = database_load(f.joinpath("www/jax_database.csv"))
         init_db_name = "jax_database.csv"
-
-    def _generate_marker_function(marker):
-        def marker_function(val):
-            if val != output_df[marker][0]:
-                return {"style": "text-align:center;background-color:#ec7a80"}
-            else:
-                return {"style": "text-align:center"}
-
-        return marker_function
-
-    for marker in markers:
-        globals()[marker] = _generate_marker_function(marker)
-
-    cell_style_dict = {
-        marker: (
-            globals()[marker]
-            if marker in globals()
-            else (lambda x: {"style": "text-align:center"})
-        )
-        for marker in markers
-        + [
-            "Mixed Sample",
-            "Shared Markers",
-            "Shared Alleles",
-            "Tanabe Score",
-            "Master Query Score",
-            "Master Ref Score",
-        ]
-    }
-
-    header_style_dict = {
-        "Shared Markers": {"style": "text-align:center"},
-        "Shared Alleles": {"style": "text-align:center"},
-        "Tanabe Score": {"style": "text-align:center"},
-        "Master Query Score": {"style": "text-align:center"},
-        "Master Ref Score": {"style": "text-align:center"},
-    }
 
     stack = ui.HTML(
         (
@@ -279,7 +248,7 @@ def create_app(db=None):
                         ui.column(
                             12,
                             {"id": "res_card"},
-                            ui.output_ui("out_result"),
+                            ui.output_table("out_result"),
                         ),
                         full_screen=False,
                         fill=False,
@@ -478,6 +447,7 @@ def create_app(db=None):
         res_click_file = reactive.value(0)
         str_database = reactive.value(init_db)
         db_name = reactive.value(init_db_name)
+        output_df = reactive.value(None)
 
         @output
         @render.text
@@ -646,18 +616,27 @@ def create_app(db=None):
             )
 
         @output
-        @render.ui
+        @render.table
         def out_result():
-            global output_df
-            output_df = output_results()
-            if output_df is not None:
-                output_df.fillna("", inplace=True)
-                return _enhanced_from_dataframe(
-                    output_df,
-                    cell_style_dict=cell_style_dict,
-                    header_style_dict=header_style_dict,
-                    process_header_styles=True,
+            output_df.set(output_results())
+
+            if output_df() is not None:
+                out_df = output_df().copy()
+                out_df = out_df.style.set_table_attributes(
+                    'class="dataframe shiny-table table w-auto"'
+                ).hide(axis="index").apply(_highlight_non_matches, subset=out_df.columns[5:], axis=0).format(
+                    {
+                        "Shared Markers": "{0:0.0f}",
+                        "Shared Alleles": "{0:0.0f}",
+                        "Tanabe Score": "{0:0.2f}",
+                        "Masters Query Score": "{0:0.2f}",
+                        "Masters Ref Score": "{0:0.2f}",
+                    },
+                    na_rep=""
                 )
+            else:
+                out_df = pd.DataFrame({"No input provided.": []})
+            return out_df
 
         # Dealing with downloading results, when requested.
         # Note that output_results() is a reactive Calc result.
@@ -684,7 +663,7 @@ def create_app(db=None):
         def out_batch_df():
             output_df.set(batch_query_results())
             try:
-                return render.DataTable(output_df)
+                return render.DataTable(output_df())
             except Exception:
                 m = ui.modal(
                     ui.div(
@@ -772,9 +751,9 @@ def create_app(db=None):
         @output
         @render.data_frame
         def out_file_df():
-            output_df = file_query_results()
-            if output_df is not None:
-                return render.DataTable(output_df)
+            output_df.set(file_query_results())
+            if output_df() is not None:
+                return render.DataTable(output_df())
 
         # File input loading
         @reactive.calc

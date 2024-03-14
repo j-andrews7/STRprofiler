@@ -101,8 +101,8 @@ def _single_query(
             "n_shared_markers": "Shared Markers",
             "n_shared_alleles": "Shared Alleles",
             "tanabe_score": "Tanabe Score",
-            "masters_query_score": "Master Query Score",
-            "masters_ref_score": "Master Ref Score",
+            "masters_query_score": "Masters Query Score",
+            "masters_ref_score": "Masters Ref Score",
         },
         inplace=True,
     )
@@ -200,8 +200,8 @@ def _batch_query(
             "top_hit": "Top Match",
             "next_best": "Next Best Match",
             "tanabe_matches": "Tanabe Matches",
-            "masters_query_matches": "Master Query Matches",
-            "masters_ref_matches": "Master Ref Matches",
+            "masters_query_matches": "Masters Query Matches",
+            "masters_ref_matches": "Masters Ref Matches",
         }
     )
 
@@ -292,8 +292,8 @@ def _file_query(
             "top_hit": "Top Match",
             "next_best": "Next Best Match",
             "tanabe_matches": "Tanabe Matches",
-            "masters_query_matches": "Master Query Matches",
-            "masters_ref_matches": "Master Ref Matches",
+            "masters_query_matches": "Masters Query Matches",
+            "masters_ref_matches": "Masters Ref Matches",
         }
     )
 
