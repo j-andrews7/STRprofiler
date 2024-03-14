@@ -88,7 +88,7 @@ def create_app(db=None):
         "PentaE",
         "TH01",
         "TPOX",
-        "vWA",
+        "vWA"
     ]
 
     demo_vals = [
@@ -109,7 +109,7 @@ def create_app(db=None):
         "",
         "7,8",
         "8,11",
-        "16,18",
+        "16,18"
     ]
 
     if db is not None:
@@ -495,7 +495,6 @@ def create_app(db=None):
                 width="100%",
             )
 
-        # TODO change this to reset to the db passed to the app (sample db if none provided)
         @reactive.effect
         @reactive.event(input.reset_db)
         def _():
@@ -660,7 +659,7 @@ def create_app(db=None):
                     process_header_styles=True,
                 )
 
-        # Dealing with dowloading results, when requested.
+        # Dealing with downloading results, when requested.
         # Note that output_results() is a reactive Calc result.
         @render.download(
             filename="STR_Query_Results_"
