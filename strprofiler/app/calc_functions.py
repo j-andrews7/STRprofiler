@@ -147,21 +147,21 @@ def _batch_query(
         samp_comps = [q_out]
 
         for sa in str_database.keys():
-            if sa != s:
-                r = str_database[sa]
+            # if sa != s:
+            r = str_database[sa]
 
-                try:
-                    scores = sp.score_query(query=q, reference=r, use_amel=use_amel)
-                except Exception as e:
-                    print(e)
-                    return False
+            try:
+                scores = sp.score_query(query=q, reference=r, use_amel=use_amel)
+            except Exception as e:
+                print(e)
+                return False
 
-                # Create dict of scores for each sample comparison.
-                samp_out = OrderedDict({"Sample": sa})
-                samp_out.update(scores)
-                samp_out.update(r)
+            # Create dict of scores for each sample comparison.
+            samp_out = OrderedDict({"Sample": sa})
+            samp_out.update(scores)
+            samp_out.update(r)
 
-                samp_comps.append(samp_out)
+            samp_comps.append(samp_out)
 
         # Create DataFrame of scores for each sample comparison.
         full_samp_out = pd.DataFrame(samp_comps)
