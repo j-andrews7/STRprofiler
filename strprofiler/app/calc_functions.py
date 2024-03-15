@@ -147,7 +147,6 @@ def _batch_query(
         samp_comps = [q_out]
 
         for sa in str_database.keys():
-            # if sa != s:
             r = str_database[sa]
 
             try:

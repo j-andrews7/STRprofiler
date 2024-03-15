@@ -10,20 +10,16 @@ from datetime import date
 import time
 import importlib.resources
 
-# To add new markers:
-# 1. add new marker to `markers` list below.
-# 2. add new demo value in `demo_vals` list for marker.
-
 
 def database_load(file):
     """
-    Load a database from a file and return it as a pandas dataframe.
+    Load a database from a file and return it as a dictionary.
 
     Args:
         file (str): Path to the database file.
 
     Returns:
-        str_database: A pandas dataframe of STR profiles in long format.
+        str_database: A dictionary of STR profiles in long format.
 
     Raises:
         Exception: If the file fails to load or if sample ID names are duplicated.
@@ -58,10 +54,6 @@ def database_load(file):
     return str_database
 
 
-def _marker_ui(id):
-    return ui.column(2, ui.input_text(id, id, placeholder=""))
-
-
 def _highlight_non_matches(s):
     """
     Highlight the cells that do not match the first row's value in their respective columns.
@@ -75,48 +67,6 @@ def create_app(db=None):
 
     f = importlib.resources.files("strprofiler.app")
     www_dir = str(f.joinpath("www"))
-
-    markers = [
-        "Amelogenin",
-        "CSF1PO",
-        "D2S1338",
-        "D3S1358",
-        "D5S818",
-        "D7S820",
-        "D8S1179",
-        "D13S317",
-        "D16S539",
-        "D18S51",
-        "D19S433",
-        "D21S11",
-        "FGA",
-        "PentaD",
-        "PentaE",
-        "TH01",
-        "TPOX",
-        "vWA"
-    ]
-
-    demo_vals = [
-        "X,Y",
-        "10",
-        "26",
-        "17,18",
-        "12",
-        "8,10",
-        "11,14",
-        "11",
-        "9,11",
-        "12",
-        "13,15",
-        "28,31.2",
-        "21,22",
-        "",
-        "",
-        "7,8",
-        "8,11",
-        "16,18"
-    ]
 
     if db is not None:
         init_db = database_load(db)
@@ -205,7 +155,7 @@ def create_app(db=None):
                                 ui.card(
                                     ui.column(
                                         12,
-                                        ui.row([_marker_ui(marker) for marker in markers]),
+                                        ui.output_ui("marker_inputs"),
                                     ),
                                     full_screen=False,
                                     fill=False,
@@ -448,6 +398,9 @@ def create_app(db=None):
         str_database = reactive.value(init_db)
         db_name = reactive.value(init_db_name)
         output_df = reactive.value(None)
+        demo_vals = reactive.value(None)
+        demo_name = reactive.value(None)
+        markers = reactive.value(list(init_db[next(iter(init_db))].keys()))
 
         @output
         @render.text
@@ -465,12 +418,20 @@ def create_app(db=None):
                 width="100%",
             )
 
+        @render.ui
+        @reactive.event(markers)
+        def marker_inputs():
+            def _marker_ui(id):
+                return ui.column(2, ui.input_text(id, id, placeholder=""))
+            return ui.row([_marker_ui(marker) for marker in markers()])
+
         @reactive.effect
         @reactive.event(input.reset_db)
         def _():
             file_check.set(not file_check())
             str_database.set(init_db)
             db_name.set(init_db_name)
+            markers.set(list(init_db[next(iter(init_db))].keys()))
 
             @output
             @render.text
@@ -490,6 +451,7 @@ def create_app(db=None):
             else:
                 return
             str_database.set(database_load(file[0]["datapath"]))
+            markers.set(list(str_database()[next(iter(str_database()))].keys()))
 
             @output
             @render.text
@@ -539,14 +501,17 @@ def create_app(db=None):
         @reactive.effect
         @reactive.event(input.demo_data)
         def _():
+            demo_name.set(next(iter(str_database())))
+            demo_vals.set(str_database()[demo_name()])
+
             # Update the fields with the demo data using the marker list and demo_vals list
-            for i, marker in enumerate(markers):
-                ui.update_text(marker, value=demo_vals[i])
+            for marker in markers():
+                ui.update_text(marker, value=demo_vals()[marker])
 
             @output
             @render.text
             def loaded_example_text():
-                x = ui.strong("Example: J000077608_P0")
+                x = ui.strong("Example: " + demo_name())
                 return x
 
         # Reset all marker fields
@@ -554,7 +519,7 @@ def create_app(db=None):
         @reactive.effect
         @reactive.event(input.reset)
         def reset_clicked():
-            [ui.update_text(marker, value="") for marker in markers]
+            [ui.update_text(marker, value="") for marker in markers()]
             ui.update_switch("score_amel_query", value=False)
             ui.update_numeric("mix_threshold_query", value="3")
 
@@ -578,9 +543,9 @@ def create_app(db=None):
         def output_results():
 
             if input.reset() != reset_count():
-                query = {m: "" for m in markers}
+                query = {m: "" for m in markers()}
             else:
-                query = {m: input[m]() for m in markers}
+                query = {m: input[m]() for m in markers()}
 
             reset_count.set(input.reset())
             if not any(query.values()):
