@@ -9,12 +9,12 @@ repository = "https://github.com/j-andrews7/strprofiler"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
+python = ">=3.9,<4.0"
 pandas = "^1.4.3"
 rich-click = "^1.5.2"
-numpy = "^1.23.3"
+numpy = "^1.26.3"
 openpyxl = "^3.0.10"
-shiny = "^0.7.0"
+shiny = "^0.8.0"
 shinyswatch = "^0.4.2"
 
 [tool.poetry.dev-dependencies]

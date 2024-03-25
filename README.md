@@ -51,7 +51,8 @@ Full usage information can be found by running `strprofiler --help`.
 │ --tan_threshold    -tanth   FLOAT        Minimum Tanabe score to report as potential matches in summary table. [default: 80]                          │
 │ --mas_q_threshold  -masqth  FLOAT        Minimum Masters (vs. query) score to report as potential matches in summary table. [default: 80]             │
 │ --mas_r_threshold  -masrth  FLOAT        Minimum Masters (vs. reference) score to report as potential matches in summary table. [default: 80]         │
-│ --mix_threshold    -mix     INTEGER      Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing. [default: 3]    │
+│ --mix_threshold    -mix     INTEGER      Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing.                 |
+|                                            [default: 3]                                                                                               │
 │ --sample_map       -sm      PATH         Path to sample map in csv format for renaming. First column should be sample names as given                  |
 |                                            in STR file(s),  second should be new names to assign. No header.                                          │
 │ --database         -db      PATH         Path to an STR database file in csv, xlsx, tsv, or txt format.                                               │
@@ -152,17 +153,54 @@ In addition to the marker columns, this output contains the following columns:
 
 `strprofiler -db ExampleSTR_database.csv -o ./strprofiler_output STR1.xlsx`
 
-In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s). 
+In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s).
+
+## The `strprofiler` App
+
+New in v0.2.0 is `strprofiler-app`, a command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
+
+This application can provide a convenient portal to a group's STR database and can be hosted on standard Shiny servers, Posit Connect instances, or ShinyApps.io. 
+
+### Deploying an `strprofiler` App
+
+Building an app for deployment to any of the above options is simple.
+
+First, make your app.py file:
+
+```python
+from shiny import run_app
+from pathlib import Path
+from strprofiler.app.app import create_app
+
+database = Path("my_database.csv")
+str_app = create_app(db=database)
+run_app(str_app)
+```
+
+If no database is provided, an example database included with the package will be used. 
+This app can then be deployed to any of the above endpoints as [one would with any other Shiny app](https://shiny.posit.co/py/docs/deploy.html).
+
+#### Database Format
+
+The database should be formated as a simple samples by markers matrix and saved as a csv, tsv, tab-delimited txt, or xlsx file, the same format as for the standard `strprofiler` command, e.g:
+
+|Sample       |Amelogenin|CSF1PO|D13S317|D16S539|D18S51|D19S433|D21S11 |D2S1338|D3S1358|D5S818|D7S820|D8S1179|FGA|TH01 |TPOX|vWA|Penta E|Penta D|
+|-------------|----------|------|-------|-------|------|-------|-------|-------|-------|------|------|-------|---|-----|----|---|-------|-------|
+|sample1      |X,Y       |12    |8      |13     |14    |14     |31,31.2|17,19  |15     |11,12 |11,12 |12,15  |23 |7,9.3|8   |18 |       |       |
+|sample2      |X         |10    |9      |13     |16    |12,14  |29     |20,23  |15,16  |12,13 |9,12  |14,15  |18 |7    |8,9 |15 |       |       |
+
+
 
 ## Contributing
-You can contribute by creating [issues](https://github.com/j-andrews7/strprofiler/issues) to highlight bugs and make suggestions for additional features. [Pull requests](https://github.com/j-andrews7/strprofiler/pulls) are also very welcome.
+You can contribute by creating [issues](https://github.com/j-andrews7/strprofiler/issues) to highlight bugs and make suggestions for additional features.
+[Pull requests](https://github.com/j-andrews7/strprofiler/pulls) are also very welcome.
 
 ## License
 
-**strprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. It is released with zero warranty for any purpose and I retain no liability for its use. [Read the full license](https://github.com/j-andrews7/strprofiler/blob/master/LICENSE) for additional details.
+**strprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. It is released with zero warranty for any purpose and the authors retain no liability for its use. [Read the full license](https://github.com/j-andrews7/strprofiler/blob/master/LICENSE) for additional details.
 
 ## Reference
 
 If you use **strprofiler** in your research, please cite the DOI:
 
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.1.5 (v0.1.5). Zenodo. https://doi.org/10.5281/zenodo.7348386
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.2.0 (v0.2.0). Zenodo. https://doi.org/10.5281/zenodo.7348386

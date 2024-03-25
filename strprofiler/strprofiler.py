@@ -8,7 +8,7 @@ from math import nan
 import sys
 from importlib.metadata import version
 from shiny import run_app
-from strprofiler.app.app import create_app
+from strprofiler.str_app.app import create_app
 
 ### Utility functions ###
 
