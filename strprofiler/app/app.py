@@ -4,7 +4,7 @@ from shiny.types import FileInfo, ImgData
 import pandas as pd
 
 import strprofiler.strprofiler as sp
-from strprofiler.str_app.calc_functions import _single_query, _batch_query, _file_query
+from strprofiler.app.calc_functions import _single_query, _batch_query, _file_query
 
 from datetime import date
 import time
