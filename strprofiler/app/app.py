@@ -120,7 +120,7 @@ def create_app(db=None):
                                         ),
                                         ui.column(
                                             6,
-                                            ui.input_selectize(
+                                            ui.input_select(
                                                 "query_filter",
                                                 "Similarity Score Filter",
                                                 choices=[
