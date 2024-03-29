@@ -400,7 +400,7 @@ def create_app(db=None):
         output_df = reactive.value(None)
         demo_vals = reactive.value(None)
         demo_name = reactive.value(None)
-        markers = reactive.value(list(init_db[next(iter(init_db))].keys()))
+        markers = reactive.value( [i for i in list(init_db[next(iter(init_db))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])] )
 
         @output
         @render.text
@@ -589,7 +589,7 @@ def create_app(db=None):
                 out_df = output_df().copy()
                 out_df = out_df.style.set_table_attributes(
                     'class="dataframe shiny-table table w-auto"'
-                ).hide(axis="index").apply(_highlight_non_matches, subset=out_df.columns[5:], axis=0).format(
+                ).hide(axis="index").apply(_highlight_non_matches, subset=markers(), axis=0).format(
                     {
                         "Shared Markers": "{0:0.0f}",
                         "Shared Alleles": "{0:0.0f}",
