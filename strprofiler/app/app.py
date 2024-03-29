@@ -1,5 +1,5 @@
 import shinyswatch
-from shiny import App, Inputs, Outputs, Session, reactive, render, ui
+from shiny import App, reactive, render, ui
 from shiny.types import FileInfo, ImgData
 import pandas as pd
 
@@ -61,7 +61,8 @@ def _highlight_non_matches(s):
     is_match = s == s.iloc[0]
     return ["text-align:center;background-color:#ec7a80" if not v else "text-align:center" for v in is_match]
 
-### App Generation ###
+# App Generation ###
+
 
 def create_app(db=None):
 
@@ -400,7 +401,7 @@ def create_app(db=None):
         output_df = reactive.value(None)
         demo_vals = reactive.value(None)
         demo_name = reactive.value(None)
-        markers = reactive.value( [i for i in list(init_db[next(iter(init_db))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])] )
+        markers = reactive.value([i for i in list(init_db[next(iter(init_db))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
 
         @output
         @render.text

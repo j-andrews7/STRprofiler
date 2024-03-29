@@ -70,12 +70,12 @@ def _single_query(
     for sa in str_database.keys():
         r = str_database[sa]
 
-        # catch cases where ref is empty or otherwise invalid. 
-        try: 
+        # catch cases where ref is empty or otherwise invalid.
+        try:
             scores = sp.score_query(
                 query=query, reference=r, use_amel=use_amel, amel_col="Amelogenin"
             )
-        except ZeroDivisionError as zde:
+        except ZeroDivisionError:
             pass
 
         # Create dict of scores for each sample comparison.
@@ -84,7 +84,6 @@ def _single_query(
         samp_out.update(r)
 
         samp_comps.append(samp_out)
-
 
     # Create DataFrame of scores for each sample comparison.
     full_samp_out = pd.DataFrame(samp_comps)
@@ -159,9 +158,9 @@ def _batch_query(
 
             try:
                 scores = sp.score_query(query=q, reference=r, use_amel=use_amel)
-            except ZeroDivisionError as zde:
+            except ZeroDivisionError:
                 pass
-            except Exception as e:
+            except Exception:
                 return False
 
             # Create dict of scores for each sample comparison.
