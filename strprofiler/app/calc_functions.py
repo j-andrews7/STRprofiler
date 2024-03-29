@@ -75,7 +75,7 @@ def _single_query(
             scores = sp.score_query(
                 query=query, reference=r, use_amel=use_amel, amel_col="Amelogenin"
             )
-        except:
+        except ZeroDivisionError as zde:
             pass
 
         # Create dict of scores for each sample comparison.
