@@ -59,6 +59,8 @@ def _single_query(
         "tanabe_score": nan,
         "masters_query_score": nan,
         "masters_ref_score": nan,
+        "Center": nan,
+        "Passage": nan
     }
     q_out.update(query)
 
@@ -67,9 +69,14 @@ def _single_query(
 
     for sa in str_database.keys():
         r = str_database[sa]
-        scores = sp.score_query(
-            query=query, reference=r, use_amel=use_amel, amel_col="Amelogenin"
-        )
+
+        # catch cases where ref is empty or otherwise invalid.
+        try:
+            scores = sp.score_query(
+                query=query, reference=r, use_amel=use_amel, amel_col="Amelogenin"
+            )
+        except ZeroDivisionError:
+            pass
 
         # Create dict of scores for each sample comparison.
         samp_out = OrderedDict({"Sample": sa})
@@ -151,8 +158,9 @@ def _batch_query(
 
             try:
                 scores = sp.score_query(query=q, reference=r, use_amel=use_amel)
-            except Exception as e:
-                print(e)
+            except ZeroDivisionError:
+                pass
+            except Exception:
                 return False
 
             # Create dict of scores for each sample comparison.
