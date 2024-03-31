@@ -1,4 +1,4 @@
-import strprofiler.strprofiler as sp
+import strprofiler.utils as sp
 import pandas as pd
 from math import nan
 from collections import OrderedDict
@@ -49,7 +49,7 @@ def _single_query(
     )
 
     q_out = {
-        "Sample": "Query-" + current_time,
+        "Sample": "Query",
         "mixed": mixed,
         "query_sample": True,
         "n_shared_markers": nan,

@@ -3,7 +3,7 @@ from shiny import App, reactive, render, ui
 from shiny.types import FileInfo, ImgData
 import pandas as pd
 
-import strprofiler.strprofiler as sp
+import strprofiler.utils as sp
 from strprofiler.app.calc_functions import _single_query, _batch_query, _file_query
 
 from datetime import date
