@@ -73,6 +73,7 @@ def create_app(db=None):
     www_dir = str(f.joinpath("www"))
 
     if db is not None:
+        print("Loading custom database: ", db)
         init_db = database_load(db)
         init_db_name = db
     else:
