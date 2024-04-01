@@ -436,7 +436,7 @@ def create_app(db=None):
             file_check.set(not file_check())
             str_database.set(init_db)
             db_name.set(init_db_name)
-            markers.set(list(init_db[next(iter(init_db))].keys()))
+            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
 
             @output
             @render.text
@@ -456,7 +456,7 @@ def create_app(db=None):
             else:
                 return
             str_database.set(database_load(file[0]["datapath"]))
-            markers.set(list(str_database()[next(iter(str_database()))].keys()))
+            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
 
             @output
             @render.text
