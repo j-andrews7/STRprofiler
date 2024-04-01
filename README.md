@@ -168,17 +168,16 @@ Building an app for deployment to any of the above options is simple.
 First, make your app.py file:
 
 ```python
-from shiny import run_app
-from pathlib import Path
 from strprofiler.app.app import create_app
 
-database = Path("my_database.csv")
-str_app = create_app(db=database)
-run_app(str_app)
+database = "./tester_db.csv"
+create_app(db=database)
 ```
 
 If no database is provided, an example database included with the package will be used. 
 This app can then be deployed to any of the above endpoints as [one would with any other Shiny app](https://shiny.posit.co/py/docs/deploy.html).
+
+Alternatively, one could export it as a shinylive app and host it on Github pages or similar.
 
 #### Database Format
 
