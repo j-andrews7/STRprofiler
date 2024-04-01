@@ -33,6 +33,9 @@ def database_load(file):
             penta_fix=True,
         ).to_dict(orient="index")
     except Exception as e:
+        print("The file failed to load. Reported error:")
+        print(str(e))
+        
         m = ui.modal(
             ui.HTML(
                 "The file failed to load.<br>Check if sample ID names are duplicated.<br><br>Reported error:<br>"
