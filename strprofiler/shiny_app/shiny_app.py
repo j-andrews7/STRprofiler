@@ -4,7 +4,7 @@ from shiny.types import FileInfo, ImgData
 import pandas as pd
 
 import strprofiler.utils as sp
-from strprofiler.app.calc_functions import _single_query, _batch_query, _file_query
+from strprofiler.shiny_app.calc_functions import _single_query, _batch_query, _file_query
 
 from datetime import date
 import time
@@ -35,7 +35,7 @@ def database_load(file):
     except Exception as e:
         print("The file failed to load. Reported error:")
         print(str(e))
-        
+
         m = ui.modal(
             ui.HTML(
                 "The file failed to load.<br>Check if sample ID names are duplicated.<br><br>Reported error:<br>"
@@ -51,7 +51,7 @@ def database_load(file):
         )
         ui.modal_show(m)
 
-        f = importlib.resources.files("strprofiler.app")
+        f = importlib.resources.files("strprofiler.shiny_app")
         str_database = database_load(f.joinpath("www/jax_database.csv"))
 
     return str_database
@@ -69,17 +69,19 @@ def _highlight_non_matches(s):
 
 def create_app(db=None):
 
-    f = importlib.resources.files("strprofiler.app")
+    f = importlib.resources.files("strprofiler.shiny_app")
     www_dir = str(f.joinpath("www"))
 
     if db is not None:
         print("Loading custom database: ", db)
         init_db = database_load(db)
         init_db_name = db
+        print('fizz')
     else:
+        print("Reloading: ", db)
         init_db = database_load(f.joinpath("www/jax_database.csv"))
         init_db_name = "jax_database.csv"
-
+        print('bang')
     stack = ui.HTML(
         (
             '<svg xmlns="http://www.w3.org/2000/svg" height="100%" fill="currentColor"'

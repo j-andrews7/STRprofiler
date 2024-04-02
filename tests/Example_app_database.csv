@@ -1,0 +1,5 @@
+Sample,Center,Passage,Amelogenin,Marker_1,Marker_2,Marker_3,Marker_4,Marker_5
+Sample_A,JAX,P0,"X,Y",12,8,13,14,14
+Sample_B,JAX,P0,"X,Y",10,11,9,18,"13,15"
+Sample_C,JAX,P0,"X,Y",10,11,"9,11",12,"13,15"
+Sample_D,JAX,P0,"X,Y",11,"11,12","9,11","12,18","13,15"

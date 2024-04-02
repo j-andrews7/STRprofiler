@@ -6,7 +6,7 @@ from collections import OrderedDict
 from math import nan
 import sys
 from shiny import run_app
-from strprofiler.app.app import create_app
+from strprofiler.shiny_app.shiny_app import create_app
 import strprofiler.utils as utils
 
 
@@ -297,7 +297,7 @@ def strprofiler(
     type=click.Path(exists=True),
 )
 @click.version_option()
-def app(database=None):
+def local_shiny_app(database=None):
     """STRprofiler shiny application for interactive comparisons & querying of STR profiles.
 
     :param database: Path to a database file in csv, xlsx, tsv, or txt format. If provided, will be loaded into the app, defaults to None
