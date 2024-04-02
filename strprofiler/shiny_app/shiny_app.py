@@ -439,6 +439,8 @@ def create_app(db=None):
             str_database.set(init_db)
             db_name.set(init_db_name)
             markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
+            ui.remove_ui("#inserted-downloader")
+            res_click.set(0)
 
             @output
             @render.text
@@ -461,6 +463,9 @@ def create_app(db=None):
             markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
             [ui.update_text(marker, value="") for marker in markers()]
             db_file_change.set(True)
+            ui.remove_ui("#inserted-downloader")
+            res_click.set(0)
+            db_file_change.set(False)
 
             @output
             @render.text
@@ -569,7 +574,6 @@ def create_app(db=None):
 
                 ui.remove_ui("#inserted-downloader")
                 res_click.set(0)
-                db_file_change.set(False)
 
                 return None
             if res_click() == 0:
