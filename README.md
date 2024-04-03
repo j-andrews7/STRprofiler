@@ -168,10 +168,10 @@ Building an app for deployment to any of the above options is simple.
 First, make your app.py file:
 
 ```python
-from strprofiler.app.app import create_app
+from strprofiler.shiny_app.shiny_app import create_app
 
 database = "./tester_db.csv"
-create_app(db=database)
+app = create_app(db=database)
 ```
 
 If no database is provided, an example database included with the package will be used. 

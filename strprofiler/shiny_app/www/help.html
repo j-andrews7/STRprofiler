@@ -1511,22 +1511,23 @@ only</h3>
 <div id="database-queries" class="section level1">
 <h1>Database Queries</h1>
 For a provided sample entered manually in the
-<code>Database Query</code> or sample(s) uploaded from a batch file
-(Batch Database Query tab) <code>STR Similarity</code> will generate a
-report that includes the similarity scores (described below) as computed
-against a database of known STR profiles.<br />
+<code>Database Single Query</code> or sample(s) uploaded from a batch
+file in the <code>Database Batch Query</code> tab)<br />
+<code>STR Similarity</code> will generate a report that includes the
+similarity scores (described below) as computed against a database of
+known STR profiles.<br />
 
 </p>
 <p>The report will differ depending on if an individual sample or batch
 of samples is provided.</p>
-<div id="database-information" class="section level3">
-<h3>Database information</h3>
-<p>Data underlying the database were provided by …..
-<code>TO BE FILLED LATER AS DATABASE IS MADE.</code></p>
+<div id="database-information" class="section level2">
+<h2>Database information</h2>
+<p>Current data underlying the database were provided by: <a href="https://tumor.informatics.jax.org/mtbwi/pdxSearch.do">The Jackson
+Laboratory PDX program</a></p>
 <hr />
 </div>
-<div id="individual-sample-report" class="section level3">
-<h3>Individual Sample Report</h3>
+<div id="database-single-query-report" class="section level2">
+<h2>Database Single Query Report</h2>
 <p>For individual samples, a report is generated with the following
 fields.</p>
 <table>
@@ -1575,10 +1576,13 @@ and database sample.</td>
 </tr>
 </tbody>
 </table>
+<p>The report is filtered to include only those samples with greater
+than or equal to the <code>Similarity Score Filter Threshold</code>
+defined by the user.</p>
 <hr />
 </div>
-<div id="batch-sample-report" class="section level3">
-<h3>Batch Sample Report</h3>
+<div id="database-batch-query-report" class="section level2">
+<h2>Database Batch Query Report</h2>
 <p>For batched samples, a report is summary report is generated. For
 individual sample comparison report, enter the individual sample in the
 database query tab.</p>
@@ -1626,15 +1630,28 @@ scoring threshold to sample.</td>
 </tr>
 </tbody>
 </table>
+<p>The report is filtered to include only those samples with greater
+than or equal to the <code>Similarity Score Filter Thresholds</code>
+defined by the user.</p>
+</div>
+<div id="database-file-managment" class="section level2">
+<h2>Database File Managment</h2>
+<p>Users can upload custom database files. The files must be in CSV
+format. A ‘Sample’ header must be present, but custom marker names may
+be used. Note that to score <code>Amelogenin</code> using the option
+provided, there must be a <code>Amelogenin</code> header in the uploaded
+file.</p>
 <hr />
 </div>
 </div>
-<div id="non-database-queries" class="section level1">
-<h1>Non-database Queries</h1>
+<div id="within-file-query" class="section level1">
+<h1>Within File Query</h1>
 <p>For batch samples entered in the File Query tab,
 <code>STR Similarity</code> will generate a report that mirrors the
 batch query above, except that samples will be queried against each
-other rather than against the database.</p>
+other rather than against the database. The report is filtered to
+include only those samples with greater than or equal to the
+<code>Similarity Score Filter Threshold</code> defined by the user.</p>
 <hr />
 </div>
 <div id="reported-similarity-scores" class="section level1">
@@ -1664,56 +1681,49 @@ AKA the Sørenson-Dice coefficient</a>:</li>
 </div>
 <div id="query-options" class="section level1">
 <h1>Query Options</h1>
-<div id="all-fields" class="section level3">
-<h3>All fields</h3>
+<div id="sample-query-options" class="section level2">
+<h2>Sample Query Options</h2>
 <ul>
-<li>Amelogenin is included in the score computation by default but can
-be excluded by de-selecting option.</li>
-<li>‘Mixed’ Sample Threshold</li>
+<li>Amelogenin scoring is excluded by default but can be included by
+selecting the option.<br />
+</li>
+<li>‘Mixed’ Sample Threshold: is the number of markers with &gt;= 2
+alleles allowed before a sample is flagged for potential mixing.
+[default: 3]<br />
+</li>
+<li>Similarity Score Filter: is the similiarity score used for result
+filtering. [default: Tanabe]</li>
+<li>Similarity Score Filter Threshold: is the threshold to filter
+results. Only those samples with &gt;= the threshold will appear in
+results. [default: 80]</li>
 </ul>
 </div>
-<div id="batch-and-file-specfic" class="section level3">
-<h3>Batch and file specfic</h3>
+<div id="batch-and-file-query-specfic" class="section level2">
+<h2>Batch and File Query Specfic</h2>
 <ul>
+<li>Amelogenin scoring is excluded by default but can be included by
+selecting the option.</li>
 <li>Tanabe Filter Threshold: is the Tanabe score threshold over which a
-sample is considered a match in batch and file queries.</li>
+sample is considered a match in batch and file queries. [default:
+80]</li>
 <li>Masters (vs. query) Filter Threshold: is the Masters (vs. query)
 score threshold over which a sample is considered a match in batch and
-file queries.</li>
+file queries. [default: 80]</li>
 <li>Masters (vs. reference) Filter Threshold: is the Masters
 (vs. reference) score threshold over which a sample is considered a
-match in batch and file queries.</li>
+match in batch and file queries. [default: 80]</li>
 </ul>
 <hr />
 </div>
 </div>
-<div id="authors" class="section level1">
-<h1>Authors</h1>
-<p><a href="https://github.com/MikeWLloyd" target="_blank">Mike
-Lloyd</a>, The Jackson Laboratory.<br />
-<a href="https://github.com/j-andrews7" target="_blank">Jared
-Andrews</a>, St. Jude Children’s Research Hospital</p>
-<hr />
-</div>
-<div id="license" class="section level1">
-<h1>License</h1>
-<p>STR Similarity is provided under the MIT license. Source code can be
-found at
-<a href="https://github.com/MikeWLloyd/strprofiler_shiny/" target="_blank">MikeWLloyd/strprofiler_shiny</a></p>
-<hr />
-</div>
-<div id="citations" class="section level1">
-<h1>Citations</h1>
-<p>STR similarity relies on the python package
-<a href="https://pypi.org/project/strprofiler/" target="_blank"><code>strprofiler</code></a>
-for file parsing and similarity score calculations.</p>
-<blockquote>
-<p><code>strprofiler</code> is released under the MIT license:<br />
-Jared Andrews, &amp; Sam Culley. (2022).
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<p><code>strprofiler</code> is provided under the MIT license. If you
+use this app in your research please cite:<br />
+Jared Andrews, Mike Lloyd, &amp; Sam Culley. (2024).
 <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>:
-v0.1.3. Zenodo.
-<a href="https://doi.org/10.5281/zenodo.10463015" target="_blank">https://doi.org/10.5281/zenodo.10463015</a></p>
-</blockquote>
+v0.1.4. Zenodo.
+<a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a></p>
 </div>
 
 

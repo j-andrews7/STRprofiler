@@ -12,18 +12,18 @@ output:
 ---
 
 # Database Queries  
-For a provided sample entered manually in the `Database Query` or sample(s) uploaded from a batch file (Batch Database Query tab)
+For a provided sample entered manually in the `Database Single Query` or sample(s) uploaded from a batch file in the `Database Batch Query` tab)  
 `STR Similarity` will generate a report that includes the similarity scores (described below) as computed against a database of known STR profiles.  
 </p>
 The report will differ depending on if an individual sample or batch of samples is provided.   
 
-### Database information
-Data underlying the database were provided by ..... `TO BE FILLED LATER AS DATABASE IS MADE.`   
+## Database information
+Current data underlying the database were provided by: [The Jackson Laboratory PDX program](https://tumor.informatics.jax.org/mtbwi/pdxSearch.do)  
 
 ---
 
-### Individual Sample Report
-For individual samples, a report is generated with the following fields.
+## Database Single Query Report
+For individual samples, a report is generated with the following fields.  
 
 | Output Field | Description |
 | :--- |    :----   |
@@ -34,9 +34,11 @@ For individual samples, a report is generated with the following fields.
 | Master Query Score | Master 'Query' similarity score between the query and database sample. |
 | Master Ref Score | Master 'Reference' similarity score between the query and database sample. |
 
+The report is filtered to include only those samples with greater than or equal to the `Similarity Score Filter Threshold` defined by the user.  
+
 ---
 
-### Batch Sample Report 
+## Database Batch Query Report 
 For batched samples, a report is summary report is generated. For individual sample comparison report, enter the individual sample in the database query tab.
 
 | Output Field | Description |
@@ -48,10 +50,19 @@ For batched samples, a report is summary report is generated. For individual sam
 | Master Query Matches | Name and Masters (vs. query) score of matches above scoring threshold to sample. |
 | Master Ref Matches | Name and Masters (vs. reference) score of matches above scoring threshold to sample. |
 
+The report is filtered to include only those samples with greater than or equal to the `Similarity Score Filter Thresholds` defined by the user.  
+
+## Database File Managment
+
+Users can upload custom database files. The files must be in CSV format. A 'Sample' header must be present, but custom marker names may be used. Note that to score `Amelogenin` using the option provided, there must be a `Amelogenin` header in the uploaded file.  
+
+
 ---
 
-# Non-database Queries
-For batch samples entered in the File Query tab, `STR Similarity` will generate a report that mirrors the batch query above, except that samples will be queried against each other rather than against the database. 
+# Within File Query
+
+For batch samples entered in the File Query tab, `STR Similarity` will generate a report that mirrors the batch query above, except that samples will be queried against each other rather than against the database. The report is filtered to include only those samples with greater than or equal to the `Similarity Score Filter Threshold` defined by the user.  
+
 
 ---
 
@@ -79,34 +90,22 @@ For batch samples entered in the File Query tab, `STR Similarity` will generate 
 
 # Query Options
 
-### All fields
+## Sample Query Options
 
-* Amelogenin is included in the score computation by default but can be excluded by de-selecting option.
-* 'Mixed' Sample Threshold
+* Amelogenin scoring is excluded by default but can be included by selecting the option.  
+* 'Mixed' Sample Threshold: is the number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing. [default: 3]  
+* Similarity Score Filter: is the similiarity score used for result filtering. [default: Tanabe]
+* Similarity Score Filter Threshold: is the threshold to filter results. Only those samples with >= the threshold will appear in results. [default: 80]
 
-### Batch and file specfic
+## Batch and File Query Specfic
 
-* Tanabe Filter Threshold: is the Tanabe score threshold over which a sample is considered a match in batch and file queries. 
-* Masters (vs. query) Filter Threshold: is the Masters (vs. query) score threshold over which a sample is considered a match in batch and file queries.
-* Masters (vs. reference) Filter Threshold: is the Masters (vs. reference) score threshold over which a sample is considered a match in batch and file queries.
-
----
-
-# Authors
-<a href="https://github.com/MikeWLloyd" target="_blank">Mike Lloyd</a>, The Jackson Laboratory.  
-<a href="https://github.com/j-andrews7" target="_blank">Jared Andrews</a>, St. Jude Children's Research Hospital
+* Amelogenin scoring is excluded by default but can be included by selecting the option.
+* Tanabe Filter Threshold: is the Tanabe score threshold over which a sample is considered a match in batch and file queries. [default: 80] 
+* Masters (vs. query) Filter Threshold: is the Masters (vs. query) score threshold over which a sample is considered a match in batch and file queries. [default: 80]
+* Masters (vs. reference) Filter Threshold: is the Masters (vs. reference) score threshold over which a sample is considered a match in batch and file queries. [default: 80]
 
 ---
 
-# License 
-STR Similarity is provided under the MIT license. Source code can be found at <a href="https://github.com/MikeWLloyd/strprofiler_shiny/" target="_blank">MikeWLloyd/strprofiler_shiny</a>
-
----
-
-# Citations
-STR similarity relies on the python package <a href="https://pypi.org/project/strprofiler/" target="_blank">`strprofiler`</a> for file parsing and similarity score calculations.
-
-> `strprofiler` is released under the MIT license:    
-> Jared Andrews, & Sam Culley. (2022). <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>: v0.1.3. Zenodo. <a href="https://doi.org/10.5281/zenodo.10463015" target="_blank">https://doi.org/10.5281/zenodo.10463015</a>
-
-
+# Reference
+`strprofiler` is provided under the MIT license. If you use this app in your research please cite:    
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>: v0.1.4. Zenodo. <a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a>
