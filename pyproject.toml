@@ -22,7 +22,7 @@ Jinja2 = "^3.1.3"
 
 [tool.poetry.scripts]
 strprofiler = 'strprofiler.strprofiler:strprofiler'
-strprofiler-app = 'strprofiler.strprofiler:app'
+strprofiler-app = 'strprofiler.strprofiler:local_shiny_app'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

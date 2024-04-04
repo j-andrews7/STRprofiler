@@ -4,7 +4,7 @@ from shiny.types import FileInfo, ImgData
 import pandas as pd
 
 import strprofiler.utils as sp
-from strprofiler.app.calc_functions import _single_query, _batch_query, _file_query
+from strprofiler.shiny_app.calc_functions import _single_query, _batch_query, _file_query
 
 from datetime import date
 import time
@@ -35,7 +35,7 @@ def database_load(file):
     except Exception as e:
         print("The file failed to load. Reported error:")
         print(str(e))
-        
+
         m = ui.modal(
             ui.HTML(
                 "The file failed to load.<br>Check if sample ID names are duplicated.<br><br>Reported error:<br>"
@@ -51,7 +51,7 @@ def database_load(file):
         )
         ui.modal_show(m)
 
-        f = importlib.resources.files("strprofiler.app")
+        f = importlib.resources.files("strprofiler.shiny_app")
         str_database = database_load(f.joinpath("www/jax_database.csv"))
 
     return str_database
@@ -69,7 +69,7 @@ def _highlight_non_matches(s):
 
 def create_app(db=None):
 
-    f = importlib.resources.files("strprofiler.app")
+    f = importlib.resources.files("strprofiler.shiny_app")
     www_dir = str(f.joinpath("www"))
 
     if db is not None:
@@ -77,9 +77,9 @@ def create_app(db=None):
         init_db = database_load(db)
         init_db_name = db
     else:
+        print("Reloading: ", db)
         init_db = database_load(f.joinpath("www/jax_database.csv"))
         init_db_name = "jax_database.csv"
-
     stack = ui.HTML(
         (
             '<svg xmlns="http://www.w3.org/2000/svg" height="100%" fill="currentColor"'
@@ -396,7 +396,9 @@ def create_app(db=None):
     def server(input, output, session):
 
         file_check = reactive.value(False)
+        db_file_change = reactive.value(False)
         reset_count = reactive.value(0)
+        reset_count_db = reactive.value(0)
         res_click = reactive.value(0)
         res_click_batch = reactive.value(0)
         res_click_file = reactive.value(0)
@@ -437,6 +439,8 @@ def create_app(db=None):
             str_database.set(init_db)
             db_name.set(init_db_name)
             markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
+            ui.remove_ui("#inserted-downloader")
+            res_click.set(0)
 
             @output
             @render.text
@@ -457,6 +461,11 @@ def create_app(db=None):
                 return
             str_database.set(database_load(file[0]["datapath"]))
             markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
+            [ui.update_text(marker, value="") for marker in markers()]
+            db_file_change.set(True)
+            ui.remove_ui("#inserted-downloader")
+            res_click.set(0)
+            db_file_change.set(False)
 
             @output
             @render.text
@@ -522,7 +531,7 @@ def create_app(db=None):
         # Reset all marker fields
         # Effect occurs on click of 'Reset Inputs' button
         @reactive.effect
-        @reactive.event(input.reset)
+        @reactive.event(input.reset, input.reset_db)
         def reset_clicked():
             [ui.update_text(marker, value="") for marker in markers()]
             ui.update_switch("score_amel_query", value=False)
@@ -544,15 +553,18 @@ def create_app(db=None):
         # the download button is turned on. If query is empty,
         # no results are expected and download button removed.
         @reactive.calc
-        @reactive.event(input.search, input.reset)
+        @reactive.event(input.search, input.reset, input.reset_db, db_file_change)
         def output_results():
-
             if input.reset() != reset_count():
                 query = {m: "" for m in markers()}
+                reset_count.set(input.reset())
+            elif input.reset_db() != reset_count_db():
+                query = {m: "" for m in markers()}
+                reset_count_db.set(input.reset_db())
             else:
                 query = {m: input[m]() for m in markers()}
+                reset_count.set(input.reset())
 
-            reset_count.set(input.reset())
             if not any(query.values()):
 
                 @output
@@ -562,6 +574,7 @@ def create_app(db=None):
 
                 ui.remove_ui("#inserted-downloader")
                 res_click.set(0)
+
                 return None
             if res_click() == 0:
                 ui.insert_ui(
@@ -589,7 +602,6 @@ def create_app(db=None):
         @render.table
         def out_result():
             output_df.set(output_results())
-
             if output_df() is not None:
                 out_df = output_df().copy()
                 out_df = out_df.style.set_table_attributes(
@@ -693,7 +705,7 @@ def create_app(db=None):
             )
 
         # Dealing with dowloading results, when requested.
-        # Note that output_results() is a reactive Calc result.
+        # Note that batch_query_results() is a reactive Calc result.
         @render.download(
             filename="STR_Batch_Results_"
             + date.today().isoformat()
@@ -764,7 +776,7 @@ def create_app(db=None):
             )
 
         # Dealing with dowloading results, when requested.
-        # Note that output_results() is a reactive Calc result.
+        # Note that file_query_results() is a reactive Calc result.
         @render.download(
             filename="STR_Results_"
             + date.today().isoformat()
