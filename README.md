@@ -181,14 +181,14 @@ Alternatively, one could export it as a shinylive app and host it on Github page
 
 #### Database Format
 
-The database should be formated as a simple samples by markers matrix and saved as a csv, tsv, tab-delimited txt, or xlsx file, the same format as for the standard `strprofiler` command, e.g:
+The database should be formatted as a samples by markers matrix and saved as a csv, tsv, tab-delimited txt, or xlsx file, the same format as for the standard `strprofiler` command, e.g:
 
-|Sample       |Amelogenin|CSF1PO|D13S317|D16S539|D18S51|D19S433|D21S11 |D2S1338|D3S1358|D5S818|D7S820|D8S1179|FGA|TH01 |TPOX|vWA|Penta E|Penta D|
+|Sample       |Amelogenin|CSF1PO|D13S317|D16S539|D18S51|D19S433|D21S11 |D2S1338|D3S1358|D5S818|D7S820|D8S1179|FGA|TH01 |TPOX|vWA|PentaE |PentaD |
 |-------------|----------|------|-------|-------|------|-------|-------|-------|-------|------|------|-------|---|-----|----|---|-------|-------|
 |sample1      |X,Y       |12    |8      |13     |14    |14     |31,31.2|17,19  |15     |11,12 |11,12 |12,15  |23 |7,9.3|8   |18 |       |       |
 |sample2      |X         |10    |9      |13     |16    |12,14  |29     |20,23  |15,16  |12,13 |9,12  |14,15  |18 |7    |8,9 |15 |       |       |
 
-
+Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns.
 
 ## Contributing
 You can contribute by creating [issues](https://github.com/j-andrews7/strprofiler/issues) to highlight bugs and make suggestions for additional features.
