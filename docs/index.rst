@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-strprofiler 
+STRprofiler 
 ===========
 
 .. toctree::
@@ -13,13 +13,13 @@ strprofiler
 .. image:: https://zenodo.org/badge/523477912.svg
    :target: https://zenodo.org/badge/latestdoi/523477912
 
-**strprofiler** is a simple python utility to compare short tandem repeat (STR) profiles. 
+**STRprofiler** is a simple python utility to compare short tandem repeat (STR) profiles. 
 In particular, it is designed to aid research labs in comparing models (e.g. cell lines or xenografts) generated from primary tissue samples to ensure authenticity. 
 It includes basic checks for sample mixing and contamination.
 
-**strprofiler is intended only for research purposes.**
+**STRprofiler is intended only for research purposes.**
 
-For each STR profile provided, **strprofiler** will generate a sample-specific report that includes the following similarity scores as compared to every other profile:
+For each STR profile provided, **STRprofiler** will generate a sample-specific report that includes the following similarity scores as compared to every other profile:
 
 `Tanabe, AKA the Sørenson-Dice coefficient <https://www.doi.org/10.11418/jtca1981.18.4_329>`_:
 
@@ -44,29 +44,30 @@ Amelogenin is not included in the score computation by default but can be includ
 Installation
 ============
 
-**strprofiler** is available on PyPI and can be installed with ``pip``::
+**STRprofiler** is available on PyPI and can be installed with ``pip``::
    
       pip install strprofiler
 
 Usage
 =====
 
-.. autofunction:: strprofiler.strprofiler
+.. autofunction:: strprofiler.strprofiler.strprofiler
+
 
 Input Files(s)
-==============
+~~~~~~~~~~~~~~
 
-**strprofiler** can take either a single STR file or multiple STR files as input. These files can be csv, tsv, tab-separated text, or xlsx (first sheet used) files. The STR file(s) should be in either 'wide' or 'long' format. The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
+**STRprofiler** can take either a single STR file or multiple STR files as input. These files can be csv, tsv, tab-separated text, or xlsx (first sheet used) files. The STR file(s) should be in either 'wide' or 'long' format. The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
 
-+--------+---------+---------+---------+--------+---------+--------+---------+----------+--------+
-| Sample | D1S1656 |  DYS391 | D3S1358 | D2S441 | D16S539 | D5S818 | D8S1179 | D22S1045 | D18S51 |
-+========+=========+=========+=========+========+=========+========+=========+==========+========+
-| Line1  |   12,14 |      12 |      13 |  12,14 |    17.3 |  16,17 |    18.3 |          |  17,11 |
-+--------+---------+---------+---------+--------+---------+--------+---------+----------+--------+
-| Line2  |   12,14 | 11.3,12 |   13,15 |  12,14 |    17.3 |  16,17 |    18.3 |          |  17,11 |
-+--------+---------+---------+---------+--------+---------+--------+---------+----------+--------+
-| ...    |         |         |         |        |         |        |         |          |        |
-+--------+---------+---------+---------+--------+---------+--------+---------+----------+--------+
++--------+---------+---------+---------+--------+---------+--------+
+| Sample | D1S1656 |  DYS391 | D3S1358 | D2S441 | D16S539 | D5S818 | 
++========+=========+=========+=========+========+=========+========+
+| Line1  |   12,14 |      12 |      13 |  12,14 |    17.3 |  16,17 |
++--------+---------+---------+---------+--------+---------+--------+
+| Line2  |   12,14 | 11.3,12 |   13,15 |  12,14 |    17.3 |  16,17 |
++--------+---------+---------+---------+--------+---------+--------+
+| ...    |         |         |         |        |         |        |
++--------+---------+---------+---------+--------+---------+--------+
 
 The wide format expects a line for each marker for each sample, e.g.:
 
@@ -141,27 +142,27 @@ The wide format expects a line for each marker for each sample, e.g.:
 In this format, the `marker_col` must be specified. Only columns beginning with "Allele" will be used to parse the alleles for each sample/marker. Any other size or height columns will be ignored.
 
 Output Files
-============
+~~~~~~~~~~~~
 
-**strprofiler** generates two types of output files. The first is a summary file, which contains the top hits for each sample above the specified scoring thresholds. This file provides a useful overview in addition to a flag to identify samples with potential mixing for closer inspection. In the output directory, this file will be named `full_summary.strprofiler.YYYYMMDD.HH_MM_SS.csv` where the date and time are the time the program was run.
+**STRprofiler** generates two types of output files. The first is a summary file, which contains the top hits for each sample above the specified scoring thresholds. This file provides a useful overview in addition to a flag to identify samples with potential mixing for closer inspection. In the output directory, this file will be named `full_summary.strprofiler.YYYYMMDD.HH_MM_SS.csv` where the date and time are the time the program was run.
 
 In addition to the marker columns, the summary file contains the following columns:
 
-+---------------------------+--------------------------------------------------------------------------------------+
-| **Column Name**           | **Description**                                                                      |
-+===========================+======================================================================================+
-| **mixed**                 | Flag to indicate sample mixing.                                                      |
-+---------------------------+--------------------------------------------------------------------------------------+
-| **top_hit**               | Name and Tanabe score of top match to sample.                                        |
-+---------------------------+--------------------------------------------------------------------------------------+
-| **next_best**             | Name and Tanabe score of next best match to sample.                                  |
-+---------------------------+--------------------------------------------------------------------------------------+
-| **tanabe_matches**        | Name and Tanabe score of matches above scoring threshold to sample.                  |
-+---------------------------+--------------------------------------------------------------------------------------+
-| **masters_query_matches** | Name and Masters (vs. query) score of matches above scoring threshold to sample.     |
-+---------------------------+--------------------------------------------------------------------------------------+
-| **masters_ref_matches**   | Name and Masters (vs. reference) score of matches above scoring threshold to sample. |
-+---------------------------+--------------------------------------------------------------------------------------+
++---------------------------+----------------------------------------------------------------------------+
+| **Column Name**           | **Description**                                                            |
++===========================+============================================================================+
+| **mixed**                 | Flag to indicate sample mixing.                                            |
++---------------------------+----------------------------------------------------------------------------+
+| **top_hit**               | Name and Tanabe score of top match.                                        |
++---------------------------+----------------------------------------------------------------------------+
+| **next_best**             | Name and Tanabe score of next best match.                                  |
++---------------------------+----------------------------------------------------------------------------+
+| **tanabe_matches**        | Name and Tanabe score of matches above scoring threshold.                  |
++---------------------------+----------------------------------------------------------------------------+
+| **masters_query_matches** | Name and Masters (vs. query) score of matches above scoring threshold.     |
++---------------------------+----------------------------------------------------------------------------+
+| **masters_ref_matches**   | Name and Masters (vs. reference) score of matches above scoring threshold. |
++---------------------------+----------------------------------------------------------------------------+
 
 The second is a sample-specific comparison file, which contains the results of the comparison between the query sample and all other provided samples. These files are generated for each STR profile provided in the input file(s) and named after the query sample in question. For example, if the input file contains a sample named `Sample1`, the output file will be named `Sample1.strprofiler.YYYYMMDD.HH_MM_SS.csv`.
 
@@ -192,13 +193,15 @@ In addition to the marker columns, this output contains the following columns:
 Database Comparison
 ~~~~~~~~~~~~~~~~~~~
 
-**strprofiler** can be also used to compare batches of samples against a larger database of samples. 
+**STRprofiler** can be also used to compare batches of samples against a larger database of samples. 
 
-`strprofiler -db ExampleSTR_database.csv -o ./strprofiler_output STR1.xlsx`
+.. code:: bash
+
+   strprofiler -db ExampleSTR_database.csv -o ./strprofiler_output STR1.xlsx
 
 In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s).
 
-The `strprofiler` App
+The `STRprofiler` App
 =====================
 
 New in v0.2.0 is `strprofiler-app`, a command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
@@ -225,7 +228,7 @@ This app can then be deployed to any of the above endpoints as `one would with a
 Alternatively, one could export it as a shinylive app and host it on Github pages or similar.
 
 Database Format
-~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^
 
 The database should be formatted as a samples by markers matrix and saved as a csv, tsv, tab-delimited txt, or xlsx file, the same format as for the standard `strprofiler` command, e.g:
 
@@ -242,7 +245,7 @@ Optionally, one may provide two metadata columns - "Center" and "Passage", which
 Other Functions
 ===============
 
-.. automodule:: strprofiler.strprofiler
+.. automodule:: strprofiler.utils
    :members:
 
 Contributing
