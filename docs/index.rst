@@ -208,6 +208,8 @@ New in v0.2.0 is `strprofiler-app`, a command that launches a Shiny application 
 
 This application can provide a convenient portal to a group's STR database and can be hosted on standard Shiny servers, Posit Connect instances, or ShinyApps.io. 
 
+An example of the application can be seen `here <https://hg99x7-jared0andrews.shinyapps.io/strprofiler/>`__.
+
 Deploying an ``strprofiler`` App
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

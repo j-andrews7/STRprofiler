@@ -8,11 +8,11 @@
 [![PyPI license](https://img.shields.io/pypi/l/strprofiler.svg)](https://pypi.python.org/pypi/strprofiler/)
 [![DOI](https://zenodo.org/badge/523477912.svg)](https://zenodo.org/badge/latestdoi/523477912)
 
-**strprofiler** is a simple python utility to compare short tandem repeat (STR) profiles. In particular, it is designed to aid research labs in comparing models (e.g. cell lines & xenografts) generated from primary tissue samples to ensure contamination has not occurred. It includes basic checks for sample mixing and contamination.
+**STRprofiler** is a simple python utility to compare short tandem repeat (STR) profiles. In particular, it is designed to aid research labs in comparing models (e.g. cell lines & xenografts) generated from primary tissue samples to ensure contamination has not occurred. It includes basic checks for sample mixing and contamination.
 
-**strprofiler is intended only for research purposes.**
+**STRprofiler is intended only for research purposes.**
 
-For each STR profile provided, **strprofiler** will generate a sample-specific report that includes the following similarity scores as compared to every other profile:
+For each STR profile provided, **STRprofiler** will generate a sample-specific report that includes the following similarity scores as compared to every other profile:
 
 [Tanabe, AKA the Sørenson-Dice coefficient](https://www.doi.org/10.11418/jtca1981.18.4_329):
 
@@ -30,7 +30,7 @@ Amelogenin is not included in the score computation by default but can be includ
 
 ## Installation
 
-**strprofiler** is available on PyPI and can be installed with pip:
+**STRprofiler** is available on PyPI and can be installed with pip:
 
 ```bash
 pip install strprofiler
@@ -38,7 +38,7 @@ pip install strprofiler
 
 ## Usage
 
-**strprofiler** can be run directly from the command line. 
+**STRprofiler** can be run directly from the command line. 
 
 `strprofiler -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
 
@@ -71,7 +71,7 @@ Full usage information can be found by running `strprofiler --help`.
 
 ## Input Files(s)
 
-**strprofiler** can take either a single STR file or multiple STR files as input. These files can be csv, tsv, tab-separated text, or xlsx (first sheet used) files. The STR file(s) should be in either 'wide' or 'long' format. The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
+**STRprofiler** can take either a single STR file or multiple STR files as input. These files can be csv, tsv, tab-separated text, or xlsx (first sheet used) files. The STR file(s) should be in either 'wide' or 'long' format. The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
 
 | Sample | D1S1656 |  DYS391 | D3S1358 | D2S441 | D16S539 | D5S818 | D8S1179 | D22S1045 | D18S51 |
 |:------:|:-------:|:-------:|:-------:|:------:|:-------:|:------:|:-------:|:--------:|:------:|
@@ -120,7 +120,7 @@ In this format, the `marker_col` must be specified. Only columns beginning with 
 
 ## Output Files
 
-**strprofiler** generates two types of output files. The first is a summary file, which contains the top hits for each sample above the specified scoring thresholds. This file provides a useful overview in addition to a flag to identify samples with potential mixing for closer inspection. In the output directory, this file will be named `full_summary.strprofiler.YYYYMMDD.HH_MM_SS.csv` where the date and time are the time the program was run.
+**STRprofiler** generates two types of output files. The first is a summary file, which contains the top hits for each sample above the specified scoring thresholds. This file provides a useful overview in addition to a flag to identify samples with potential mixing for closer inspection. In the output directory, this file will be named `full_summary.strprofiler.YYYYMMDD.HH_MM_SS.csv` where the date and time are the time the program was run.
 
 In addition to the marker columns, the summary file contains the following columns:
 
@@ -151,17 +151,19 @@ In addition to the marker columns, this output contains the following columns:
 
 ## Database Comparison
 
-**strprofiler** can be also used to compare batches of samples against a larger database of samples. 
+**STRprofiler** can be also used to compare batches of samples against a larger database of samples. 
 
 `strprofiler -db ExampleSTR_database.csv -o ./strprofiler_output STR1.xlsx`
 
 In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s).
 
-## The `strprofiler` App
+## The STRprofiler App
 
 New in v0.2.0 is `strprofiler-app`, a command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
 
 This application can provide a convenient portal to a group's STR database and can be hosted on standard Shiny servers, Posit Connect instances, or ShinyApps.io. 
+
+An example of the application can be seen [here](https://hg99x7-jared0andrews.shinyapps.io/strprofiler/).
 
 ### Deploying an `strprofiler` App
 
@@ -198,7 +200,7 @@ You can contribute by creating [issues](https://github.com/j-andrews7/strprofile
 
 ## License
 
-**strprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. It is released with zero warranty for any purpose and the authors retain no liability for its use. [Read the full license](https://github.com/j-andrews7/strprofiler/blob/master/LICENSE) for additional details.
+**STRprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. It is released with zero warranty for any purpose and the authors retain no liability for its use. [Read the full license](https://github.com/j-andrews7/strprofiler/blob/master/LICENSE) for additional details.
 
 ## Reference
 

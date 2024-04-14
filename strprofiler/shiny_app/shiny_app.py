@@ -2,6 +2,7 @@ import shinyswatch
 from shiny import App, reactive, render, ui
 from shiny.types import FileInfo, ImgData
 import pandas as pd
+from faicons import icon_svg
 
 import strprofiler.utils as sp
 from strprofiler.shiny_app.calc_functions import _single_query, _batch_query, _file_query

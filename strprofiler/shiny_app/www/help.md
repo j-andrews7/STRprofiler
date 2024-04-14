@@ -1,6 +1,6 @@
 ---
-title: "STR Similarity"
-subtitle: 'This site and tool are intended research purposes only'
+title: "STRprofiler"
+subtitle: 'This site and tool are intended for research purposes only.'
 output: 
   html_document:
     theme: spacelab
@@ -12,13 +12,13 @@ output:
 ---
 
 # Database Queries  
-For a provided sample entered manually in the `Database Single Query` or sample(s) uploaded from a batch file in the `Database Batch Query` tab)  
-`STR Similarity` will generate a report that includes the similarity scores (described below) as computed against a database of known STR profiles.  
+For a provided sample entered manually in the `Database Single Query` or sample(s) uploaded from a batch file in the `Database Batch Query` tab, 
+`STRprofiler` will generate a report that includes the similarity scores (described below) as computed against a database of known STR profiles.  
 </p>
 The report will differ depending on if an individual sample or batch of samples is provided.   
 
 ## Database information
-Current data underlying the database were provided by: [The Jackson Laboratory PDX program](https://tumor.informatics.jax.org/mtbwi/pdxSearch.do)  
+Current data underlying the default database were provided by: [The Jackson Laboratory PDX program](https://tumor.informatics.jax.org/mtbwi/pdxSearch.do)  
 
 ---
 
