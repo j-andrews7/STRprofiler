@@ -1,6 +1,6 @@
-<div style="text-align:center">
-<img src="https://raw.githubusercontent.com/j-andrews7/strprofiler/dev/strprofiler/shiny_app/www/logo.png" alt="STRprofiler" height="200">
-</div>
+<p align="center">
+    <img src="https://raw.githubusercontent.com/j-andrews7/strprofiler/dev/strprofiler/shiny_app/www/logo.png" alt="STRprofiler" height="300">
+</p>
 
 [![Coverage Status](https://coveralls.io/repos/github/j-andrews7/strprofiler/badge.svg?branch=main)](https://coveralls.io/github/j-andrews7/strprofiler?branch=main)
 [![PyPI version](https://badge.fury.io/py/strprofiler.svg)](https://badge.fury.io/py/strprofiler)
