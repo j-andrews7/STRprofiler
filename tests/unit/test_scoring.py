@@ -1,4 +1,4 @@
-import strprofiler.strprofiler as sp
+import strprofiler.utils as sp
 import pytest
 
 query = {
