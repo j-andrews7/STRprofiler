@@ -2,7 +2,7 @@
 
 ## v0.2.0
 
-**Release date: 03/16/2024**
+**Release date: 04/16/2024**
 
  - Addition of a new command, `strprofiler-app`, which launches an interactive Shiny
  application for single or batch queries of user-entered STR profiles against a user-provided database.

@@ -100,117 +100,115 @@ def create_app(db=None):
         ),
         ui.page_navbar(
             shinyswatch.theme.superhero(),
-            ui.nav_menu(
-                "Database Single/Batch Query",
-                ui.nav_panel(
-                    "Database Single Query",
-                    ui.card(
-                        ui.layout_sidebar(
-                            ui.panel_sidebar(
-                                {"id": "sidebar"},
-                                ui.tags.h3("Options"),
-                                ui.card(
-                                    ui.input_switch(
-                                        "score_amel_query", "Score Amelogenin", value=False
-                                    ),
-                                    ui.row(
-                                        ui.column(
-                                            6,
-                                            ui.input_numeric(
-                                                "mix_threshold_query",
-                                                "'Mixed' Sample Threshold",
-                                                value=3,
-                                                width="100%",
-                                            ),
-                                        ),
-                                        ui.column(
-                                            6,
-                                            ui.input_select(
-                                                "query_filter",
-                                                "Similarity Score Filter",
-                                                choices=[
-                                                    "Tanabe",
-                                                    "Masters Query",
-                                                    "Masters Reference",
-                                                ],
-                                                width="100%",
-                                            ),
-                                        ),
-                                    ),
-                                    ui.output_image(
-                                        "image", height="50px", fill=True, inline=True
-                                    ),
-                                    ui.input_numeric(
-                                        "query_filter_threshold",
-                                        "Similarity Score Filter Threshold",
-                                        value=80,
-                                        width="100%",
-                                    ),
-                                ),
-                                position="right",
-                            ),
-                            ui.panel_main(
-                                {"id": "main"},
-                                ui.column(
-                                    12,
-                                    ui.row(
-                                        ui.column(4, ui.tags.h3("Sample Input")),
-                                    ),
-                                ),
-                                ui.card(
-                                    ui.column(
-                                        12,
-                                        ui.output_ui("marker_inputs"),
-                                    ),
-                                    full_screen=False,
-                                    fill=False,
+            ui.nav_panel(
+                "Single Query",
+                ui.card(
+                    ui.layout_sidebar(
+                        ui.panel_sidebar(
+                            {"id": "sidebar"},
+                            ui.tags.h3("Options"),
+                            ui.card(
+                                ui.input_switch(
+                                    "score_amel_query", "Score Amelogenin", value=False
                                 ),
                                 ui.row(
                                     ui.column(
-                                        4,
-                                        ui.input_action_button(
-                                            "demo_data",
-                                            "Load Example Data",
-                                            class_="btn-primary",
+                                        6,
+                                        ui.input_numeric(
+                                            "mix_threshold_query",
+                                            "'Mixed' Sample Threshold",
+                                            value=3,
+                                            width="100%",
                                         ),
                                     ),
-                                    ui.column(4, ui.output_ui("loaded_example_text")),
                                     ui.column(
-                                        4,
-                                        ui.input_action_button(
-                                            "search",
-                                            "Search",
-                                            class_="btn-success",
-                                            width="45%",
-                                        ),
-                                        ui.input_action_button(
-                                            "reset",
-                                            "Reset",
-                                            class_="btn-danger",
-                                            width="45%",
+                                        6,
+                                        ui.input_select(
+                                            "query_filter",
+                                            "Similarity Score Filter",
+                                            choices=[
+                                                "Tanabe",
+                                                "Masters Query",
+                                                "Masters Reference",
+                                            ],
+                                            width="100%",
                                         ),
                                     ),
                                 ),
+                                ui.output_image(
+                                    "image", height="50px", fill=True, inline=True
+                                ),
+                                ui.input_numeric(
+                                    "query_filter_threshold",
+                                    "Similarity Score Filter Threshold",
+                                    value=80,
+                                    width="100%",
+                                ),
                             ),
-                        )
-                    ),
-                    ui.tags.hr(),
-                    ui.card(
-                        ui.row(
-                            ui.column(3, ui.tags.h3("Results")),
-                            ui.column(1, ui.p("")),
+                            position="right",
                         ),
-                        ui.column(
-                            12,
-                            {"id": "res_card"},
-                            ui.output_table("out_result"),
+                        ui.panel_main(
+                            {"id": "main"},
+                            ui.column(
+                                12,
+                                ui.row(
+                                    ui.column(4, ui.tags.h3("Sample Input")),
+                                ),
+                            ),
+                            ui.card(
+                                ui.column(
+                                    12,
+                                    ui.output_ui("marker_inputs"),
+                                ),
+                                full_screen=False,
+                                fill=False,
+                            ),
+                            ui.row(
+                                ui.column(
+                                    4,
+                                    ui.input_action_button(
+                                        "demo_data",
+                                        "Load Example Data",
+                                        class_="btn-primary",
+                                    ),
+                                ),
+                                ui.column(4, ui.output_ui("loaded_example_text")),
+                                ui.column(
+                                    4,
+                                    ui.input_action_button(
+                                        "search",
+                                        "Search",
+                                        class_="btn-success",
+                                        width="45%",
+                                    ),
+                                    ui.input_action_button(
+                                        "reset",
+                                        "Reset",
+                                        class_="btn-danger",
+                                        width="45%",
+                                    ),
+                                ),
+                            ),
                         ),
-                        full_screen=False,
-                        fill=False,
-                    ),
+                    )
                 ),
-                ui.nav_panel(
-                    "Database Batch Query",
+                ui.tags.hr(),
+                ui.card(
+                    ui.row(
+                        ui.column(3, ui.tags.h3("Results")),
+                        ui.column(1, ui.p("")),
+                    ),
+                    ui.column(
+                        12,
+                        {"id": "res_card"},
+                        ui.output_table("out_result"),
+                    ),
+                    full_screen=False,
+                    fill=False,
+                ),
+            ),
+            ui.nav_panel(
+                    "Batch Query",
                     ui.card(
                         ui.layout_sidebar(
                             ui.panel_sidebar(
@@ -282,7 +280,6 @@ def create_app(db=None):
                         ),
                     ),
                 ),
-            ),
             ui.nav_panel(
                 "Database File Managment",
                 ui.layout_columns(
@@ -389,7 +386,12 @@ def create_app(db=None):
                     )
                 ),
             ),
-            title="strprofiler",
+            title=ui.tags.a(
+                ui.tags.img(
+                    src="logo.png", height="70px"
+                ),
+                href="https://pypi.org/project/strprofiler/",
+            )
         ),
     )
 

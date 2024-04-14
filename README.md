@@ -1,4 +1,6 @@
-# strprofiler
+<div style="text-align:center">
+<img src="shiny_app/www/logo.png" alt="STRprofiler" height="200">
+</div>
 
 [![Coverage Status](https://coveralls.io/repos/github/j-andrews7/strprofiler/badge.svg?branch=main)](https://coveralls.io/github/j-andrews7/strprofiler?branch=main)
 [![PyPI version](https://badge.fury.io/py/strprofiler.svg)](https://badge.fury.io/py/strprofiler)
