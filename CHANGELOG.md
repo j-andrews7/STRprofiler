@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.2.0
+
+**Release date: 04/16/2024**
+
+ - Addition of a new command, `strprofiler-app`, which launches an interactive Shiny
+ application for single or batch queries of user-entered STR profiles against a user-provided database.
+ This can be easily deployed to internal Shiny servers, Posit Connect, or shinyapps.io as an interface to a
+ group's/lab's/consortium's STR profile database.
+
 ## v0.1.4
 
 **Release date: 01/20/2024**

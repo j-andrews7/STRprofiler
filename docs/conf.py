@@ -11,14 +11,15 @@ import sys
 sys.path.insert(0, os.path.abspath('../'))
 
 project = 'strprofiler'
-copyright = '2022, Jared Andrews'
+copyright = '2024, Jared Andrews'
 author = 'Jared Andrews'
-release = '0.1.0'
+release = '0.2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx.ext.autodoc']
+extensions = ['sphinx.ext.autodoc',
+              'myst_parser']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']

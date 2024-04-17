@@ -1,4 +1,4 @@
-import strprofiler as sp
+import strprofiler.utils as sp
 import pytest
 from pathlib import Path
 import pandas as pd
@@ -74,7 +74,7 @@ def test_ingress_mixed(paths, sample_map):
             "SampleA",
         ]
     ) == ["12,14", "12", "13", "9,10", "12,14", "X", "", ""]
-    
+
     # Check the samples are being parsed properly.
     assert list(
         df.loc[

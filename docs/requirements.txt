@@ -1,0 +1,7 @@
+sphinx-rtd-theme
+pandas
+myst-parser
+rich-click
+shiny
+shinyswatch
+faicons

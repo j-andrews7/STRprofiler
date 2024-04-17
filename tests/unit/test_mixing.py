@@ -1,4 +1,4 @@
-import strprofiler as sp
+import strprofiler.utils as sp
 import pytest
 
 samp = {
