@@ -14,11 +14,13 @@ output:
 # Database Queries  
 For a provided sample entered manually in the `Database Single Query` or sample(s) uploaded from a batch file in the `Database Batch Query` tab, 
 `STRprofiler` will generate a report that includes the similarity scores (described below) as computed against a database of known STR profiles.  
-</p>
+
 The report will differ depending on if an individual sample or batch of samples is provided.   
 
-## Database information
+## Default Database
 Current data underlying the default database were provided by: [The Jackson Laboratory PDX program](https://tumor.informatics.jax.org/mtbwi/pdxSearch.do)  
+
+If this app is hosted with a custom database, please contact the host for information on the database source.
 
 ---
 
@@ -107,5 +109,6 @@ For batch samples entered in the File Query tab, `STR Similarity` will generate 
 ---
 
 # Reference
+
 `strprofiler` is provided under the MIT license. If you use this app in your research please cite:    
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>: v0.1.4. Zenodo. <a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a>
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>: v0.2.0. Zenodo. <a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a>

@@ -387,6 +387,14 @@ def create_app(db=None):
                     )
                 ),
             ),
+            ui.nav_spacer(),
+            ui.nav_control(
+                ui.a(
+                    icon_svg("github", width="30px"),
+                    href="https://github.com/j-andrews7/strprofiler",
+                    target="_blank",
+                )
+            ),
             title=ui.tags.a(
                 ui.tags.img(
                     src="logo.png", height="70px"
