@@ -24,7 +24,7 @@ If this app is hosted with a custom database, please contact the host for inform
 
 ---
 
-## Database Single Query Report
+## Single Query Report
 For individual samples, a report is generated with the following fields.  
 
 | Output Field | Description |
@@ -40,7 +40,7 @@ The report is filtered to include only those samples with greater than or equal 
 
 ---
 
-## Database Batch Query Report 
+## Batch Query Report 
 For batched samples, a report is summary report is generated. For individual sample comparison report, enter the individual sample in the database query tab.
 
 | Output Field | Description |
