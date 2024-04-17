@@ -685,13 +685,32 @@ def create_app(db=None):
             if file is None:
                 ui.remove_ui("#inserted-downloader2")
                 return pd.DataFrame({"": []})
-            query_df = sp.str_ingress(
-                [file[0]["datapath"]],
-                sample_col="Sample",
-                marker_col="Marker",
-                sample_map=None,
-                penta_fix=True,
-            ).to_dict(orient="index")
+            try:
+                query_df = sp.str_ingress(
+                    [file[0]["datapath"]],
+                    sample_col="Sample",
+                    marker_col="Marker",
+                    sample_map=None,
+                    penta_fix=True,
+                ).to_dict(orient="index")
+            except Exception:
+                m = ui.modal(
+                    ui.div(
+                        {"style": "font-size: 18px"},
+                        ui.HTML(
+                            (
+                                "There was a fatal error in the input file.<br><br>"
+                                "Ensure column header: 'Sample' was used.<br><br>"
+                                "Adjust input file and retry upload/query."
+                            )
+                        ),
+                    ),
+                    title="Batch Query Error",
+                    easy_close=True,
+                    footer=None,
+                )
+                ui.modal_show(m)
+                return pd.DataFrame({"Failed Query. Fix Input File": []})
 
             if res_click_file() == 0:
                 ui.insert_ui(

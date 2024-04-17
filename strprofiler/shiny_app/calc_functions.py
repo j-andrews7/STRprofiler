@@ -2,7 +2,6 @@ import strprofiler.utils as sp
 import pandas as pd
 from math import nan
 from collections import OrderedDict
-import time
 
 
 def _single_query(
@@ -41,8 +40,6 @@ def _single_query(
             "n_query_alleles",
             "n_reference_alleles",
         ]
-
-    current_time = time.strftime("%H:%M", time.localtime())
 
     mixed = sp.mixing_check(
         alleles=query, three_allele_threshold=three_allele_threshold
