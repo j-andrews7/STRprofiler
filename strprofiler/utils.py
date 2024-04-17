@@ -76,9 +76,9 @@ def _make_html(dataframe: pd.DataFrame):
             flex-direction: column;
         }}
         h1 {{
-            text-align: center; 
-            background-color: #111111; 
-            color: white; 
+            text-align: center;
+            background-color: #111111;
+            color: white;
             padding: 10px 0px;
             width: 100%;
             margin: 0px;
@@ -124,7 +124,7 @@ def _make_html(dataframe: pd.DataFrame):
     <script>
         $(document).ready( function () {{
             $('#table1').DataTable({{
-                // paging: false,    
+                // paging: false,
                 // scrollY: 800,
             }});
         }});
@@ -149,9 +149,6 @@ def _make_html(dataframe: pd.DataFrame):
     """
     # return the html
     return html
-
-
-### Main functions ###
 
 
 def str_ingress(
