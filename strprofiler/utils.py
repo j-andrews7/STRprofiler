@@ -187,7 +187,7 @@ def str_ingress(
         else:
             sys.exit('File extension: ' + path.suffix + ' in file: ' + str(path) + ' is not supported.')
 
-        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+        df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
 
         df.columns = df.columns.str.strip()
 

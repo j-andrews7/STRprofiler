@@ -6,6 +6,7 @@ from faicons import icon_svg
 
 import strprofiler.utils as sp
 from strprofiler.shiny_app.calc_functions import _single_query, _batch_query, _file_query
+from strprofiler.shiny_app.clastr_api import clastr_query
 
 from datetime import date
 import time
@@ -65,9 +66,15 @@ def _highlight_non_matches(s):
     is_match = s == s.iloc[0]
     return ["text-align:center;background-color:#ec7a80" if not v else "text-align:center" for v in is_match]
 
+
+def _link_wrap(name, link, problem):
+    if not pd.isna(problem):
+        return ui.tooltip(ui.tags.a(name, href=str(link), target="_blank", style="text-align:center;font-style:oblique;color:#ec7a80"), f"{problem}")
+    else:
+        return ui.tags.a(name, href=str(link), target="_blank")
+
+
 # App Generation ###
-
-
 def create_app(db=None):
 
     f = importlib.resources.files("strprofiler.shiny_app")
@@ -93,7 +100,6 @@ def create_app(db=None):
         )
     )
 
-    # TODO move this to a separate function
     app_ui = ui.page_fluid(
         ui.tags.style("#main {padding:12px !important} #sidebar {padding:12px}"),
         ui.tags.style(
@@ -188,6 +194,12 @@ def create_app(db=None):
                                         class_="btn-danger",
                                         width="45%",
                                     ),
+                                    ui.input_action_button(
+                                        "clastr",
+                                        "Clastr",
+                                        class_="btn-success",
+                                        width="45%",
+                                    ),
                                 ),
                             ),
                         ),
@@ -199,10 +211,23 @@ def create_app(db=None):
                         ui.column(3, ui.tags.h3("Results")),
                         ui.column(1, ui.p("")),
                     ),
-                    ui.column(
-                        12,
-                        {"id": "res_card"},
-                        ui.output_table("out_result"),
+                    ui.navset_card_tab(
+                        ui.nav_panel(
+                            "STR Profiler",
+                            ui.column(
+                                12,
+                                {"id": "res_card"},
+                                ui.output_table("out_result"),
+                            ),
+                        ),
+                        ui.nav_panel(
+                            "CLASTR",
+                            ui.column(
+                                12,
+                                {"id": "res_card"},
+                                ui.output_table("clastr_table"),
+                            ),
+                        ),
                     ),
                     full_screen=False,
                     fill=False,
@@ -416,6 +441,7 @@ def create_app(db=None):
         str_database = reactive.value(init_db)
         db_name = reactive.value(init_db_name)
         output_df = reactive.value(None)
+        output_df_clastr = reactive.value(None)
         demo_vals = reactive.value(None)
         demo_name = reactive.value(None)
         markers = reactive.value([i for i in list(init_db[next(iter(init_db))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
@@ -553,6 +579,45 @@ def create_app(db=None):
             def loaded_example_text():
                 x = ui.strong("")
                 return x
+
+        @reactive.calc
+        @reactive.event(input.clastr)
+        def clastr_results():
+            query = {m: input[m]() for m in markers()}
+            thinking = ui.notification_show("Message ", duration=None)
+            clastr_return = clastr_query(query, input.query_filter(), input.score_amel_query(), input.query_filter_threshold())
+            ui.notification_remove(thinking)
+            return clastr_return
+
+        @output
+        @render.table
+        def clastr_table():
+            output_df_clastr.set(clastr_results())
+            if output_df_clastr() is not None:
+                out_df = output_df_clastr().copy()
+                print(out_df)
+                if ('No Clastr Result' in out_df.columns) | ('Error' in out_df.columns):
+                    return out_df
+                try:
+                    out_df['link'] = out_df.apply(lambda x: _link_wrap(x.accession, x.accession_link, x.problem), axis=1)
+                except Exception:
+                    out_df['link'] = out_df.apply(lambda x: _link_wrap(x.accession, x.accession_link, pd.NA), axis=1)
+                out_df = out_df.drop(['accession', 'accession_link', 'species'], axis=1).rename(
+                    columns={"link": "Accession", "name": "Name", "bestScore": "Score"})
+                cols = list(out_df.columns)
+                cols = [cols[-1]] + cols[:-1]
+                out_df = out_df[cols]
+                out_df = out_df.style.set_table_attributes(
+                    'class="dataframe shiny-table table w-auto"'
+                ).hide(axis="index").format(
+                    {
+                        "Score": "{0:0.2f}",
+                    },
+                    na_rep=""
+                )
+            else:
+                out_df = pd.DataFrame({"No input provided.": []})
+            return out_df
 
         # Dealing with calculating a results table
         # Catch when either reset or search is clicked
