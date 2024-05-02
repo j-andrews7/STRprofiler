@@ -7,6 +7,10 @@ from flatten_json import flatten
 def clastr_query(query, query_filter, include_amelogenin, score_filter):
     url = "https://www.cellosaurus.org/str-search/api/query/"
 
+    dct = {k: [v] for k, v in query.items()}
+    query_df = pd.DataFrame(dct)
+    query_df['accession'] = 'Query'
+
     if query_filter == "Tanabe":
         query['algorithm'] = 1
     elif query_filter == "Masters Query":
@@ -82,12 +86,23 @@ def clastr_query(query, query_filter, include_amelogenin, score_filter):
         merged = pd.merge(df[['accession', 'name', 'species', 'bestScore']], pivot_markers_names_alleles, left_index=True, right_on='resultID')
 
     merged['accession_link'] = "https://web.expasy.org/cellosaurus/" + merged['accession']
-    print(merged)
-    # return final df
 
-    # TO DO: Add query to top of merged DF before return.
+    # add the query line to the top of merged, and reorder columns
 
-    return merged
+    query_added = pd.concat([query_df, merged]).reset_index(drop=True)
+    query_added["bestScore"] = query_added['bestScore'].map("{0:.2f}".format).replace("nan", "")
+
+    # print(query_added.columns)
+
+    if 'problem' in query_added.columns:
+        query_added = query_added[['accession', 'name', 'species', 'bestScore', 'accession_link', 'problem'] +
+                                  [c for c in query_added if c not in
+                                   ['accession', 'name', 'species', 'bestScore', 'accession_link', 'problem']]].fillna('')
+    else:
+        query_added = query_added[['accession', 'name', 'species', 'bestScore', 'accession_link'] +
+                                  [c for c in query_added if c not in ['accession', 'name', 'species', 'bestScore', 'accession_link']]].fillna('')
+
+    return query_added
 
 
 if __name__ == '__main__':

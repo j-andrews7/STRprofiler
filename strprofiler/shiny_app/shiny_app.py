@@ -68,7 +68,9 @@ def _highlight_non_matches(s):
 
 
 def _link_wrap(name, link, problem):
-    if not pd.isna(problem):
+    if name == 'Query':
+        return name
+    if problem != "":
         return ui.tooltip(ui.tags.a(name, href=str(link), target="_blank", style="text-align:center;font-style:oblique;color:#ec7a80"), f"{problem}")
     else:
         return ui.tags.a(name, href=str(link), target="_blank")
@@ -182,6 +184,12 @@ def create_app(db=None):
                                 ui.column(4, ui.output_ui("loaded_example_text")),
                                 ui.column(
                                     4,
+                                    ui.input_select(
+                                        "search_type",
+                                        "Search Type",
+                                        ["STR DB", "CLASTR"],
+                                        width="90%"
+                                    ),
                                     ui.input_action_button(
                                         "search",
                                         "Search",
@@ -192,12 +200,6 @@ def create_app(db=None):
                                         "reset",
                                         "Reset",
                                         class_="btn-danger",
-                                        width="45%",
-                                    ),
-                                    ui.input_action_button(
-                                        "clastr",
-                                        "Clastr",
-                                        class_="btn-success",
                                         width="45%",
                                     ),
                                 ),
@@ -211,23 +213,10 @@ def create_app(db=None):
                         ui.column(3, ui.tags.h3("Results")),
                         ui.column(1, ui.p("")),
                     ),
-                    ui.navset_card_tab(
-                        ui.nav_panel(
-                            "STR Profiler",
-                            ui.column(
-                                12,
-                                {"id": "res_card"},
-                                ui.output_table("out_result"),
-                            ),
-                        ),
-                        ui.nav_panel(
-                            "CLASTR",
-                            ui.column(
-                                12,
-                                {"id": "res_card"},
-                                ui.output_table("clastr_table"),
-                            ),
-                        ),
+                    ui.column(
+                        12,
+                        {"id": "res_card"},
+                        ui.output_table("out_result"),
                     ),
                     full_screen=False,
                     fill=False,
@@ -418,7 +407,7 @@ def create_app(db=None):
                     icon_svg("github", width="30px"),
                     href="https://github.com/j-andrews7/strprofiler",
                     target="_blank",
-                )
+                ),
             ),
             title=ui.tags.a(
                 ui.tags.img(
@@ -441,7 +430,6 @@ def create_app(db=None):
         str_database = reactive.value(init_db)
         db_name = reactive.value(init_db_name)
         output_df = reactive.value(None)
-        output_df_clastr = reactive.value(None)
         demo_vals = reactive.value(None)
         demo_name = reactive.value(None)
         markers = reactive.value([i for i in list(init_db[next(iter(init_db))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
@@ -580,45 +568,6 @@ def create_app(db=None):
                 x = ui.strong("")
                 return x
 
-        @reactive.calc
-        @reactive.event(input.clastr)
-        def clastr_results():
-            query = {m: input[m]() for m in markers()}
-            thinking = ui.notification_show("Message ", duration=None)
-            clastr_return = clastr_query(query, input.query_filter(), input.score_amel_query(), input.query_filter_threshold())
-            ui.notification_remove(thinking)
-            return clastr_return
-
-        @output
-        @render.table
-        def clastr_table():
-            output_df_clastr.set(clastr_results())
-            if output_df_clastr() is not None:
-                out_df = output_df_clastr().copy()
-                print(out_df)
-                if ('No Clastr Result' in out_df.columns) | ('Error' in out_df.columns):
-                    return out_df
-                try:
-                    out_df['link'] = out_df.apply(lambda x: _link_wrap(x.accession, x.accession_link, x.problem), axis=1)
-                except Exception:
-                    out_df['link'] = out_df.apply(lambda x: _link_wrap(x.accession, x.accession_link, pd.NA), axis=1)
-                out_df = out_df.drop(['accession', 'accession_link', 'species'], axis=1).rename(
-                    columns={"link": "Accession", "name": "Name", "bestScore": "Score"})
-                cols = list(out_df.columns)
-                cols = [cols[-1]] + cols[:-1]
-                out_df = out_df[cols]
-                out_df = out_df.style.set_table_attributes(
-                    'class="dataframe shiny-table table w-auto"'
-                ).hide(axis="index").format(
-                    {
-                        "Score": "{0:0.2f}",
-                    },
-                    na_rep=""
-                )
-            else:
-                out_df = pd.DataFrame({"No input provided.": []})
-            return out_df
-
         # Dealing with calculating a results table
         # Catch when either reset or search is clicked
         # If reset, clear the query and run to make an empty df.
@@ -650,7 +599,6 @@ def create_app(db=None):
 
                 ui.remove_ui("#inserted-downloader")
                 res_click.set(0)
-
                 return None
             if res_click() == 0:
                 ui.insert_ui(
@@ -664,34 +612,70 @@ def create_app(db=None):
                     where="afterEnd",
                 )
                 res_click.set(1)
-
-            return _single_query(
-                query,
-                str_database(),
-                input.score_amel_query(),
-                input.mix_threshold_query(),
-                input.query_filter(),
-                input.query_filter_threshold(),
-            )
+            thinking = ui.notification_show("Message: API Query Running.", duration=None)
+            # isolate input.search_type to prevent trigger when options change.
+            with reactive.isolate():
+                if input.search_type() == 'STR DB':
+                    results = _single_query(
+                                    query,
+                                    str_database(),
+                                    input.score_amel_query(),
+                                    input.mix_threshold_query(),
+                                    input.query_filter(),
+                                    input.query_filter_threshold(),
+                                )
+                elif input.search_type() == 'CLASTR':
+                    results = clastr_query(
+                                    query,
+                                    input.query_filter(),
+                                    input.score_amel_query(),
+                                    input.query_filter_threshold()
+                                )
+            ui.notification_remove(thinking)
+            return results
 
         @output
         @render.table
         def out_result():
             output_df.set(output_results())
             if output_df() is not None:
-                out_df = output_df().copy()
-                out_df = out_df.style.set_table_attributes(
-                    'class="dataframe shiny-table table w-auto"'
-                ).hide(axis="index").apply(_highlight_non_matches, subset=markers(), axis=0).format(
-                    {
-                        "Shared Markers": "{0:0.0f}",
-                        "Shared Alleles": "{0:0.0f}",
-                        "Tanabe Score": "{0:0.2f}",
-                        "Masters Query Score": "{0:0.2f}",
-                        "Masters Ref Score": "{0:0.2f}",
-                    },
-                    na_rep=""
-                )
+                # isolate input.search_type to prevent trigger when options change.
+                with reactive.isolate():
+                    if input.search_type() == 'STR DB':
+                        out_df = output_df().copy()
+                        out_df = out_df.style.set_table_attributes(
+                            'class="dataframe shiny-table table w-auto"'
+                        ).hide(axis="index").apply(_highlight_non_matches, subset=markers(), axis=0).format(
+                            {
+                                "Shared Markers": "{0:0.0f}",
+                                "Shared Alleles": "{0:0.0f}",
+                                "Tanabe Score": "{0:0.2f}",
+                                "Masters Query Score": "{0:0.2f}",
+                                "Masters Ref Score": "{0:0.2f}",
+                            },
+                            na_rep=""
+                        )
+                    elif input.search_type() == 'CLASTR':
+                        out_df = output_df().copy()
+                        print(out_df)
+                        if ('No Clastr Result' in out_df.columns) | ('Error' in out_df.columns):
+                            return out_df
+                        try:
+                            out_df['link'] = out_df.apply(lambda x: _link_wrap(x.accession, x.accession_link, x.problem), axis=1)
+                            out_df.drop(columns=['problem'], inplace=True)
+                        except Exception:
+                            out_df['link'] = out_df.apply(lambda x: _link_wrap(x.accession, x.accession_link, ''), axis=1)
+
+                        out_df = out_df.drop(['accession', 'accession_link', 'species'], axis=1).rename(
+                            columns={"link": "Accession", "name": "Name", "bestScore": "Score"})
+
+                        cols = list(out_df.columns)
+                        cols = [cols[-1]] + cols[:-1]
+
+                        out_df = out_df[cols]
+                        out_df = out_df.style.set_table_attributes(
+                            'class="dataframe shiny-table table w-auto"'
+                        ).hide(axis="index").apply(_highlight_non_matches, subset=markers(), axis=0)
             else:
                 out_df = pd.DataFrame({"No input provided.": []})
             return out_df
