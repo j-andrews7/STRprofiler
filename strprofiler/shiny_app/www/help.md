@@ -20,21 +20,36 @@ The report will differ depending on if an individual sample or batch of samples 
 ## Default Database
 Current data underlying the default database were provided by: [The Jackson Laboratory PDX program](https://tumor.informatics.jax.org/mtbwi/pdxSearch.do)  
 
-If this app is hosted with a custom database, please contact the host for information on the database source.
+If this app is hosted with a custom database, please contact the host for information on the database source.  
+
+## CLASTR / Cellosaurus API Query
+Query of the [Cellosaurus](https://www.cellosaurus.org/description.html) (Bairoch, 2018) cell line database is also available for single samples via the [CLASTR](https://www.cellosaurus.org/str-search/) (Robin, Capes-Davis, and Bairoch, 2019) [REST API](https://www.cellosaurus.org/str-search/help.html#5).  
 
 ---
 
 ## Single Query Report
-For individual samples, a report is generated with the following fields.  
+For individual samples, a report is generated with the following fields when 'STR DB' is selected as the search type.  
 
 | Output Field | Description |
 | :--- |    :----   |
 | Mixed Sample      | Flag to indicate sample mixing. Sample mixing is determined by the "'Mixed' Sample Threshold" option. If more markers are tri+ allelic than the threshold, samples are flagged as potentially mixed. |
 | Shared Markers   | Number of markers shared between the query and database sample. |
 | Shared Alleles   | Number of alleles shared between the query and database sample. |
-| Tanabe Score | Tanabe similarity score between the query and database sample. |
-| Master Query Score | Master 'Query' similarity score between the query and database sample. |
-| Master Ref Score | Master 'Reference' similarity score between the query and database sample. |
+| Tanabe Score | Tanabe similarity score between the query and database sample (if Tanabe selected). |
+| Master Query Score | Master 'Query' similarity score between the query and database sample (if Master Query selected). |
+| Master Ref Score | Master 'Reference' similarity score between the query and database sample (if Master Ref selected). |
+| Markers 1 ... n | Marker alleles with mismatches highlight. |
+
+The report is filtered to include only those samples with greater than or equal to the `Similarity Score Filter Threshold` defined by the user, and report only the similarity score selected.    
+
+When 'CLASTR' is selected as the search type, a report is generated with the following fields:  
+
+| Output Field | Description |
+| :--- |    :----   |
+| Accession      | Cellosaurus cell line accession ID. Links are provided to each accession information page. |
+| Name   | Cell line name. |
+| Score | Similarity score between the query and cell line sample. Reported score reflectes the selected Similarity Score Filter. |
+| Markers 1 ... n | Marker alleles with mismatches highlight. |
 
 The report is filtered to include only those samples with greater than or equal to the `Similarity Score Filter Threshold` defined by the user.  
 
@@ -108,7 +123,11 @@ For batch samples entered in the File Query tab, `STR Similarity` will generate 
 
 ---
 
-# Reference
+# References
 
 `strprofiler` is provided under the MIT license. If you use this app in your research please cite:    
 Jared Andrews, Mike Lloyd, & Sam Culley. (2024). <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>: v0.2.0. Zenodo. <a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a>
+
+Bairoch A. (2018) The Cellosaurus, a cell line knowledge resource. Journal of Biomolecular Techniques. 29:25-38. DOI: 10.7171/jbt.18-2902-002; PMID: 29805321 
+
+Robin, T., Capes-Davis, A. & Bairoch, A. (2019) CLASTR: the Cellosaurus STR Similarity Search Tool - A Precious Help for Cell Line Authentication. International Journal of Cancer. PubMed: 31444973  DOI: 10.1002/IJC.32639

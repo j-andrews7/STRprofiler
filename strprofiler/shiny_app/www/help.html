@@ -1524,12 +1524,20 @@ of samples is provided.</p>
 Laboratory PDX program</a></p>
 <p>If this app is hosted with a custom database, please contact the host
 for information on the database source.</p>
+</div>
+<div id="clastr-cellosaurus-api-query" class="section level2">
+<h2>CLASTR / Cellosaurus API Query</h2>
+<p>Query of the <a href="https://www.cellosaurus.org/description.html">Cellosaurus</a>
+(Bairoch, 2018) cell line database is also available for single samples
+via the <a href="https://www.cellosaurus.org/str-search/">CLASTR</a>
+(Robin, Capes-Davis, and Bairoch, 2019) <a href="https://www.cellosaurus.org/str-search/help.html#5">REST
+API</a>.</p>
 <hr />
 </div>
 <div id="single-query-report" class="section level2">
 <h2>Single Query Report</h2>
 <p>For individual samples, a report is generated with the following
-fields.</p>
+fields when ‘STR DB’ is selected as the search type.</p>
 <table>
 <colgroup>
 <col width="44%" />
@@ -1562,17 +1570,59 @@ sample.</td>
 <tr class="even">
 <td align="left">Tanabe Score</td>
 <td align="left">Tanabe similarity score between the query and database
-sample.</td>
+sample (if Tanabe selected).</td>
 </tr>
 <tr class="odd">
 <td align="left">Master Query Score</td>
 <td align="left">Master ‘Query’ similarity score between the query and
-database sample.</td>
+database sample (if Master Query selected).</td>
 </tr>
 <tr class="even">
 <td align="left">Master Ref Score</td>
 <td align="left">Master ‘Reference’ similarity score between the query
-and database sample.</td>
+and database sample (if Master Ref selected).</td>
+</tr>
+<tr class="odd">
+<td align="left">Markers 1 … n</td>
+<td align="left">Marker alleles with mismatches highlight.</td>
+</tr>
+</tbody>
+</table>
+<p>The report is filtered to include only those samples with greater
+than or equal to the <code>Similarity Score Filter Threshold</code>
+defined by the user, and report only the similarity score selected.</p>
+<p>When ‘CLASTR’ is selected as the search type, a report is generated
+with the following fields:</p>
+<table>
+<colgroup>
+<col width="44%" />
+<col width="55%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Output Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Accession</td>
+<td align="left">Cellosaurus cell line accession ID. Links are provided
+to each accession information page.</td>
+</tr>
+<tr class="even">
+<td align="left">Name</td>
+<td align="left">Cell line name.</td>
+</tr>
+<tr class="odd">
+<td align="left">Score</td>
+<td align="left">Similarity score between the query and cell line
+sample. Reported score reflectes the selected Similarity Score
+Filter.</td>
+</tr>
+<tr class="even">
+<td align="left">Markers 1 … n</td>
+<td align="left">Marker alleles with mismatches highlight.</td>
 </tr>
 </tbody>
 </table>
@@ -1716,14 +1766,21 @@ match in batch and file queries. [default: 80]</li>
 <hr />
 </div>
 </div>
-<div id="reference" class="section level1">
-<h1>Reference</h1>
+<div id="references" class="section level1">
+<h1>References</h1>
 <p><code>strprofiler</code> is provided under the MIT license. If you
 use this app in your research please cite:<br />
 Jared Andrews, Mike Lloyd, &amp; Sam Culley. (2024).
 <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>:
 v0.2.0. Zenodo.
 <a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a></p>
+<p>Bairoch A. (2018) The Cellosaurus, a cell line knowledge resource.
+Journal of Biomolecular Techniques. 29:25-38. DOI:
+10.7171/jbt.18-2902-002; PMID: 29805321</p>
+<p>Robin, T., Capes-Davis, A. &amp; Bairoch, A. (2019) CLASTR: the
+Cellosaurus STR Similarity Search Tool - A Precious Help for Cell Line
+Authentication. International Journal of Cancer. PubMed: 31444973  DOI:
+10.1002/IJC.32639</p>
 </div>
 
 

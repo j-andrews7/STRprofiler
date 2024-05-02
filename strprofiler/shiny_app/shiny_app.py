@@ -187,14 +187,19 @@ def create_app(db=None):
                                     ui.input_select(
                                         "search_type",
                                         "Search Type",
-                                        ["STR DB", "CLASTR"],
+                                        ["STRprofiler Database", "Cellosaurus Database (CLASTR)"],
                                         width="90%"
                                     ),
-                                    ui.input_action_button(
-                                        "search",
-                                        "Search",
-                                        class_="btn-success",
-                                        width="45%",
+                                    ui.tooltip(
+                                        ui.input_action_button(
+                                            "search",
+                                            "Search",
+                                            class_="btn-success",
+                                            width="45%",
+                                        ),
+                                        "Query STRprofilier Database",
+                                        id="tt_selected_search",
+                                        placement="left",
                                     ),
                                     ui.input_action_button(
                                         "reset",
@@ -450,6 +455,14 @@ def create_app(db=None):
                 width="100%",
             )
 
+        @reactive.effect
+        @reactive.event(input.search_type)
+        def update_tooltip_msg():
+            if input.search_type() == 'STRprofiler Database':
+                ui.update_tooltip("tt_selected_search", 'Query STRprofilier Database', show=False)
+            if input.search_type() == 'Cellosaurus Database (CLASTR)':
+                ui.update_tooltip("tt_selected_search", 'Query Cellosaurus Database via CLASTR API', show=False)
+
         @render.ui
         @reactive.event(markers)
         def marker_inputs():
@@ -615,7 +628,7 @@ def create_app(db=None):
             thinking = ui.notification_show("Message: API Query Running.", duration=None)
             # isolate input.search_type to prevent trigger when options change.
             with reactive.isolate():
-                if input.search_type() == 'STR DB':
+                if input.search_type() == 'STRprofiler Database':
                     results = _single_query(
                                     query,
                                     str_database(),
@@ -624,7 +637,7 @@ def create_app(db=None):
                                     input.query_filter(),
                                     input.query_filter_threshold(),
                                 )
-                elif input.search_type() == 'CLASTR':
+                elif input.search_type() == 'Cellosaurus Database (CLASTR)':
                     results = clastr_query(
                                     query,
                                     input.query_filter(),
@@ -641,7 +654,7 @@ def create_app(db=None):
             if output_df() is not None:
                 # isolate input.search_type to prevent trigger when options change.
                 with reactive.isolate():
-                    if input.search_type() == 'STR DB':
+                    if input.search_type() == 'STRprofiler Database':
                         out_df = output_df().copy()
                         out_df = out_df.style.set_table_attributes(
                             'class="dataframe shiny-table table w-auto"'
@@ -655,7 +668,7 @@ def create_app(db=None):
                             },
                             na_rep=""
                         )
-                    elif input.search_type() == 'CLASTR':
+                    elif input.search_type() == 'Cellosaurus Database (CLASTR)':
                         out_df = output_df().copy()
                         print(out_df)
                         if ('No Clastr Result' in out_df.columns) | ('Error' in out_df.columns):
