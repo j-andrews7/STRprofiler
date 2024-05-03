@@ -103,6 +103,7 @@ def create_app(db=None):
     )
 
     app_ui = ui.page_fluid(
+        ui.panel_title('', "STR Profiler"),
         ui.tags.style("#main {padding:12px !important} #sidebar {padding:12px}"),
         ui.tags.style(
             ".h3 {margin-bottom:0.1rem; line-height:1} .card-body {padding-top:6px; padding-bottom:6px}"
