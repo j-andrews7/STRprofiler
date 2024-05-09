@@ -4,7 +4,7 @@ import pandas as pd
 from flatten_json import flatten
 
 
-def clastr_query(query, query_filter, include_amelogenin, score_filter):
+def _clastr_query(query, query_filter, include_amelogenin, score_filter):
     url = "https://www.cellosaurus.org/str-search/api/query/"
 
     dct = {k: [v] for k, v in query.items()}
@@ -65,7 +65,7 @@ def clastr_query(query, query_filter, include_amelogenin, score_filter):
 
     # Marker names are not consistant across results. MarkerName[1] != the same thing in all cases.
     # We must track marker name by index by result.
-    # The same logic from above applies, split the compount column name string,
+    # The same logic from above applies, split the compound column name string,
     # Melt on markerID, and then merge with concat allele made above.
     # Finally, pivot into a table and rejoin to higher level results.
     marker_names = df.filter(regex='^profiles_0_.*_name').T
@@ -103,6 +103,30 @@ def clastr_query(query, query_filter, include_amelogenin, score_filter):
                                   [c for c in query_added if c not in ['accession', 'name', 'species', 'bestScore', 'accession_link']]].fillna('')
 
     return query_added
+
+
+def _clastr_batch_query(query, query_filter, include_amelogenin, score_filter):
+    url = "https://www.cellosaurus.org/str-search/api/batch/"
+
+    if query_filter == "Tanabe":
+        query = [dict(item, **{'algorithm': 1}) for item in query]
+    elif query_filter == "Masters Query":
+        query = [dict(item, **{'algorithm': 2}) for item in query]
+    elif query_filter == "Masters Reference":
+        query = [dict(item, **{'algorithm': 2}) for item in query]
+
+    query = [dict(item, **{'includeAmelogenin': include_amelogenin}) for item in query]
+    query = [dict(item, **{'scoreFilter': score_filter}) for item in query]
+    query = [dict(item, **{'outputFormat': 'xlsx'}) for item in query]
+
+    r = requests.post(url, data=json.dumps(query))
+
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        return pd.DataFrame({"Error": [str(e)]})
+
+    return r
 
 
 if __name__ == '__main__':
@@ -143,9 +167,41 @@ if __name__ == '__main__':
     #         "vWA": "16",
     #         }
 
-    r = clastr_query(data, 'Tanabe', False, 70)
+    r = _clastr_query(data, 'Tanabe', False, 70)
 
     print(r)
+
+    batch_data = [{
+        "description": "Example 1",
+        "Amelogenin": "X",
+        "CSF1PO": "13,14",
+        "D5S818": "13",
+        "D7S820": "8",
+        "D13S317": "12",
+        "FGA": "24",
+        "TH01": "8",
+        "TPOX": "11",
+        "vWA": "16",
+        }, {
+        "description": "Example 2",
+        "Amelogenin": "X, Y",
+        "CSF1PO": "13",
+        "D5S818": "13, 14",
+        "D7S820": "8, 19",
+        "D13S317": "11, 12",
+        "FGA": "24",
+        "TH01": "8",
+        "TPOX": "11",
+        "vWA": "15",
+        "outputFormat": "xlsx"
+        }]
+
+    r = _clastr_batch_query(batch_data, 'Tanabe', False, 70)
+
+    with open('testing.xlsx', 'wb') as fd:
+        for chunk in r.iter_content(chunk_size=128):
+            fd.write(chunk)
+
 
 #  JSON data structure:
 # {

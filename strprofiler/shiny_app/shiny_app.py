@@ -6,7 +6,7 @@ from faicons import icon_svg
 
 import strprofiler.utils as sp
 from strprofiler.shiny_app.calc_functions import _single_query, _batch_query, _file_query
-from strprofiler.shiny_app.clastr_api import clastr_query
+from strprofiler.shiny_app.clastr_api import _clastr_query, _clastr_batch_query
 
 from datetime import date
 import time
@@ -271,6 +271,12 @@ def create_app(db=None):
                                     accept=[".csv"],
                                     multiple=False,
                                     width="100%",
+                                ),
+                                ui.input_select(
+                                    "search_type_batch",
+                                    "Search Type",
+                                    ["STRprofiler Database", "Cellosaurus Database (CLASTR)"],
+                                    width="100%"
                                 ),
                                 ui.input_action_button(
                                     "csv_query",
@@ -639,7 +645,7 @@ def create_app(db=None):
                                     input.query_filter_threshold(),
                                 )
                 elif input.search_type() == 'Cellosaurus Database (CLASTR)':
-                    results = clastr_query(
+                    results = _clastr_query(
                                     query,
                                     input.query_filter(),
                                     input.score_amel_query(),
@@ -693,6 +699,7 @@ def create_app(db=None):
             else:
                 out_df = pd.DataFrame({"No input provided.": []})
             return out_df
+        # TO DO: Remove results table when changing query methods.
 
         # Dealing with downloading results, when requested.
         # Note that output_results() is a reactive Calc result.
@@ -718,26 +725,31 @@ def create_app(db=None):
         @render.data_frame
         def out_batch_df():
             output_df.set(batch_query_results())
-            try:
-                return render.DataTable(output_df())
-            except Exception:
-                m = ui.modal(
-                    ui.div(
-                        {"style": "font-size: 18px"},
-                        ui.HTML(
-                            (
-                                "There was a fatal error in the query.<br><br>"
-                                "Ensure marker names match expectation, and that"
-                                " no special characters (spaces, etc.) were used in sample names."
-                            )
-                        ),
-                    ),
-                    title="Batch Query Error",
-                    easy_close=True,
-                    footer=None,
-                )
-                ui.modal_show(m)
-                return render.DataTable(pd.DataFrame({"Failed Query. Fix Input File": []}))
+            print(output_df)
+            with reactive.isolate():
+                if input.search_type_batch() == 'STRprofiler Database':
+                    try:
+                        return render.DataTable(output_df())
+                    except Exception:
+                        m = ui.modal(
+                            ui.div(
+                                {"style": "font-size: 18px"},
+                                ui.HTML(
+                                    (
+                                        "There was a fatal error in the query.<br><br>"
+                                        "Ensure marker names match expectation, and that"
+                                        " no special characters (spaces, etc.) were used in sample names."
+                                    )
+                                ),
+                            ),
+                            title="Batch Query Error",
+                            easy_close=True,
+                            footer=None,
+                        )
+                        ui.modal_show(m)
+                        return render.DataTable(pd.DataFrame({"Failed Query. Fix Input File": []}))
+                elif input.search_type_batch() == 'Cellosaurus Database (CLASTR)':
+                    return render.DataTable(pd.DataFrame({"CASTR Batch Query": ['Download Results']}))
 
         # File input loading
         @reactive.calc
@@ -776,39 +788,75 @@ def create_app(db=None):
                 return pd.DataFrame({"Failed Query. Fix Input File": []})
 
             if res_click_file() == 0:
-                ui.insert_ui(
-                    ui.div(
-                        {"id": "inserted-downloader2"},
-                        ui.download_button(
-                            "download2", "Download CSV", width="25%", class_="btn-primary"
+                if input.search_type_batch() == 'STRprofiler Database':
+                    ui.insert_ui(
+                        ui.div(
+                            {"id": "inserted-downloader2"},
+                            ui.download_button(
+                                "download2", "Download CSV", width="25%", class_="btn-primary"
+                            ),
                         ),
-                    ),
-                    selector="#res_card_batch",
-                    where="beforeEnd",
-                )
-                res_click_file.set(1)
-            return _batch_query(
-                query_df,
-                str_database(),
-                input.score_amel_batch(),
-                input.mix_threshold_batch(),
-                input.tan_threshold_batch(),
-                input.mas_q_threshold_batch(),
-                input.mas_r_threshold_batch(),
-            )
+                        selector="#res_card_batch",
+                        where="beforeEnd",
+                    )
+                    res_click_file.set(1)
+                elif input.search_type_batch() == 'Cellosaurus Database (CLASTR)':
+                    ui.insert_ui(
+                        ui.div(
+                            {"id": "inserted-downloader2"},
+                            ui.download_button(
+                                "download2", "Download XLSX", width="25%", class_="btn-primary"
+                            ),
+                        ),
+                        selector="#res_card_batch",
+                        where="beforeEnd",
+                    )
+                    res_click_file.set(1)
+
+            with reactive.isolate():
+                if input.search_type_batch() == 'STRprofiler Database':
+                    results = _batch_query(
+                        query_df,
+                        str_database(),
+                        input.score_amel_batch(),
+                        input.mix_threshold_batch(),
+                        input.tan_threshold_batch(),
+                        input.mas_q_threshold_batch(),
+                        input.mas_r_threshold_batch(),
+                    )
+                elif input.search_type_batch() == 'Cellosaurus Database (CLASTR)':
+                    clastr_query = [(lambda d: d.update(description=key) or d)(val) for (key, val) in query_df.items()]
+                    results = _clastr_batch_query(
+                                    clastr_query,
+                                    input.query_filter(),
+                                    input.score_amel_batch(),
+                                    input.query_filter_threshold()
+                                )
+                    # TO DO: Change to a batch filter option set.
+            return results
+
+        # File input loading
+        @reactive.effect
+        @reactive.event(input.search_type_batch)
+        def _():
+            ui.remove_ui("#inserted-downloader2")
+            res_click_file.set(0)
+            # TO DO: Remove batch results table when changing methods.
 
         # Dealing with dowloading results, when requested.
         # Note that batch_query_results() is a reactive Calc result.
         @render.download(
-            filename="STR_Batch_Results_"
-            + date.today().isoformat()
-            + "_"
-            + time.strftime("%Hh-%Mm", time.localtime())
-            + ".csv"
+            filename=lambda: "STR_Batch_Results_" + date.today().isoformat() + "_" + time.strftime("%Hh-%Mm", time.localtime()) + ".csv"
+            if f"{input.search_type_batch()}" == 'STRprofiler Database'
+            else "STR_Batch_Results_" + date.today().isoformat() + "_" + time.strftime("%Hh-%Mm", time.localtime()) + ".xlsx"
         )
         def download2():
             if batch_query_results() is not None:
-                yield batch_query_results().to_csv(index=False)
+                if input.search_type_batch() == 'STRprofiler Database':
+                    yield batch_query_results().to_csv(index=False)
+                if input.search_type_batch() == 'Cellosaurus Database (CLASTR)':
+                    for chunk in batch_query_results().iter_content(chunk_size=128):
+                        yield chunk
 
         # Dealing with passing example file to user.
         @render.download()
