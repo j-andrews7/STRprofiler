@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "strprofiler"
-version = "0.2.0"
+version = "0.3.0"
 description = "A simple python utility to compare short tandem repeat (STR) profiles."
 authors = ["Jared Andrews <jared.andrews07@gmail.com>",
            "Mike Lloyd <mike.lloyd@jax.org>"]
@@ -18,6 +18,8 @@ shiny = "^0.8.0"
 shinyswatch = "^0.4.2"
 Jinja2 = "^3.1.3"
 faicons = "^0.2.2"
+requests = "^2.31.0"
+flatten-json = "^0.1.14"
 
 [tool.poetry.dev-dependencies]
 

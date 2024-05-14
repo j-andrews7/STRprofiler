@@ -5,3 +5,5 @@ rich-click
 shiny
 shinyswatch
 faicons
+requests
+flatten-json
