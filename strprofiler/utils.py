@@ -35,17 +35,38 @@ def _clean_element(x):
     return ",".join(sorted_elements)
 
 
-def _pentafix(samps_dict):
+def _pentafix(samps_dict, reverse = False):
     """Takes a dictionary of alleles and returns a dictionary with common Penta markers renamed for consistency."""
-    if "Penta D" in samps_dict.keys():
-        samps_dict["PentaD"] = samps_dict.pop("Penta D")
-    elif "Penta_D" in samps_dict.keys():
-        samps_dict["PentaD"] = samps_dict.pop("Penta_D")
+    if not reverse:
+        if "Penta C" in samps_dict.keys():
+            samps_dict["PentaC"] = samps_dict.pop("Penta C")
+        elif "Penta_C" in samps_dict.keys():
+            samps_dict["PentaC"] = samps_dict.pop("Penta_C")
+            
+        if "Penta D" in samps_dict.keys():
+            samps_dict["PentaD"] = samps_dict.pop("Penta D")
+        elif "Penta_D" in samps_dict.keys():
+            samps_dict["PentaD"] = samps_dict.pop("Penta_D")
 
-    if "Penta E" in samps_dict.keys():
-        samps_dict["PentaE"] = samps_dict.pop("Penta E")
-    elif "Penta_E" in samps_dict.keys():
-        samps_dict["PentaE"] = samps_dict.pop("Penta_E")
+        if "Penta E" in samps_dict.keys():
+            samps_dict["PentaE"] = samps_dict.pop("Penta E")
+        elif "Penta_E" in samps_dict.keys():
+            samps_dict["PentaE"] = samps_dict.pop("Penta_E")
+    else:
+        if "PentaC" in samps_dict.keys():
+            samps_dict["Penta C"] = samps_dict.pop("PentaC")
+        elif "Penta_C" in samps_dict.keys():
+            samps_dict["Penta C"] = samps_dict.pop("Penta_C")
+
+        if "PentaD" in samps_dict.keys():
+            samps_dict["Penta D"] = samps_dict.pop("PentaD")
+        elif "Penta_D" in samps_dict.keys():
+            samps_dict["Penta D"] = samps_dict.pop("Penta_D")
+
+        if "PentaE" in samps_dict.keys():
+            samps_dict["Penta E"] = samps_dict.pop("PentaE")
+        elif "Penta_E" in samps_dict.keys():
+            samps_dict["Penta E"] = samps_dict.pop("Penta_E")
 
     return samps_dict
 

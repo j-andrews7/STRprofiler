@@ -2,7 +2,7 @@ import requests
 import json
 import pandas as pd
 from flatten_json import flatten
-
+from strprofiler.utils import _pentafix
 
 def _clastr_query(query, query_filter, include_amelogenin, score_filter):
     url = "https://www.cellosaurus.org/str-search/api/query/"
@@ -17,16 +17,8 @@ def _clastr_query(query, query_filter, include_amelogenin, score_filter):
         query['algorithm'] = 2
     elif query_filter == "Masters Reference":
         query['algorithm'] = 3
-
-    if "PentaD" in query.keys():
-        query["Penta D"] = query.pop("PentaD")
-    elif "Penta_D" in query.keys():
-        query["Penta D"] = query.pop("Penta_D")
-
-    if "PentaE" in query.keys():
-        query["Penta E"] = query.pop("PentaE")
-    elif "Penta_E" in query.keys():
-        query["Penta E"] = query.pop("Penta_E")
+    
+    query = _pentafix(query, reverse = True)
 
     query['includeAmelogenin'] = include_amelogenin
     query['scoreFilter'] = score_filter
@@ -97,10 +89,7 @@ def _clastr_query(query, query_filter, include_amelogenin, score_filter):
 
     merged['accession_link'] = "https://web.expasy.org/cellosaurus/" + merged['accession']
 
-    if "Penta D" in merged.keys():
-        merged["PentaD"] = merged.pop("Penta D")
-    if "Penta E" in merged.keys():
-        merged["PentaE"] = merged.pop("Penta E")
+    merged = _pentafix(merged)
 
     # add the query line to the top of merged, and reorder columns
 
@@ -122,6 +111,8 @@ def _clastr_query(query, query_filter, include_amelogenin, score_filter):
 
 def _clastr_batch_query(query, query_filter, include_amelogenin, score_filter):
     url = "https://www.cellosaurus.org/str-search/api/batch/"
+
+    query = [_pentafix(item, reverse = True) for item in query]
 
     if query_filter == "Tanabe":
         query = [dict(item, **{'algorithm': 1}) for item in query]
