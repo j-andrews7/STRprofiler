@@ -76,6 +76,25 @@ def _link_wrap(name, link, problem):
         return ui.tags.a(name, href=str(link), target="_blank")
 
 
+def notify_modal(marker_list):
+    ui.modal_show(
+        ui.modal(
+            "Marker(s): {} are incompatible with the CLASTR query."
+            .format(str(marker_list)[1:-1]),
+            ui.tags.br(),
+            ui.tags.br(),
+            "The marker(s) will not be used in the query.",
+            ui.tags.br(),
+            ui.tags.br(),
+            "See: ", ui.tags.a('CLASTR', href=str("https://www.cellosaurus.org/str-search/"), target="_blank"),
+            " for a complete list of compatible marker names",
+            title="Inompatible CLASTR Markers",
+            easy_close=True,
+            footer=ui.modal_button('Understood')
+        )
+    )
+
+
 # App Generation ###
 def create_app(db=None):
 
@@ -236,33 +255,61 @@ def create_app(db=None):
                                 {"id": "batch_sidebar"},
                                 ui.tags.h3("Options"),
                                 ui.tags.hr(),
+                                ui.input_select(
+                                        "search_type_batch",
+                                        "Search Type",
+                                        ["STRprofiler Database", "Cellosaurus Database (CLASTR)"],
+                                        width="100%"
+                                ),
                                 ui.card(
                                     ui.input_switch(
                                         "score_amel_batch", "Score Amelogenin", value=False
                                     ),
-                                    ui.input_numeric(
-                                        "mix_threshold_batch",
-                                        "'Mixed' Sample Threshold",
-                                        value=3,
-                                        width="100%",
+                                    ui.panel_conditional(
+                                        "input.search_type_batch === 'STRprofiler Database'",
+                                        ui.input_numeric(
+                                            "mix_threshold_batch",
+                                            "'Mixed' Sample Threshold",
+                                            value=3,
+                                            width="100%",
+                                        ),
+                                        ui.input_numeric(
+                                            "tan_threshold_batch",
+                                            "Tanabe Filter Threshold",
+                                            value=80,
+                                            width="100%",
+                                        ),
+                                        ui.input_numeric(
+                                            "mas_q_threshold_batch",
+                                            "Masters (vs. query) Filter Threshold",
+                                            value=80,
+                                            width="100%",
+                                        ),
+                                        ui.input_numeric(
+                                            "mas_r_threshold_batch",
+                                            "Masters (vs. reference) Filter Threshold",
+                                            value=80,
+                                            width="100%",
+                                        ),
                                     ),
-                                    ui.input_numeric(
-                                        "tan_threshold_batch",
-                                        "Tanabe Filter Threshold",
-                                        value=80,
-                                        width="100%",
-                                    ),
-                                    ui.input_numeric(
-                                        "mas_q_threshold_batch",
-                                        "Masters (vs. query) Filter Threshold",
-                                        value=80,
-                                        width="100%",
-                                    ),
-                                    ui.input_numeric(
-                                        "mas_r_threshold_batch",
-                                        "Masters (vs. reference) Filter Threshold",
-                                        value=80,
-                                        width="100%",
+                                    ui.panel_conditional(
+                                        "input.search_type_batch === 'Cellosaurus Database (CLASTR)'",
+                                        ui.input_select(
+                                            "batch_query_filter",
+                                            "Similarity Score Filter",
+                                            choices=[
+                                                "Tanabe",
+                                                "Masters Query",
+                                                "Masters Reference",
+                                            ],
+                                            width="100%",
+                                        ),
+                                        ui.input_numeric(
+                                            "batch_query_filter_threshold",
+                                            "Similarity Score Filter Threshold",
+                                            value=80,
+                                            width="100%",
+                                        ),
                                     ),
                                 ),
                                 ui.input_file(
@@ -271,12 +318,6 @@ def create_app(db=None):
                                     accept=[".csv"],
                                     multiple=False,
                                     width="100%",
-                                ),
-                                ui.input_select(
-                                    "search_type_batch",
-                                    "Search Type",
-                                    ["STRprofiler Database", "Cellosaurus Database (CLASTR)"],
-                                    width="100%"
                                 ),
                                 ui.input_action_button(
                                     "csv_query",
@@ -645,23 +686,11 @@ def create_app(db=None):
                                     input.query_filter_threshold(),
                                 )
                 elif input.search_type() == 'Cellosaurus Database (CLASTR)':
+
                     malformed_markers = _valid_marker_check(query.keys())
                     if malformed_markers:
-                        notify_m = ui.modal(
-                            "Markers: {} are incompatible with the CLASTR query."
-                            .format(str(malformed_markers)[1:-1]),
-                            ui.tags.br(),
-                            ui.tags.br(),
-                            "These markers will not be used in the query.",
-                            ui.tags.br(),
-                            ui.tags.br(),
-                            "See: ", ui.tags.a('CLASTR', href=str("https://www.cellosaurus.org/str-search/"), target="_blank"),
-                            " for a complete list of compatible marker names",
-                            title="Inompatible CLASTR Markers",
-                            easy_close=True,
-                            footer=ui.modal_button('Understood')
-                        )
-                        ui.modal_show(notify_m)
+                        notify_modal(malformed_markers)
+
                     results = _clastr_query(
                                     query,
                                     input.query_filter(),
@@ -741,7 +770,6 @@ def create_app(db=None):
         @render.data_frame
         def out_batch_df():
             output_df.set(batch_query_results())
-            print(output_df)
             with reactive.isolate():
                 if input.search_type_batch() == 'STRprofiler Database':
                     try:
@@ -842,13 +870,17 @@ def create_app(db=None):
                     )
                 elif input.search_type_batch() == 'Cellosaurus Database (CLASTR)':
                     clastr_query = [(lambda d: d.update(description=key) or d)(val) for (key, val) in query_df.items()]
+
+                    malformed_markers = _valid_marker_check(query_df[next(iter(query_df))].keys())
+                    if malformed_markers:
+                        notify_modal(malformed_markers)
+
                     results = _clastr_batch_query(
                                     clastr_query,
-                                    input.query_filter(),
+                                    input.batch_query_filter(),
                                     input.score_amel_batch(),
-                                    input.query_filter_threshold()
+                                    input.batch_query_filter_threshold()
                                 )
-                    # TO DO: Change to a batch filter option set.
             return results
 
         # File input loading

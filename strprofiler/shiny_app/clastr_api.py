@@ -44,7 +44,7 @@ def _valid_marker_check(markers):
                          'SE33']
 
     # remove extra fields, if present as keys may come from _clastr_query or other.
-    query_markers = [marker for marker in markers if marker not in ['algorithm', 'includeAmelogenin', 'scoreFilter']]
+    query_markers = [marker for marker in markers if marker not in ['algorithm', 'includeAmelogenin', 'scoreFilter', 'description']]
 
     missing_markers = list(set(query_markers) - set(valid_api_markers))
 
@@ -142,8 +142,6 @@ def _clastr_query(query, query_filter, include_amelogenin, score_filter):
 
     query_added = pd.concat([query_df, merged]).reset_index(drop=True)
     query_added["bestScore"] = query_added['bestScore'].map("{0:.2f}".format).replace("nan", "")
-
-    # print(query_added.columns)
 
     if 'problem' in query_added.columns:
         query_added = query_added[['accession', 'name', 'species', 'bestScore', 'accession_link', 'problem'] +
