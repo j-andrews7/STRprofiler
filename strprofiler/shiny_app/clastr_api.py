@@ -4,6 +4,53 @@ import pandas as pd
 from flatten_json import flatten
 from strprofiler.utils import _pentafix
 
+
+def _valid_marker_check(markers):
+
+    valid_api_markers = ['Amelogenin',
+                         'CSF1PO',
+                         'D2S1338',
+                         'D3S1358',
+                         'D5S818',
+                         'D7S820',
+                         'D8S1179',
+                         'D13S317',
+                         'D16S539',
+                         'D18S51',
+                         'D19S433',
+                         'D21S11',
+                         'FGA',
+                         'Penta D',
+                         'Penta E',
+                         'PentaD',
+                         'PentaE',
+                         'TH01',
+                         'TPOX',
+                         'vWA',
+                         'D1S1656',
+                         'D2S441',
+                         'D6S1043',
+                         'D10S1248',
+                         'D12S391',
+                         'D22S1045',
+                         'DXS101',
+                         'DYS391',
+                         'F13A01',
+                         'F13B',
+                         'FESFPS',
+                         'LPL',
+                         'Penta C',
+                         'PentaC',
+                         'SE33']
+
+    # remove extra fields, if present as keys may come from _clastr_query or other.
+    query_markers = [marker for marker in markers if marker not in ['algorithm', 'includeAmelogenin', 'scoreFilter']]
+
+    missing_markers = list(set(query_markers) - set(valid_api_markers))
+
+    return missing_markers
+
+
 def _clastr_query(query, query_filter, include_amelogenin, score_filter):
     url = "https://www.cellosaurus.org/str-search/api/query/"
 
@@ -17,8 +64,8 @@ def _clastr_query(query, query_filter, include_amelogenin, score_filter):
         query['algorithm'] = 2
     elif query_filter == "Masters Reference":
         query['algorithm'] = 3
-    
-    query = _pentafix(query, reverse = True)
+
+    query = _pentafix(query, reverse=True)
 
     query['includeAmelogenin'] = include_amelogenin
     query['scoreFilter'] = score_filter
@@ -112,7 +159,7 @@ def _clastr_query(query, query_filter, include_amelogenin, score_filter):
 def _clastr_batch_query(query, query_filter, include_amelogenin, score_filter):
     url = "https://www.cellosaurus.org/str-search/api/batch/"
 
-    query = [_pentafix(item, reverse = True) for item in query]
+    query = [_pentafix(item, reverse=True) for item in query]
 
     if query_filter == "Tanabe":
         query = [dict(item, **{'algorithm': 1}) for item in query]
@@ -158,6 +205,7 @@ if __name__ == '__main__':
             "TH01": "7,9.3",
             "TPOX": "8",
             "vWA": "18",
+            "NoGoodVeryBad": "I'm not a valid marker. However, that is ok. We catch this now."
             }
 
     # # stock from https://www.cellosaurus.org/str-search/help.html#5.1
@@ -193,6 +241,10 @@ if __name__ == '__main__':
     #         "TPOX": "8,9",
     #         "vWA": "17,19"
     #         }
+
+    malformed_markers = _valid_marker_check(data.keys())
+
+    print(malformed_markers)
 
     r = _clastr_query(data, 'Tanabe', False, 70)
 

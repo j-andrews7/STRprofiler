@@ -6,7 +6,7 @@ from faicons import icon_svg
 
 import strprofiler.utils as sp
 from strprofiler.shiny_app.calc_functions import _single_query, _batch_query, _file_query
-from strprofiler.shiny_app.clastr_api import _clastr_query, _clastr_batch_query
+from strprofiler.shiny_app.clastr_api import _valid_marker_check, _clastr_query, _clastr_batch_query
 
 from datetime import date
 import time
@@ -645,6 +645,23 @@ def create_app(db=None):
                                     input.query_filter_threshold(),
                                 )
                 elif input.search_type() == 'Cellosaurus Database (CLASTR)':
+                    malformed_markers = _valid_marker_check(query.keys())
+                    if malformed_markers:
+                        notify_m = ui.modal(
+                            "Markers: {} are incompatible with the CLASTR query."
+                            .format(str(malformed_markers)[1:-1]),
+                            ui.tags.br(),
+                            ui.tags.br(),
+                            "These markers will not be used in the query.",
+                            ui.tags.br(),
+                            ui.tags.br(),
+                            "See: ", ui.tags.a('CLASTR', href=str("https://www.cellosaurus.org/str-search/"), target="_blank"),
+                            " for a complete list of compatible marker names",
+                            title="Inompatible CLASTR Markers",
+                            easy_close=True,
+                            footer=ui.modal_button('Understood')
+                        )
+                        ui.modal_show(notify_m)
                     results = _clastr_query(
                                     query,
                                     input.query_filter(),
