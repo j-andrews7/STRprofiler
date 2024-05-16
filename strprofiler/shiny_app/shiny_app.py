@@ -677,7 +677,6 @@ def create_app(db=None):
                         )
                     elif input.search_type() == 'Cellosaurus Database (CLASTR)':
                         out_df = output_df().copy()
-                        print(out_df)
                         if ('No Clastr Result' in out_df.columns) | ('Error' in out_df.columns):
                             return out_df
                         try:

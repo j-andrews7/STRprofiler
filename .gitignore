@@ -154,3 +154,4 @@ cython_debug/
 .DS_Store
 
 strprofiler.json
+testing.xlsx

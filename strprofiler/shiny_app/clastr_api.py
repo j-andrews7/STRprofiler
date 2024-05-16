@@ -18,6 +18,16 @@ def _clastr_query(query, query_filter, include_amelogenin, score_filter):
     elif query_filter == "Masters Reference":
         query['algorithm'] = 3
 
+    if "PentaD" in query.keys():
+        query["Penta D"] = query.pop("PentaD")
+    elif "Penta_D" in query.keys():
+        query["Penta D"] = query.pop("Penta_D")
+
+    if "PentaE" in query.keys():
+        query["Penta E"] = query.pop("PentaE")
+    elif "Penta_E" in query.keys():
+        query["Penta E"] = query.pop("Penta_E")
+
     query['includeAmelogenin'] = include_amelogenin
     query['scoreFilter'] = score_filter
 
@@ -87,6 +97,11 @@ def _clastr_query(query, query_filter, include_amelogenin, score_filter):
 
     merged['accession_link'] = "https://web.expasy.org/cellosaurus/" + merged['accession']
 
+    if "Penta D" in merged.keys():
+        merged["PentaD"] = merged.pop("Penta D")
+    if "Penta E" in merged.keys():
+        merged["PentaE"] = merged.pop("Penta E")
+
     # add the query line to the top of merged, and reorder columns
 
     query_added = pd.concat([query_df, merged]).reset_index(drop=True)
@@ -147,8 +162,8 @@ if __name__ == '__main__':
             "D19S433": "14",
             "D21S11": "31,31.2",
             "FGA": "23",
-            "Penta D": "",
-            "Penta E": "",
+            "PentaD": "",
+            "PentaE": "",
             "TH01": "7,9.3",
             "TPOX": "8",
             "vWA": "18",
@@ -159,12 +174,33 @@ if __name__ == '__main__':
     #         "Amelogenin": "X",
     #         "CSF1PO": "13,14",
     #         "D5S818": "13",
-    #         "D7S820": "8",
+    #         "D7S820": "8,9",
     #         "D13S317": "12",
     #         "FGA": "24",
     #         "TH01": "8",
     #         "TPOX": "11",
-    #         "vWA": "16",
+    #         "vWA": "16"
+    #         }
+
+    # # stock example from https://www.cellosaurus.org/str-search/
+    # data = {"Amelogenin": "X",
+    #         "CSF1PO": "11,12",
+    #         "D2S1338": "19,23",
+    #         "D3S1358": "15,17",
+    #         "D5S818": "11,12",
+    #         "D7S820": "10",
+    #         "D8S1179": "10",
+    #         "D13S317": "11,12",
+    #         "D16S539": "11,12",
+    #         "D18S51": "13",
+    #         "D19S433": "14",
+    #         "D21S11": "29,30",
+    #         "FGA": "20,22",
+    #         "PentaD": "11,14",
+    #         "PentaE": "14,16",
+    #         "TH01": "6,9",
+    #         "TPOX": "8,9",
+    #         "vWA": "17,19"
     #         }
 
     r = _clastr_query(data, 'Tanabe', False, 70)
