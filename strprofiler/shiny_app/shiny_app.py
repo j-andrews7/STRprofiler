@@ -4,9 +4,9 @@ from shiny.types import FileInfo, ImgData
 import pandas as pd
 from faicons import icon_svg
 
-import strprofiler.utils as sp
+import strprofiler.utils as utils
 from strprofiler.shiny_app.calc_functions import _single_query, _batch_query, _file_query
-from strprofiler.shiny_app.clastr_api import _valid_marker_check, _clastr_query, _clastr_batch_query
+from strprofiler.shiny_app.clastr_api import _clastr_query, _clastr_batch_query
 
 from datetime import date
 import time
@@ -27,7 +27,7 @@ def database_load(file):
         Exception: If the file fails to load or if sample ID names are duplicated.
     """
     try:
-        str_database = sp.str_ingress(
+        str_database = utils.str_ingress(
             [file],  # expects list
             sample_col="Sample",
             marker_col="Marker",
@@ -211,7 +211,7 @@ def create_app(db=None):
                                         width="90%"
                                     ),
                                     ui.tooltip(
-                                        ui.input_action_button(
+                                        ui.input_task_button(
                                             "search",
                                             "Search",
                                             class_="btn-success",
@@ -238,6 +238,7 @@ def create_app(db=None):
                         ui.column(3, ui.tags.h3("Results")),
                         ui.column(1, ui.p("")),
                     ),
+                    # TO DO: Try loading/thinking spinners.
                     ui.column(
                         12,
                         {"id": "res_card"},
@@ -319,7 +320,7 @@ def create_app(db=None):
                                     multiple=False,
                                     width="100%",
                                 ),
-                                ui.input_action_button(
+                                ui.input_task_button(
                                     "csv_query",
                                     "CSV Query",
                                     class_="btn-primary",
@@ -673,7 +674,7 @@ def create_app(db=None):
                     where="afterEnd",
                 )
                 res_click.set(1)
-            thinking = ui.notification_show("Message: API Query Running.", duration=None)
+
             # isolate input.search_type to prevent trigger when options change.
             with reactive.isolate():
                 if input.search_type() == 'STRprofiler Database':
@@ -687,7 +688,7 @@ def create_app(db=None):
                                 )
                 elif input.search_type() == 'Cellosaurus Database (CLASTR)':
 
-                    malformed_markers = _valid_marker_check(query.keys())
+                    malformed_markers = utils.validate_api_markers(query.keys())
                     if malformed_markers:
                         notify_modal(malformed_markers)
 
@@ -697,7 +698,8 @@ def create_app(db=None):
                                     input.score_amel_query(),
                                     input.query_filter_threshold()
                                 )
-            ui.notification_remove(thinking)
+                    # TO DO: Does this need to be async?
+
             return results
 
         @output
@@ -805,7 +807,7 @@ def create_app(db=None):
                 ui.remove_ui("#inserted-downloader2")
                 return pd.DataFrame({"": []})
             try:
-                query_df = sp.str_ingress(
+                query_df = utils.str_ingress(
                     [file[0]["datapath"]],
                     sample_col="Sample",
                     marker_col="Marker",
@@ -850,6 +852,7 @@ def create_app(db=None):
                             {"id": "inserted-downloader2"},
                             ui.download_button(
                                 "download2", "Download XLSX", width="25%", class_="btn-primary"
+                                # TO DO: Adjust spacing on 'results' section. XLSX button is too far down.
                             ),
                         ),
                         selector="#res_card_batch",
@@ -870,8 +873,7 @@ def create_app(db=None):
                     )
                 elif input.search_type_batch() == 'Cellosaurus Database (CLASTR)':
                     clastr_query = [(lambda d: d.update(description=key) or d)(val) for (key, val) in query_df.items()]
-
-                    malformed_markers = _valid_marker_check(query_df[next(iter(query_df))].keys())
+                    malformed_markers = utils.validate_api_markers(query_df[next(iter(query_df))].keys())
                     if malformed_markers:
                         notify_modal(malformed_markers)
 
@@ -881,6 +883,8 @@ def create_app(db=None):
                                     input.score_amel_batch(),
                                     input.batch_query_filter_threshold()
                                 )
+                    # TO DO: Does this need to be async?
+
             return results
 
         # File input loading
@@ -935,7 +939,7 @@ def create_app(db=None):
             if file is None:
                 ui.remove_ui("#inserted-downloader3")
                 return pd.DataFrame({"": []})
-            query_df = sp.str_ingress(
+            query_df = utils.str_ingress(
                 [file[0]["datapath"]],
                 sample_col="Sample",
                 marker_col="Marker",
