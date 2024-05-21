@@ -88,9 +88,17 @@ def notify_modal(marker_list):
             ui.tags.br(),
             "See: ", ui.tags.a('CLASTR', href=str("https://www.cellosaurus.org/str-search/"), target="_blank"),
             " for a complete list of compatible marker names",
-            title="Inompatible CLASTR Markers",
+            title="Incompatible CLASTR Markers",
             easy_close=True,
             footer=ui.modal_button('Understood')
+        )
+    )
+
+
+def notify_non_int():
+    ui.modal_show(
+        ui.notification_show(
+            'Threshold must be an integer',
         )
     )
 
@@ -503,6 +511,16 @@ def create_app(db=None):
                 multiple=False,
                 width="100%",
             )
+
+        @reactive.effect
+        @reactive.event(input.query_filter_threshold, input.batch_query_filter_threshold)
+        def _():
+            if not isinstance(input.query_filter_threshold(), int):
+                notify_non_int()
+                ui.update_numeric("query_filter_threshold", value=int(input.query_filter_threshold()))
+            if not isinstance(input.batch_query_filter_threshold(), int):
+                notify_non_int()
+                ui.update_numeric("batch_query_filter_threshold", value=int(input.batch_query_filter_threshold()))
 
         @reactive.effect
         @reactive.event(input.search_type)
