@@ -116,7 +116,7 @@ def clastr_batch_post_request(
     penta_fix=True,
     score_amel=False,
 ):
-    """CLASTR_Query compares STR profiles to the human Cellosaurus knowledge base using the CLASTR REST API..
+    """CLASTR_Query compares STR profiles to the human Cellosaurus knowledge base using the CLASTR REST API.
 
     :param input_files: List of input STR files in csv, xlsx, tsv, or txt format.
     :type input_files: click.Path

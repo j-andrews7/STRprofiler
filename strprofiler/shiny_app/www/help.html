@@ -1528,9 +1528,9 @@ for information on the database source.</p>
 <div id="clastr-cellosaurus-api-query" class="section level2">
 <h2>CLASTR / Cellosaurus API Query</h2>
 <p>Query of the <a href="https://www.cellosaurus.org/description.html">Cellosaurus</a>
-(Bairoch, 2018) cell line database is also available for single samples
-via the <a href="https://www.cellosaurus.org/str-search/">CLASTR</a>
-(Robin, Capes-Davis, and Bairoch, 2019) <a href="https://www.cellosaurus.org/str-search/help.html#5">REST
+(Bairoch, 2018) cell line database is also available for single and
+batch samples via the <a href="https://www.cellosaurus.org/str-search/">CLASTR</a> (Robin,
+Capes-Davis, and Bairoch, 2019) <a href="https://www.cellosaurus.org/str-search/help.html#5">REST
 API</a>.</p>
 <hr />
 </div>
@@ -1591,8 +1591,8 @@ and database sample (if Master Ref selected).</td>
 <p>The report is filtered to include only those samples with greater
 than or equal to the <code>Similarity Score Filter Threshold</code>
 defined by the user, and report only the similarity score selected.</p>
-<p>When ‘CLASTR’ is selected as the search type, a report is generated
-with the following fields:</p>
+<p>When <code>Cellosaurus Database (CLASTR)</code> is selected as the
+search type, a report is generated with the following fields:</p>
 <table>
 <colgroup>
 <col width="44%" />
@@ -1683,6 +1683,9 @@ scoring threshold to sample.</td>
 <p>The report is filtered to include only those samples with greater
 than or equal to the <code>Similarity Score Filter Thresholds</code>
 defined by the user.</p>
+<p>When <code>Cellosaurus Database (CLASTR)</code> is selected as the
+search type, a report is generated in XLSX format, and can be downloaded
+via the <code>Download XLSX</code> button.</p>
 </div>
 <div id="database-file-managment" class="section level2">
 <h2>Database File Managment</h2>
@@ -1750,19 +1753,21 @@ results. [default: 80]</li>
 </div>
 <div id="batch-and-file-query-specfic" class="section level2">
 <h2>Batch and File Query Specfic</h2>
-<ul>
-<li>Amelogenin scoring is excluded by default but can be included by
-selecting the option.</li>
-<li>Tanabe Filter Threshold: is the Tanabe score threshold over which a
-sample is considered a match in batch and file queries. [default:
-80]</li>
-<li>Masters (vs. query) Filter Threshold: is the Masters (vs. query)
-score threshold over which a sample is considered a match in batch and
-file queries. [default: 80]</li>
-<li>Masters (vs. reference) Filter Threshold: is the Masters
-(vs. reference) score threshold over which a sample is considered a
-match in batch and file queries. [default: 80]</li>
-</ul>
+<p><code>STRprofiler Database</code> options:<br />
+* Amelogenin scoring is excluded by default but can be included by
+selecting the option. * Tanabe Filter Threshold: is the Tanabe score
+threshold over which a sample is considered a match in batch and file
+queries. [default: 80] * Masters (vs. query) Filter Threshold: is the
+Masters (vs. query) score threshold over which a sample is considered a
+match in batch and file queries. [default: 80] * Masters (vs. reference)
+Filter Threshold: is the Masters (vs. reference) score threshold over
+which a sample is considered a match in batch and file queries.
+[default: 80]</p>
+<p><code>Cellosaurus Database (CLASTR)</code> options:<br />
+* Similarity Score Filter: is the similiarity score used for result
+filtering. [default: Tanabe] * Similarity Score Filter Threshold: is the
+threshold to filter results. Only those samples with &gt;= the threshold
+will appear in results. [default: 80]</p>
 <hr />
 </div>
 </div>

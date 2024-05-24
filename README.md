@@ -49,24 +49,58 @@ Full usage information can be found by running `strprofiler --help`.
 
  STRprofiler compares STR profiles to each other.  
 
-╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --tan_threshold    -tanth   FLOAT        Minimum Tanabe score to report as potential matches in summary table. [default: 80]                          │
-│ --mas_q_threshold  -masqth  FLOAT        Minimum Masters (vs. query) score to report as potential matches in summary table. [default: 80]             │
-│ --mas_r_threshold  -masrth  FLOAT        Minimum Masters (vs. reference) score to report as potential matches in summary table. [default: 80]         │
-│ --mix_threshold    -mix     INTEGER      Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing.                 |
-|                                            [default: 3]                                                                                               │
-│ --sample_map       -sm      PATH         Path to sample map in csv format for renaming. First column should be sample names as given                  |
-|                                            in STR file(s),  second should be new names to assign. No header.                                          │
-│ --database         -db      PATH         Path to an STR database file in csv, xlsx, tsv, or txt format.                                               │
-│ --amel_col         -acol    TEXT         Name of Amelogenin column in STR file(s). [default: AMEL]                                                    │
-│ --sample_col       -scol    TEXT         Name of sample column in STR file(s). [default: Sample]                                                      │
-│ --marker_col       -mcol    TEXT         Name of marker column in STR file(s). Only used if format is 'wide'. [default: Marker]                       │
-│ --penta_fix        -pfix                 Whether to try to harmonize PentaE/D allele spelling. [default: True]                                        │
-│ --score_amel       -amel                 Use Amelogenin for similarity scoring. [default: False]                                                      │
-│ --output_dir       -o       PATH         Path to the output directory. [default: ./STRprofiler]                                                       │
-│ --version                                Show the version and exit.                                                                                   │
-│ --help                                   Show this message and exit.                                                                                  │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --tan_threshold    -tanth   FLOAT    Minimum Tanabe score to report as potential matches in summary table. [default: 80]                                                                          │
+│ --mas_q_threshold  -masqth  FLOAT    Minimum Masters (vs. query) score to report as potential matches in summary table. [default: 80]                                                             │
+│ --mas_r_threshold  -masrth  FLOAT    Minimum Masters (vs. reference) score to report as potential matches in summary table. [default: 80]                                                         │
+│ --mix_threshold    -mix     INTEGER  Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing. [default: 3]                                                    │
+│ --sample_map       -sm      PATH     Path to sample map in csv format for renaming. First column should be sample names as given in STR file(s), second should be new names to assign. No header. │
+│ --database         -db      PATH     Path to an STR database file in csv, xlsx, tsv, or txt format.                                                                                               │
+│ --amel_col         -acol    TEXT     Name of Amelogenin column in STR file(s). [default: AMEL]                                                                                                    │
+│ --sample_col       -scol    TEXT     Name of sample column in STR file(s). [default: Sample]                                                                                                      │
+│ --marker_col       -mcol    TEXT     Name of marker column in STR file(s). Only used if format is 'wide'. [default: Marker]                                                                       │
+│ --penta_fix        -pfix             Whether to try to harmonize PentaE/D allele spelling. [default: True]                                                                                        │
+│ --score_amel       -amel             Use Amelogenin for similarity scoring. [default: False]                                                                                                      │
+│ --output_dir       -o       PATH     Path to the output directory. [default: ./STRprofiler]                                                                                                       │
+│ --version                            Show the version and exit.                                                                                                                                   │
+│ --help                               Show this message and exit.                                                                                                                                  │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+```
+
+**CLASTR**
+
+Additionally, the [Cellosaurus](https://www.cellosaurus.org/description.html) (Bairoch, 2018) cell line database can be queried via the [CLASTR](https://www.cellosaurus.org/str-search/) (Robin, Capes-Davis, and Bairoch, 2019) [REST API](https://www.cellosaurus.org/str-search/help.html#5).  
+
+    Bairoch A. (2018) The Cellosaurus, a cell line knowledge resource. Journal of Biomolecular Techniques. 29:25-38. DOI: 10.7171/jbt.18-2902-002; PMID: 29805321 
+
+    Robin, T., Capes-Davis, A. & Bairoch, A. (2019) CLASTR: the Cellosaurus STR Similarity Search Tool - A Precious Help for Cell Line Authentication. International Journal of Cancer. PubMed: 31444973  DOI: 10.1002/IJC.32639
+
+
+`clastr -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
+
+Full usage information can be found by running `clastr --help`.
+
+```bash
+ Usage: clastr [OPTIONS] INPUT_FILES...   
+
+**clastr** compares STR profiles to the human Cellosaurus knowledge base using the CLASTR REST API.  
+
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --search_algorithm  -sa    INTEGER  Search algorithm to use in the Clastr query. 1 - Tanabe, 2 - Masters (vs. query); 3 - Masters (vs. reference) [default: 1]                      │
+│ --scoring_mode      -sm    INTEGER  Search mode to account for missing alleles in query or reference. 1 - Non-empty markers, 2 - Query markers, 3 - Reference markers. [default: 1] │
+│ --score_filter      -sf    INTEGER  Minimum score to report as potential matches in summary table. [default: 80]                                                                    │
+│ --max_results       -mr    INTEGER  Filter defining the maximum number of results to be returned. [default: 200]                                                                    │
+│ --min_markers       -mm    INTEGER  Filter defining the minimum number of markers for matches to be reported. [default: 8]                                                          │
+│ --sample_col        -scol  TEXT     Name of sample column in STR file(s). [default: Sample]                                                                                         │
+│ --marker_col        -mcol  TEXT     Name of marker column in STR file(s). Only used if format is 'wide'. [default: Marker]                                                          │
+│ --penta_fix         -pfix           Whether to try to harmonize PentaE/D allele spelling. [default: True]                                                                           │
+│ --score_amel        -amel           Use Amelogenin for similarity scoring. [default: False]                                                                                         │
+│ --output_dir        -o     PATH     Path to the output directory. [default: ./STRprofiler]                                                                                          │
+│ --version                           Show the version and exit.                                                                                                                      │
+│ --help                              Show this message and exit.                                                                                                                     │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
 ```
 
 ## Input Files(s)
@@ -148,6 +182,10 @@ In addition to the marker columns, this output contains the following columns:
 | **tanabe_score**        | Tanabe similarity score.                                     |
 | **masters_query_score** | Masters (vs query) similarity score.                         |
 | **masters_ref_score**   | Masters (vs reference) similarity score.                     |
+
+**clastr**
+
+Output for `clastr` is provided in XLSX format. Results follow the CLASTR format, documented here: https://www.cellosaurus.org/str-search/help.html#4
 
 ## Database Comparison
 

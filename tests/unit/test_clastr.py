@@ -48,3 +48,14 @@ def test_clastr(paths):
     assert r.status_code == 200
 
     assert isinstance(r.iter_content(chunk_size=128), types.GeneratorType)
+
+    url = "https://www.cellosaurus.org/str-search/api/batch/%"
+
+    r = requests.post(url, data=json.dumps(clastr_query))
+
+    assert r.status_code == 404
+
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        assert e

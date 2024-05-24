@@ -753,7 +753,7 @@ def create_app(db=None):
                             out_df['link'] = out_df.apply(lambda x: _link_wrap(x.accession, x.accession_link, ''), axis=1)
 
                         out_df = out_df.drop(['accession', 'accession_link', 'species'], axis=1).rename(
-                            columns={"link": "Accession", "name": "Name", "bestScore": "Score"})
+                            columns={"link": "Accession", "name": "Name", "score": "Score"})
 
                         cols = list(out_df.columns)
                         cols = [cols[-1]] + cols[:-1]
