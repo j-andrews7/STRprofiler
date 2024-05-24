@@ -515,10 +515,11 @@ def create_app(db=None):
         @reactive.effect
         @reactive.event(input.query_filter_threshold, input.batch_query_filter_threshold)
         def _():
-            if not isinstance(input.query_filter_threshold(), int):
+            if not isinstance(input.query_filter_threshold(), int | None):
+                print(input.query_filter_threshold())
                 notify_non_int()
                 ui.update_numeric("query_filter_threshold", value=int(input.query_filter_threshold()))
-            if not isinstance(input.batch_query_filter_threshold(), int):
+            if not isinstance(input.batch_query_filter_threshold(), int | None):
                 notify_non_int()
                 ui.update_numeric("batch_query_filter_threshold", value=int(input.batch_query_filter_threshold()))
 
