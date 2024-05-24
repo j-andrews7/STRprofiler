@@ -447,6 +447,12 @@ def make_summary(
 
 
 def validate_api_markers(markers):
+    """ Compare list of markers against controlled list of markers names from CLASTR.
+    :param markers: List of markers to compare against controlled marker name list.
+    :type markers: list
+    :return: List of non-compliant marker names.
+    :rtype: list
+    """
 
     valid_api_markers = ['Amel',
                          'Amelogenin',
