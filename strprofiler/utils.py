@@ -207,7 +207,7 @@ def str_ingress(
         elif path.suffix == ".txt":
             df = pd.read_csv(path, sep="\t")
         else:
-            sys.exit('File extension: ' + path.suffix + ' in file: ' + str(path) + ' is not supported.')
+            sys.exit("File extension: " + path.suffix + " in file: " + str(path) + " is not supported.")
 
         df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
 
@@ -454,45 +454,45 @@ def validate_api_markers(markers):
     :rtype: list
     """
 
-    valid_api_markers = ['Amel',
-                         'Amelogenin',
-                         'CSF1PO',
-                         'D2S1338',
-                         'D3S1358',
-                         'D5S818',
-                         'D7S820',
-                         'D8S1179',
-                         'D13S317',
-                         'D16S539',
-                         'D18S51',
-                         'D19S433',
-                         'D21S11',
-                         'FGA',
-                         'Penta D',
-                         'Penta E',
-                         'PentaD',
-                         'PentaE',
-                         'TH01',
-                         'TPOX',
-                         'vWA',
-                         'D1S1656',
-                         'D2S441',
-                         'D6S1043',
-                         'D10S1248',
-                         'D12S391',
-                         'D22S1045',
-                         'DXS101',
-                         'DYS391',
-                         'F13A01',
-                         'F13B',
-                         'FESFPS',
-                         'LPL',
-                         'Penta C',
-                         'PentaC',
-                         'SE33']
+    valid_api_markers = ["Amel",
+                         "Amelogenin",
+                         "CSF1PO",
+                         "D2S1338",
+                         "D3S1358",
+                         "D5S818",
+                         "D7S820",
+                         "D8S1179",
+                         "D13S317",
+                         "D16S539",
+                         "D18S51",
+                         "D19S433",
+                         "D21S11",
+                         "FGA",
+                         "Penta D",
+                         "Penta E",
+                         "PentaD",
+                         "PentaE",
+                         "TH01",
+                         "TPOX",
+                         "vWA",
+                         "D1S1656",
+                         "D2S441",
+                         "D6S1043",
+                         "D10S1248",
+                         "D12S391",
+                         "D22S1045",
+                         "DXS101",
+                         "DYS391",
+                         "F13A01",
+                         "F13B",
+                         "FESFPS",
+                         "LPL",
+                         "Penta C",
+                         "PentaC",
+                         "SE33"]
 
     # remove extra fields, if present as keys may come from _clastr_query or other.
-    query_markers = [marker for marker in markers if marker not in ['algorithm', 'includeAmelogenin', 'scoreFilter', 'description']]
+    query_markers = [marker for marker in markers if marker not in ["algorithm", "includeAmelogenin", "scoreFilter", "description"]]
 
     missing_markers = list(set(query_markers) - set(valid_api_markers))
 

@@ -208,13 +208,13 @@ def clastr_batch_post_request(
     url = "https://www.cellosaurus.org/str-search/api/batch/"
 
     clastr_query = [utils._pentafix(item, reverse=True) for item in clastr_query]
-    clastr_query = [dict(item, **{'algorithm': search_algorithm}) for item in clastr_query]
-    clastr_query = [dict(item, **{'scoringMode': scoring_mode}) for item in clastr_query]
-    clastr_query = [dict(item, **{'scoreFilter': score_filter}) for item in clastr_query]
-    clastr_query = [dict(item, **{'includeAmelogenin': score_amel}) for item in clastr_query]
-    clastr_query = [dict(item, **{'minMarkers': min_markers}) for item in clastr_query]
-    clastr_query = [dict(item, **{'maxResults': max_results}) for item in clastr_query]
-    clastr_query = [dict(item, **{'outputFormat': 'xlsx'}) for item in clastr_query]
+    clastr_query = [dict(item, **{"algorithm": search_algorithm}) for item in clastr_query]
+    clastr_query = [dict(item, **{"scoringMode": scoring_mode}) for item in clastr_query]
+    clastr_query = [dict(item, **{"scoreFilter": score_filter}) for item in clastr_query]
+    clastr_query = [dict(item, **{"includeAmelogenin": score_amel}) for item in clastr_query]
+    clastr_query = [dict(item, **{"minMarkers": min_markers}) for item in clastr_query]
+    clastr_query = [dict(item, **{"maxResults": max_results}) for item in clastr_query]
+    clastr_query = [dict(item, **{"outputFormat": "xlsx"}) for item in clastr_query]
 
     print("Querying CLASTR API at: ", url, file=log_file)
     r = requests.post(url, data=json.dumps(clastr_query))
