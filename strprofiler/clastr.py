@@ -224,7 +224,7 @@ def clastr_batch_post_request(
     except requests.exceptions.HTTPError as e:
         print("Request failed with error: '", e, "'", file=log_file)
         print("Request failed with error: '", e, "'")
-        return ''
+        return ""
 
     print("Response from query: ", r.status_code, file=log_file)
 
