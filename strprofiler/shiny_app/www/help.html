@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Michael W. Lloyd, The Jackson Laboratory" />
+<meta name="author" content="Jared Andrews, St. Jude Children’s Research Hospital" />
 
 
-<title>STRprofiler</title>
+<title>STRprofiler Shiny Application Usage</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1501,13 +1503,16 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">STRprofiler</h1>
-<h3 class="subtitle">This site and tool are intended for research
-purposes only.</h3>
+<h1 class="title toc-ignore">STRprofiler Shiny Application Usage</h1>
+<h4 class="author">Michael W. Lloyd, The Jackson Laboratory</h4>
+<h4 class="author">Jared Andrews, St. Jude Children’s Research
+Hospital</h4>
 
 </div>
 
 
+<p><strong>This site and tool are intended for research purposes
+only.</strong></p>
 <div id="database-queries" class="section level1">
 <h1>Database Queries</h1>
 <p>For a provided sample entered manually in the
@@ -1520,8 +1525,8 @@ known STR profiles.</p>
 of samples is provided.</p>
 <div id="default-database" class="section level2">
 <h2>Default Database</h2>
-<p>Current data underlying the default database were provided by: <a href="https://tumor.informatics.jax.org/mtbwi/pdxSearch.do">The Jackson
-Laboratory PDX program</a></p>
+<p>Current data underlying the default database were provided by <a href="https://tumor.informatics.jax.org/mtbwi/pdxSearch.do">The Jackson
+Laboratory PDX program</a>.</p>
 <p>If this app is hosted with a custom database, please contact the host
 for information on the database source.</p>
 </div>
@@ -1537,7 +1542,7 @@ API</a>.</p>
 <div id="single-query-report" class="section level2">
 <h2>Single Query Report</h2>
 <p>For individual samples, a report is generated with the following
-fields when ‘STR DB’ is selected as the search type.</p>
+fields when ‘STRprofiler Database’ is selected as the search type.</p>
 <table>
 <colgroup>
 <col width="44%" />
@@ -1584,7 +1589,7 @@ and database sample (if Master Ref selected).</td>
 </tr>
 <tr class="odd">
 <td align="left">Markers 1 … n</td>
-<td align="left">Marker alleles with mismatches highlight.</td>
+<td align="left">Marker alleles with mismatches highlighted.</td>
 </tr>
 </tbody>
 </table>
@@ -1622,7 +1627,7 @@ Filter.</td>
 </tr>
 <tr class="even">
 <td align="left">Markers 1 … n</td>
-<td align="left">Marker alleles with mismatches highlight.</td>
+<td align="left">Marker alleles with mismatches highlighted.</td>
 </tr>
 </tbody>
 </table>
@@ -1633,9 +1638,7 @@ defined by the user.</p>
 </div>
 <div id="batch-query-report" class="section level2">
 <h2>Batch Query Report</h2>
-<p>For batched samples, a report is summary report is generated. For
-individual sample comparison report, enter the individual sample in the
-database query tab.</p>
+<p>For batched samples, a summary report is generated.</p>
 <table>
 <colgroup>
 <col width="44%" />
@@ -1651,8 +1654,9 @@ database query tab.</p>
 <tr class="odd">
 <td align="left">Mixed Sample</td>
 <td align="left">Flag to indicate sample mixing. Sample mixing is
-determined by the “‘Mixed’ Sample Threshold” option. If more markers are
-tri+</td>
+determined by the “‘Mixed’ Sample Threshold” option. If more markers
+have more than 3 alleles for this number of markers, the sample will be
+flagged as potentially mixed.</td>
 </tr>
 <tr class="even">
 <td align="left">Top Match</td>
@@ -1685,10 +1689,11 @@ than or equal to the <code>Similarity Score Filter Thresholds</code>
 defined by the user.</p>
 <p>When <code>Cellosaurus Database (CLASTR)</code> is selected as the
 search type, a report is generated in XLSX format, and can be downloaded
-via the <code>Download XLSX</code> button.</p>
+via the <code>Download XLSX</code> button. These results will not be
+displayed in the app window directly, they must be downloaded.</p>
 </div>
-<div id="database-file-managment" class="section level2">
-<h2>Database File Managment</h2>
+<div id="database-file-management" class="section level2">
+<h2>Database File Management</h2>
 <p>Users can upload custom database files. The files must be in CSV
 format. A ‘Sample’ header must be present, but custom marker names may
 be used. Note that to score <code>Amelogenin</code> using the option
@@ -1699,8 +1704,8 @@ file.</p>
 </div>
 <div id="within-file-query" class="section level1">
 <h1>Within File Query</h1>
-<p>For batch samples entered in the File Query tab,
-<code>STR Similarity</code> will generate a report that mirrors the
+<p>For batch samples entered in the <strong>Within File Query</strong>
+tab, <code>STRprofiler</code> will generate a report that mirrors the
 batch query above, except that samples will be queried against each
 other rather than against the database. The report is filtered to
 include only those samples with greater than or equal to the
@@ -1751,33 +1756,40 @@ results. Only those samples with &gt;= the threshold will appear in
 results. [default: 80]</li>
 </ul>
 </div>
-<div id="batch-and-file-query-specfic" class="section level2">
-<h2>Batch and File Query Specfic</h2>
-<p><code>STRprofiler Database</code> options:<br />
-* Amelogenin scoring is excluded by default but can be included by
-selecting the option. * Tanabe Filter Threshold: is the Tanabe score
-threshold over which a sample is considered a match in batch and file
-queries. [default: 80] * Masters (vs. query) Filter Threshold: is the
-Masters (vs. query) score threshold over which a sample is considered a
-match in batch and file queries. [default: 80] * Masters (vs. reference)
-Filter Threshold: is the Masters (vs. reference) score threshold over
-which a sample is considered a match in batch and file queries.
-[default: 80]</p>
-<p><code>Cellosaurus Database (CLASTR)</code> options:<br />
-* Similarity Score Filter: is the similiarity score used for result
-filtering. [default: Tanabe] * Similarity Score Filter Threshold: is the
-threshold to filter results. Only those samples with &gt;= the threshold
-will appear in results. [default: 80]</p>
+<div id="batch-and-file-query-specific" class="section level2">
+<h2>Batch and File Query Specific</h2>
+<p><code>STRprofiler Database</code> options:</p>
+<ul>
+<li>Amelogenin scoring is excluded by default but can be included by
+selecting the option.</li>
+<li>Tanabe Filter Threshold: is the Tanabe score threshold over which a
+sample is considered a match in batch and file queries. [default:
+80]</li>
+<li>Masters (vs. query) Filter Threshold: is the Masters (vs. query)
+score threshold over which a sample is considered a match in batch and
+file queries. [default: 80]</li>
+<li>Masters (vs. reference) Filter Threshold: is the Masters
+(vs. reference) score threshold over which a sample is considered a
+match in batch and file queries. [default: 80]</li>
+</ul>
+<p><code>Cellosaurus Database (CLASTR)</code> options:</p>
+<ul>
+<li>Similarity Score Filter: is the similiarity score used for result
+filtering. [default: Tanabe]</li>
+<li>Similarity Score Filter Threshold: is the threshold to filter
+results. Only those samples with &gt;= the threshold will appear in
+results. [default: 80]</li>
+</ul>
 <hr />
 </div>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
-<p><code>strprofiler</code> is provided under the MIT license. If you
+<p><code>STRprofiler</code> is provided under the MIT license. If you
 use this app in your research please cite:<br />
 Jared Andrews, Mike Lloyd, &amp; Sam Culley. (2024).
 <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>:
-v0.2.0. Zenodo.
+v0.3.0. Zenodo.
 <a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a></p>
 <p>Bairoch A. (2018) The Cellosaurus, a cell line knowledge resource.
 Journal of Biomolecular Techniques. 29:25-38. DOI:
