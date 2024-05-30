@@ -214,6 +214,17 @@ Output for `clastr` is provided in XLSX format. Results follow the CLASTR format
 
 In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s).
 
+### Database Format
+
+The database should be formatted as a samples by markers matrix and saved as a csv file, e.g:
+
+|Sample       |Amelogenin|CSF1PO|D13S317|D16S539|D18S51|D19S433|D21S11 |D2S1338|D3S1358|D5S818|D7S820|D8S1179|FGA|TH01 |TPOX|vWA|PentaE |PentaD |
+|-------------|----------|------|-------|-------|------|-------|-------|-------|-------|------|------|-------|---|-----|----|---|-------|-------|
+|sample1      |X,Y       |12    |8      |13     |14    |14     |31,31.2|17,19  |15     |11,12 |11,12 |12,15  |23 |7,9.3|8   |18 |       |       |
+|sample2      |X         |10    |9      |13     |16    |12,14  |29     |20,23  |15,16  |12,13 |9,12  |14,15  |18 |7    |8,9 |15 |       |       |
+
+Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns.
+
 ## The STRprofiler App
 
 New in v0.2.0 is `strprofiler-app`, a command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
@@ -236,20 +247,11 @@ app = create_app(db=database)
 ```
 
 If no database is provided, an example database included with the package will be used. 
+The database file uses same format as for the standard `strprofiler` command.
+
 This app can then be deployed to any of the above endpoints as [one would with any other Shiny app](https://shiny.posit.co/py/docs/deploy.html).
 
 Alternatively, one could export it as a shinylive app and host it on Github pages or similar.
-
-#### Database Format
-
-The database should be formatted as a samples by markers matrix and saved as a csv, tsv, tab-delimited txt, or xlsx file, the same format as for the standard `strprofiler` command, e.g:
-
-|Sample       |Amelogenin|CSF1PO|D13S317|D16S539|D18S51|D19S433|D21S11 |D2S1338|D3S1358|D5S818|D7S820|D8S1179|FGA|TH01 |TPOX|vWA|PentaE |PentaD |
-|-------------|----------|------|-------|-------|------|-------|-------|-------|-------|------|------|-------|---|-----|----|---|-------|-------|
-|sample1      |X,Y       |12    |8      |13     |14    |14     |31,31.2|17,19  |15     |11,12 |11,12 |12,15  |23 |7,9.3|8   |18 |       |       |
-|sample2      |X         |10    |9      |13     |16    |12,14  |29     |20,23  |15,16  |12,13 |9,12  |14,15  |18 |7    |8,9 |15 |       |       |
-
-Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns.
 
 ## Contributing
 You can contribute by creating [issues](https://github.com/j-andrews7/strprofiler/issues) to highlight bugs and make suggestions for additional features.
