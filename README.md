@@ -8,7 +8,7 @@
 [![PyPI license](https://img.shields.io/pypi/l/strprofiler.svg)](https://pypi.python.org/pypi/strprofiler/)
 [![DOI](https://zenodo.org/badge/523477912.svg)](https://zenodo.org/badge/latestdoi/523477912)
 
-**STRprofiler** is a python package, CLI tool, and Shiny application to compare short tandem repeat (STR) profiles. In particular, it is designed to aid research labs in comparing models (e.g. cell lines & xenografts) generated from primary tissue samples to ensure contamination has not occurred. It includes basic checks for sample mixing and contamination and provides a simple interface to conveniently query the [Cellosaurus database via the CLASTR API](https://www.cellosaurus.org/str-search/).
+**STRprofiler** is a python package, CLI tool, and [Shiny application](https://sj-bakerlab.shinyapps.io/strprofiler/) to compare short tandem repeat (STR) profiles. In particular, it is designed to aid research labs in comparing models (e.g. cell lines & xenografts) generated from primary tissue samples to ensure contamination has not occurred. It includes basic checks for sample mixing and contamination and provides a simple interface to conveniently query the [Cellosaurus database via the CLASTR API](https://www.cellosaurus.org/str-search/).
 
 **STRprofiler is intended only for research purposes.**
 
@@ -231,7 +231,7 @@ New in v0.2.0 is `strprofiler-app`, a command that launches a Shiny application 
 
 This application can provide a convenient portal to a group's STR database and can be hosted on standard Shiny servers, Posit Connect instances, or ShinyApps.io. 
 
-An example of the application can be seen [here](https:sj-bakerlab.shinyapps.io/strprofiler/).
+An example of the application can be seen [here](https://sj-bakerlab.shinyapps.io/strprofiler/).
 
 ### Deploying an `strprofiler` App
 
