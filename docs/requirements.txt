@@ -7,3 +7,5 @@ shinyswatch
 faicons
 requests
 flatten-json
+json
+requests

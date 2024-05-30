@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "strprofiler"
 version = "0.3.0"
-description = "A simple python utility to compare short tandem repeat (STR) profiles."
+description = "A python package, CLI tool, and Shiny application to compare short tandem repeat (STR) profiles."
 authors = ["Jared Andrews <jared.andrews07@gmail.com>",
            "Mike Lloyd <mike.lloyd@jax.org>"]
 license = "MIT"
@@ -25,7 +25,7 @@ flatten-json = "^0.1.14"
 
 [tool.poetry.scripts]
 strprofiler = 'strprofiler.strprofiler:strprofiler'
-clastr = 'strprofiler.clastr:clastr_batch_post_request'
+clastr = 'strprofiler.clastr:clastr_query'
 strprofiler-app = 'strprofiler.strprofiler:local_shiny_app'
 
 [build-system]
