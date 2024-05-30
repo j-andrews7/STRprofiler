@@ -11,7 +11,9 @@ from strprofiler.shiny_app.clastr_api import _clastr_query, _clastr_batch_query
 from datetime import date
 import time
 import importlib.resources
+import importlib.metadata
 
+version = "v" + importlib.metadata.version("strprofiler")
 
 def database_load(file):
     """
@@ -131,9 +133,12 @@ def create_app(db=None):
 
     app_ui = ui.page_fluid(
         ui.panel_title("", "STR Profiler"),
-        ui.tags.style("#main {padding:12px !important} #sidebar {padding:12px}"),
+        ui.tags.style("#main {padding:12px !important} #sidebar {padding:12px} #version {padding:8px}"),
         ui.tags.style(
-            ".h3 {margin-bottom:0.1rem; line-height:1} .card-body {padding-top:6px; padding-bottom:6px}"
+            ".h3 {margin-bottom:0.1rem; line-height:1; font-size:26px} .card-body {padding-top:6px; padding-bottom:6px} .table {font-size:12px}"
+        ),
+        ui.tags.style(
+            ".hr {margin:8px 0 !important}"
         ),
         ui.page_navbar(
             shinyswatch.theme.superhero(),
@@ -240,13 +245,12 @@ def create_app(db=None):
                         ),
                     )
                 ),
-                ui.tags.hr(),
+                ui.tags.hr({"style": "margin-top:0.3rem; margin-bottom:0.5rem"}),
                 ui.card(
                     ui.row(
                         ui.column(3, ui.tags.h3("Results")),
                         ui.column(1, ui.p("")),
                     ),
-                    # TO DO: Try loading/thinking spinners.
                     ui.column(
                         12,
                         {"id": "res_card"},
@@ -487,6 +491,9 @@ def create_app(db=None):
                     href="https://github.com/j-andrews7/strprofiler",
                     target="_blank",
                 ),
+            ),
+            ui.nav_control(
+                ui.span(ui.p({"id": "version"}, version))
             ),
             title=ui.tags.a(
                 ui.tags.img(
