@@ -86,11 +86,6 @@ Full usage information can be found by running `strprofiler --help`.
 
 Additionally, the [Cellosaurus](https://www.cellosaurus.org/description.html) (Bairoch, 2018) cell line database can be queried via the [CLASTR](https://www.cellosaurus.org/str-search/) (Robin, Capes-Davis, and Bairoch, 2019) [REST API](https://www.cellosaurus.org/str-search/help.html#5).  
 
-    Bairoch A. (2018) The Cellosaurus, a cell line knowledge resource. Journal of Biomolecular Techniques. 29:25-38. DOI: 10.7171/jbt.18-2902-002; PMID: 29805321 
-
-    Robin, T., Capes-Davis, A. & Bairoch, A. (2019) CLASTR: the Cellosaurus STR Similarity Search Tool - A Precious Help for Cell Line Authentication. International Journal of Cancer. PubMed: 31444973  DOI: 10.1002/IJC.32639
-
-
 `clastr -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
 
 Full usage information can be found by running `clastr --help`.
@@ -264,8 +259,14 @@ You can contribute by creating [issues](https://github.com/j-andrews7/strprofile
 
 **STRprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. It is released with zero warranty for any purpose and the authors retain no liability for its use. [Read the full license](https://github.com/j-andrews7/strprofiler/blob/master/LICENSE) for additional details.
 
-## Reference
+## References
 
 If you use **STRprofiler** in your research, please cite the DOI:
 
 Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.3.0 (v0.3.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
+
+If you use the `clastr` command or functionality from the Shiny application, please cite the Cellosaurus and CLASTR publications:
+
+Bairoch A. (2018) The Cellosaurus, a cell line knowledge resource. Journal of Biomolecular Techniques. 29:25-38. DOI: 10.7171/jbt.18-2902-002; PMID: 29805321 
+
+Robin, T., Capes-Davis, A. & Bairoch, A. (2019) CLASTR: the Cellosaurus STR Similarity Search Tool - A Precious Help for Cell Line Authentication. International Journal of Cancer. PubMed: 31444973  DOI: 10.1002/IJC.32639
