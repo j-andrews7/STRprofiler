@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.0
+
+**Release date: 05/30/2024**
+
+ - Added ability to query the CLASTR API for single or batch queries from within the STRprofiler 
+ app - [#24](https://github.com/j-andrews7/strprofiler/pull/24).
+ - Numerous UI tweaks for a more compact experience.
+
 ## v0.2.0
 
 **Release date: 04/16/2024**

@@ -25,6 +25,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.conda/*
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -153,3 +154,4 @@ cython_debug/
 .DS_Store
 
 strprofiler.json
+testing.xlsx

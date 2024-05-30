@@ -12,7 +12,39 @@ def _single_query(
     query_filter,
     query_filter_threshold,
 ):
-
+    """
+    :param query: dictionary in the format:
+        {"Amelogenin": "X,Y",
+            "CSF1PO": "12",
+            ... <additional markers>
+        }
+    containing query sample markers and alleles.
+    :type query: dict
+    :param str_database: dictionary of dictonaries in the format
+        {ref1: {
+            "Amelogenin": "X,Y",
+            "CSF1PO": "12",
+            ... <additional markers>
+            }
+        ref2: {
+            "Amelogenin": "X,Y",
+            "CSF1PO": "12",
+            ... <additional markers>
+            }
+        }
+    containing reference database of known sample markers and alleles.
+    :type str_database: dict
+    :param use_amel: use Amelogenin for similarity scoring
+    :type use_amel: bool
+    :param three_allele_threshold: number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing
+    :type three_allele_threshold: int
+    :param query_filter: similiarity score to use. Options are: Tanabe, Masters Query, and Masters Reference
+    :type query_filter: str
+    :param query_filter_threshold: Minimum score to report as potential matches in summary table
+    :type query_filter_threshold: int
+    :return: pd.df containing results from similarity comparison.
+    :rtype: pd.df
+    """
     if query_filter == "Tanabe":
         query_filter_name = "tanabe_score"
         drop_cols = [
@@ -123,7 +155,47 @@ def _batch_query(
     mas_q_threshold,
     mas_r_threshold,
 ):
-
+    """
+    :param query: dictonary of dictionaries in the format
+        {Sample1: {
+            "Amelogenin": "X,Y",
+            "CSF1PO": "12",
+            ... <additional markers>
+            }
+        Sample2: {
+            "Amelogenin": "X,Y",
+            "CSF1PO": "12",
+            ... <additional markers>
+            }
+        }
+    :type query: dict
+    :param str_database: dictionary of dictonaries in the format
+        {ref1: {
+            "Amelogenin": "X,Y",
+            "CSF1PO": "12",
+            ... <additional markers>
+            }
+        ref2: {
+            "Amelogenin": "X,Y",
+            "CSF1PO": "12",
+            ... <additional markers>
+            }
+        }
+    containing reference database of known sample markers and alleles.
+    :type str_database: dict
+    :param use_amel: use Amelogenin for similarity scoring
+    :type use_amel: bool
+    :param three_allele_threshold: number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing
+    :type three_allele_threshold: int
+    :param tan_threshold: Minimum Tanabe score to report as potential matches in summary table
+    :type tan_threshold: int
+    :param mas_q_threshold: Minimum Masters (vs. query) score to report as potential matches in summary table
+    :type mas_q_threshold: int
+    :param mas_r_threshold: Minimum Masters (vs. reference) score to report as potential matches in summary table
+    :type mas_r_threshold: int
+    :return: pd.df containing results from similarity comparison.
+    :rtype: pd.df
+    """
     summaries = []
 
     for s in query_df.keys():
@@ -220,7 +292,33 @@ def _file_query(
     mas_q_threshold,
     mas_r_threshold,
 ):
-
+    """
+    :param query: dictonary of dictionaries in the format
+        {Sample1: {
+            "Amelogenin": "X,Y",
+            "CSF1PO": "12",
+            ... <additional markers>
+            }
+        Sample2: {
+            "Amelogenin": "X,Y",
+            "CSF1PO": "12",
+            ... <additional markers>
+            }
+        }
+    :type query: dict
+    :param use_amel: use Amelogenin for similarity scoring
+    :type use_amel: bool
+    :param three_allele_threshold: number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing
+    :type three_allele_threshold: int
+    :param tan_threshold: Minimum Tanabe score to report as potential matches in summary table
+    :type tan_threshold: int
+    :param mas_q_threshold: Minimum Masters (vs. query) score to report as potential matches in summary table
+    :type mas_q_threshold: int
+    :param mas_r_threshold: Minimum Masters (vs. reference) score to report as potential matches in summary table
+    :type mas_r_threshold: int
+    :return: pd.df containing results from similarity comparison.
+    :rtype: pd.df
+    """
     summaries = []
 
     for s in query_df.keys():
