@@ -93,7 +93,7 @@ Full usage information can be found by running `clastr --help`.
 ```bash
  Usage: clastr [OPTIONS] INPUT_FILES...   
 
-**clastr** compares STR profiles to the human Cellosaurus knowledge base using the CLASTR REST API.  
+**clastr** compares STR profiles to the human Cellosaurus knowledge base using the CLASTR REST API.
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────╮
 │ --search_algorithm  -sa    INT  Search algorithm to use in the CLASTR query.             |
