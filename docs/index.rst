@@ -54,10 +54,19 @@ Usage
 .. autofunction:: strprofiler.strprofiler.strprofiler
 
 
+Querying CLASTR
+===============
+
+**STRprofiler** can also be used to directly query CLASTR via their API. 
+This can be done from within the Shiny application or from the command line via the ``clastr`` command or using the ``clastr_query`` function directly:
+
+.. autofunction:: strprofiler.clastr.clastr_query
+
 Input Files(s)
 ~~~~~~~~~~~~~~
 
-**STRprofiler** can take either a single STR file or multiple STR files as input. These files can be csv, tsv, tab-separated text, or xlsx (first sheet used) files. The STR file(s) should be in either 'wide' or 'long' format. The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
+**STRprofiler** can take either a single STR file or multiple STR files as input. 
+These files can be csv, tsv, tab-separated text, or xlsx (first sheet used) files. The STR file(s) should be in either 'wide' or 'long' format. The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
 
 +--------+---------+---------+---------+--------+---------+--------+
 | Sample | D1S1656 |  DYS391 | D3S1358 | D2S441 | D16S539 | D5S818 | 
@@ -139,7 +148,7 @@ The wide format expects a line for each marker for each sample, e.g.:
 | Sample2      |  FGA      | 21          | 294.67  | 11941       |             |         |             |             |
 +--------------+-----------+-------------+---------+-------------+-------------+---------+-------------+-------------+
 
-In this format, the `marker_col` must be specified. Only columns beginning with "Allele" will be used to parse the alleles for each sample/marker. Any other size or height columns will be ignored.
+In this format, the ``marker_col`` must be specified. Only columns beginning with "Allele" will be used to parse the alleles for each sample/marker. Any other size or height columns will be ignored.
 
 Output Files
 ~~~~~~~~~~~~
@@ -201,16 +210,31 @@ Database Comparison
 
 In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s).
 
-The `STRprofiler` App
-=====================
+Database Format
+^^^^^^^^^^^^^^^
 
-New in v0.2.0 is `strprofiler-app`, a command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
+The database should be formatted as a samples by markers matrix and saved as a csv file, e.g:
+
++-----------+------------+--------+---------+---------+--------+---------+---------+---------+---------+
+| Sample    | Amelogenin | CSF1PO | D13S317 | D16S539 | D18S51 | D19S433 | D21S11  | D2S1338 | D3S1358 |
++===========+============+========+=========+=========+========+=========+=========+=========+=========+
+| sample1   | X,Y        | 12     | 8       | 13      | 14     | 14      | 31,31.2 | 17,19   | 15      |
++-----------+------------+--------+---------+---------+--------+---------+---------+---------+---------+
+| sample2   | X          | 10     | 9       | 13      | 16     | 12,14   | 29      | 20,23   | 15,16   |
++-----------+------------+--------+---------+---------+--------+---------+---------+---------+---------+
+
+Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns.
+
+The ``STRprofiler`` App
+=======================
+
+New in v0.2.0 is ``strprofiler-app``, a CLI command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
 
 This application can provide a convenient portal to a group's STR database and can be hosted on standard Shiny servers, Posit Connect instances, or ShinyApps.io. 
 
-An example of the application can be seen `here <https://hg99x7-jared0andrews.shinyapps.io/strprofiler/>`__.
+An example of the application can be seen `here <https://sj-bakerlab.shinyapps.io/strprofiler/>`__.
 
-Deploying an ``strprofiler`` App
+Deploying an ``STRprofiler`` App
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Building an app for deployment to any of the above options is simple.
@@ -225,24 +249,20 @@ First, make your app.py file:
    app = create_app(db=database)
 
 If no database is provided, an example database included with the package will be used. 
+The database file should be a csv file with the same format as described above.
+
+Then create a requirements.txt file in the same directory with `strprofiler` listed:
+
+.. code:: bash
+   strprofiler>=0.3.0
+
 This app can then be deployed to any of the above endpoints as `one would with any other Shiny app <https://shiny.posit.co/py/docs/deploy.html>`__.
 
+.. code:: bash
+   rsconnect deploy shiny -n your_server -t STRprofiler .
+
+
 Alternatively, one could export it as a shinylive app and host it on Github pages or similar.
-
-Database Format
-^^^^^^^^^^^^^^^
-
-The database should be formatted as a samples by markers matrix and saved as a csv, tsv, tab-delimited txt, or xlsx file, the same format as for the standard `strprofiler` command, e.g:
-
-+-----------+------------+--------+---------+---------+--------+---------+---------+---------+---------+
-| Sample    | Amelogenin | CSF1PO | D13S317 | D16S539 | D18S51 | D19S433 | D21S11  | D2S1338 | D3S1358 |
-+===========+============+========+=========+=========+========+=========+=========+=========+=========+
-| sample1   | X,Y        | 12     | 8       | 13      | 14     | 14      | 31,31.2 | 17,19   | 15      |
-+-----------+------------+--------+---------+---------+--------+---------+---------+---------+---------+
-| sample2   | X          | 10     | 9       | 13      | 16     | 12,14   | 29      | 20,23   | 15,16   |
-+-----------+------------+--------+---------+---------+--------+---------+---------+---------+---------+
-
-Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns.
 
 Other Functions
 ===============
@@ -258,13 +278,15 @@ You can contribute by creating `issues <https://github.com/j-andrews7/strprofile
 License
 =======
 
-**strprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. It is released with zero warranty for any purpose and I retain no liability for its use. `Read the full license <https://github.com/j-andrews7/strprofiler/blob/master/LICENSE>`_ for additional details.
+**STRprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. 
+It is released with zero warranty for any purpose and the authors retain no liability for its use. 
+`Read the full license <https://github.com/j-andrews7/strprofiler/blob/master/LICENSE>`_ for additional details.
 
 Reference
 =========
 
-If you use **strprofiler** in your research, please cite the following:
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.2.0 (v0.2.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
+If you use **STRprofiler** in your research, please cite the following:
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.3.0 (v0.3.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
 
 Indices and tables
 ==================

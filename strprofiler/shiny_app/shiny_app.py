@@ -4,13 +4,16 @@ from shiny.types import FileInfo, ImgData
 import pandas as pd
 from faicons import icon_svg
 
-import strprofiler.utils as sp
+import strprofiler.utils as utils
 from strprofiler.shiny_app.calc_functions import _single_query, _batch_query, _file_query
+from strprofiler.shiny_app.clastr_api import _clastr_query, _clastr_batch_query
 
 from datetime import date
 import time
 import importlib.resources
+import importlib.metadata
 
+version = "v" + importlib.metadata.version("strprofiler")
 
 def database_load(file):
     """
@@ -26,7 +29,7 @@ def database_load(file):
         Exception: If the file fails to load or if sample ID names are duplicated.
     """
     try:
-        str_database = sp.str_ingress(
+        str_database = utils.str_ingress(
             [file],  # expects list
             sample_col="Sample",
             marker_col="Marker",
@@ -65,9 +68,44 @@ def _highlight_non_matches(s):
     is_match = s == s.iloc[0]
     return ["text-align:center;background-color:#ec7a80" if not v else "text-align:center" for v in is_match]
 
+
+def _link_wrap(name, link, problem):
+    if name == 'Query':
+        return name
+    if problem != "":
+        return ui.tooltip(ui.tags.a(name, href=str(link), target="_blank", style="text-align:center;font-style:oblique;color:#ec7a80"), f"{problem}")
+    else:
+        return ui.tags.a(name, href=str(link), target="_blank")
+
+
+def notify_modal(marker_list):
+    ui.modal_show(
+        ui.modal(
+            "Marker(s): {} are incompatible with the CLASTR query."
+            .format(str(marker_list)[1:-1]),
+            ui.tags.br(),
+            ui.tags.br(),
+            "The marker(s) will not be used in the query.",
+            ui.tags.br(),
+            ui.tags.br(),
+            "See: ", ui.tags.a('CLASTR', href=str("https://www.cellosaurus.org/str-search/"), target="_blank"),
+            " for a complete list of compatible marker names",
+            title="Incompatible CLASTR Markers",
+            easy_close=True,
+            footer=ui.modal_button("Understood")
+        )
+    )
+
+
+def notify_non_int():
+    ui.modal_show(
+        ui.notification_show(
+            "Threshold must be an integer",
+        )
+    )
+
+
 # App Generation ###
-
-
 def create_app(db=None):
 
     f = importlib.resources.files("strprofiler.shiny_app")
@@ -93,11 +131,14 @@ def create_app(db=None):
         )
     )
 
-    # TODO move this to a separate function
     app_ui = ui.page_fluid(
-        ui.tags.style("#main {padding:12px !important} #sidebar {padding:12px}"),
+        ui.panel_title("", "STR Profiler"),
+        ui.tags.style("#main {padding:12px !important} #sidebar {padding:12px} #version {padding:8px}"),
         ui.tags.style(
-            ".h3 {margin-bottom:0.1rem; line-height:1} .card-body {padding-top:6px; padding-bottom:6px}"
+            ".h3 {margin-bottom:0.1rem; line-height:1; font-size:26px} .card-body {padding-top:6px; padding-bottom:6px} .table {font-size:12px}"
+        ),
+        ui.tags.style(
+            ".hr {margin:8px 0 !important}"
         ),
         ui.page_navbar(
             shinyswatch.theme.superhero(),
@@ -176,11 +217,22 @@ def create_app(db=None):
                                 ui.column(4, ui.output_ui("loaded_example_text")),
                                 ui.column(
                                     4,
-                                    ui.input_action_button(
-                                        "search",
-                                        "Search",
-                                        class_="btn-success",
-                                        width="45%",
+                                    ui.input_select(
+                                        "search_type",
+                                        "Search Type",
+                                        ["STRprofiler Database", "Cellosaurus Database (CLASTR)"],
+                                        width="90%"
+                                    ),
+                                    ui.tooltip(
+                                        ui.input_task_button(
+                                            "search",
+                                            "Search",
+                                            class_="btn-success",
+                                            width="45%",
+                                        ),
+                                        "Query STRprofiler Database",
+                                        id="tt_selected_search",
+                                        placement="left",
                                     ),
                                     ui.input_action_button(
                                         "reset",
@@ -193,7 +245,7 @@ def create_app(db=None):
                         ),
                     )
                 ),
-                ui.tags.hr(),
+                ui.tags.hr({"style": "margin-top:0.3rem; margin-bottom:0.5rem"}),
                 ui.card(
                     ui.row(
                         ui.column(3, ui.tags.h3("Results")),
@@ -215,35 +267,74 @@ def create_app(db=None):
                             ui.panel_sidebar(
                                 {"id": "batch_sidebar"},
                                 ui.tags.h3("Options"),
-                                ui.tags.hr(),
+                                ui.input_select(
+                                        "search_type_batch",
+                                        "Search Type",
+                                        ["STRprofiler Database", "Cellosaurus Database (CLASTR)"],
+                                        width="100%"
+                                ),
                                 ui.card(
                                     ui.input_switch(
                                         "score_amel_batch", "Score Amelogenin", value=False
                                     ),
-                                    ui.input_numeric(
-                                        "mix_threshold_batch",
-                                        "'Mixed' Sample Threshold",
-                                        value=3,
-                                        width="100%",
+                                    ui.panel_conditional(
+                                        "input.search_type_batch === 'STRprofiler Database'",
+                                        ui.row(
+                                            ui.column(6,
+                                                ui.input_numeric(
+                                                    "mix_threshold_batch",
+                                                    "'Mixed' Sample Threshold",
+                                                    value=3,
+                                                    width="100%",
+                                                ),
+                                                ui.input_numeric(
+                                                    "mas_q_threshold_batch",
+                                                    "Masters (vs. query) Filter Threshold",
+                                                    value=80,
+                                                    width="100%",
+                                                )
+                                            ),
+                                            ui.column(6,
+                                                ui.input_numeric(
+                                                    "tan_threshold_batch",
+                                                    "Tanabe Filter Threshold",
+                                                    value=80,
+                                                    width="100%",
+                                                ),
+                                                ui.input_numeric(
+                                                    "mas_r_threshold_batch",
+                                                    "Masters (vs. reference) Filter Threshold",
+                                                    value=80,
+                                                    width="100%",
+                                                )
+                                            )
+                                        )
                                     ),
-                                    ui.input_numeric(
-                                        "tan_threshold_batch",
-                                        "Tanabe Filter Threshold",
-                                        value=80,
-                                        width="100%",
-                                    ),
-                                    ui.input_numeric(
-                                        "mas_q_threshold_batch",
-                                        "Masters (vs. query) Filter Threshold",
-                                        value=80,
-                                        width="100%",
-                                    ),
-                                    ui.input_numeric(
-                                        "mas_r_threshold_batch",
-                                        "Masters (vs. reference) Filter Threshold",
-                                        value=80,
-                                        width="100%",
-                                    ),
+                                    ui.panel_conditional(
+                                        "input.search_type_batch === 'Cellosaurus Database (CLASTR)'",
+                                        ui.row(
+                                            ui.column(6,
+                                                ui.input_select(
+                                                    "batch_query_filter",
+                                                    "Similarity Score Filter",
+                                                    choices=[
+                                                        "Tanabe",
+                                                        "Masters Query",
+                                                        "Masters Reference",
+                                                    ],
+                                                    width="100%"
+                                                )
+                                            ),
+                                            ui.column(6,
+                                                ui.input_numeric(
+                                                    "batch_query_filter_threshold",
+                                                    "Similarity Score Filter Threshold",
+                                                    value=80,
+                                                    width="100%"
+                                                )
+                                            )
+                                        )
+                                    )
                                 ),
                                 ui.input_file(
                                     "file1",
@@ -252,7 +343,7 @@ def create_app(db=None):
                                     multiple=False,
                                     width="100%",
                                 ),
-                                ui.input_action_button(
+                                ui.input_task_button(
                                     "csv_query",
                                     "CSV Query",
                                     class_="btn-primary",
@@ -314,30 +405,36 @@ def create_app(db=None):
                                 ui.input_switch(
                                     "score_amel_file", "Score Amelogenin", value=False
                                 ),
-                                ui.input_numeric(
-                                    "mix_threshold_file",
-                                    "'Mixed' Sample Threshold",
-                                    value=3,
-                                    width="100%",
-                                ),
-                                ui.input_numeric(
-                                    "tan_threshold_file",
-                                    "Tanabe Filter Threshold",
-                                    value=80,
-                                    width="100%",
-                                ),
-                                ui.input_numeric(
-                                    "mas_q_threshold_file",
-                                    "Masters (vs. query) Filter Threshold",
-                                    value=80,
-                                    width="100%",
-                                ),
-                                ui.input_numeric(
-                                    "mas_r_threshold_file",
-                                    "Masters (vs. reference) Filter Threshold",
-                                    value=80,
-                                    width="100%",
-                                ),
+                                ui.row(
+                                    ui.column(6,
+                                        ui.input_numeric(
+                                            "mix_threshold_file",
+                                            "'Mixed' Sample Threshold",
+                                            value=3,
+                                            width="100%",
+                                        ),
+                                        ui.input_numeric(
+                                            "mas_q_threshold_file",
+                                            "Masters (vs. query) Filter Threshold",
+                                            value=80,
+                                            width="100%",
+                                        )
+                                    ),
+                                    ui.column(6,
+                                        ui.input_numeric(
+                                            "tan_threshold_file",
+                                            "Tanabe Filter Threshold",
+                                            value=80,
+                                            width="100%",
+                                        ),
+                                        ui.input_numeric(
+                                            "mas_r_threshold_file",
+                                            "Masters (vs. reference) Filter Threshold",
+                                            value=80,
+                                            width="100%",
+                                        )
+                                    )
+                                )
                             ),
                             ui.input_file(
                                 "file2",
@@ -393,7 +490,10 @@ def create_app(db=None):
                     icon_svg("github", width="30px"),
                     href="https://github.com/j-andrews7/strprofiler",
                     target="_blank",
-                )
+                ),
+            ),
+            ui.nav_control(
+                ui.span(ui.p({"id": "version"}, version))
             ),
             title=ui.tags.a(
                 ui.tags.img(
@@ -418,7 +518,7 @@ def create_app(db=None):
         output_df = reactive.value(None)
         demo_vals = reactive.value(None)
         demo_name = reactive.value(None)
-        markers = reactive.value([i for i in list(init_db[next(iter(init_db))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
+        markers = reactive.value([i for i in list(init_db[next(iter(init_db))].keys()) if not any([e for e in ["Center", "Passage"] if e in i])])
 
         @output
         @render.text
@@ -436,6 +536,24 @@ def create_app(db=None):
                 width="100%",
             )
 
+        @reactive.effect
+        @reactive.event(input.query_filter_threshold, input.batch_query_filter_threshold)
+        def _():
+            if not isinstance(input.query_filter_threshold(), int) and input.query_filter_threshold() is not None:
+                notify_non_int()
+                ui.update_numeric("query_filter_threshold", value=int(input.query_filter_threshold()))
+            if not isinstance(input.batch_query_filter_threshold(), int) and input.batch_query_filter_threshold() is not None:
+                notify_non_int()
+                ui.update_numeric("batch_query_filter_threshold", value=int(input.batch_query_filter_threshold()))
+
+        @reactive.effect
+        @reactive.event(input.search_type)
+        def update_tooltip_msg():
+            if input.search_type() == "STRprofiler Database":
+                ui.update_tooltip("tt_selected_search", "Query STRprofilier Database", show=False)
+            if input.search_type() == "Cellosaurus Database (CLASTR)":
+                ui.update_tooltip("tt_selected_search", "Query Cellosaurus Database via CLASTR API", show=False)
+
         @render.ui
         @reactive.event(markers)
         def marker_inputs():
@@ -449,7 +567,7 @@ def create_app(db=None):
             file_check.set(not file_check())
             str_database.set(init_db)
             db_name.set(init_db_name)
-            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
+            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ["Center", "Passage"] if e in i])])
             ui.remove_ui("#inserted-downloader")
             res_click.set(0)
 
@@ -471,7 +589,7 @@ def create_app(db=None):
             else:
                 return
             str_database.set(database_load(file[0]["datapath"]))
-            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ['Center', 'Passage'] if e in i])])
+            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ["Center", "Passage"] if e in i])])
             [ui.update_text(marker, value="") for marker in markers()]
             db_file_change.set(True)
             ui.remove_ui("#inserted-downloader")
@@ -585,7 +703,6 @@ def create_app(db=None):
 
                 ui.remove_ui("#inserted-downloader")
                 res_click.set(0)
-
                 return None
             if res_click() == 0:
                 ui.insert_ui(
@@ -600,36 +717,78 @@ def create_app(db=None):
                 )
                 res_click.set(1)
 
-            return _single_query(
-                query,
-                str_database(),
-                input.score_amel_query(),
-                input.mix_threshold_query(),
-                input.query_filter(),
-                input.query_filter_threshold(),
-            )
+            # isolate input.search_type to prevent trigger when options change.
+            with reactive.isolate():
+                if input.search_type() == "STRprofiler Database":
+                    results = _single_query(
+                                    query,
+                                    str_database(),
+                                    input.score_amel_query(),
+                                    input.mix_threshold_query(),
+                                    input.query_filter(),
+                                    input.query_filter_threshold(),
+                                )
+                elif input.search_type() == "Cellosaurus Database (CLASTR)":
+
+                    malformed_markers = utils.validate_api_markers(query.keys())
+                    if malformed_markers:
+                        notify_modal(malformed_markers)
+
+                    results = _clastr_query(
+                                    query,
+                                    input.query_filter(),
+                                    input.score_amel_query(),
+                                    input.query_filter_threshold()
+                                )
+                    # TO DO: Does this need to be async?
+
+            return results
 
         @output
         @render.table
         def out_result():
             output_df.set(output_results())
             if output_df() is not None:
-                out_df = output_df().copy()
-                out_df = out_df.style.set_table_attributes(
-                    'class="dataframe shiny-table table w-auto"'
-                ).hide(axis="index").apply(_highlight_non_matches, subset=markers(), axis=0).format(
-                    {
-                        "Shared Markers": "{0:0.0f}",
-                        "Shared Alleles": "{0:0.0f}",
-                        "Tanabe Score": "{0:0.2f}",
-                        "Masters Query Score": "{0:0.2f}",
-                        "Masters Ref Score": "{0:0.2f}",
-                    },
-                    na_rep=""
-                )
+                # isolate input.search_type to prevent trigger when options change.
+                with reactive.isolate():
+                    if input.search_type() == "STRprofiler Database":
+                        out_df = output_df().copy()
+                        out_df = out_df.style.set_table_attributes(
+                            'class="dataframe shiny-table table w-auto"'
+                        ).hide(axis="index").apply(_highlight_non_matches, subset=markers(), axis=0).format(
+                            {
+                                "Shared Markers": "{0:0.0f}",
+                                "Shared Alleles": "{0:0.0f}",
+                                "Tanabe Score": "{0:0.2f}",
+                                "Masters Query Score": "{0:0.2f}",
+                                "Masters Ref Score": "{0:0.2f}",
+                            },
+                            na_rep=""
+                        )
+                    elif input.search_type() == "Cellosaurus Database (CLASTR)":
+                        out_df = output_df().copy()
+                        if ("No CLASTR Result" in out_df.columns) | ("Error" in out_df.columns):
+                            return out_df
+                        try:
+                            out_df["link"] = out_df.apply(lambda x: _link_wrap(x.accession, x.accession_link, x.problem), axis=1)
+                            out_df.drop(columns=["problem"], inplace=True)
+                        except Exception:
+                            out_df["link"] = out_df.apply(lambda x: _link_wrap(x.accession, x.accession_link, ''), axis=1)
+
+                        out_df = out_df.drop(["accession", "accession_link", "species"], axis=1).rename(
+                            columns={"link": "Accession", "name": "Name", "score": "Score"})
+
+                        cols = list(out_df.columns)
+                        cols = [cols[-1]] + cols[:-1]
+
+                        out_df = out_df[cols]
+                        out_df = out_df.style.set_table_attributes(
+                            'class="dataframe shiny-table table w-auto"'
+                        ).hide(axis="index").apply(_highlight_non_matches, subset=markers(), axis=0)
             else:
                 out_df = pd.DataFrame({"No input provided.": []})
             return out_df
+        # TO DO: Remove results table when changing query methods.
 
         # Dealing with downloading results, when requested.
         # Note that output_results() is a reactive Calc result.
@@ -655,26 +814,30 @@ def create_app(db=None):
         @render.data_frame
         def out_batch_df():
             output_df.set(batch_query_results())
-            try:
-                return render.DataTable(output_df())
-            except Exception:
-                m = ui.modal(
-                    ui.div(
-                        {"style": "font-size: 18px"},
-                        ui.HTML(
-                            (
-                                "There was a fatal error in the query.<br><br>"
-                                "Ensure marker names match expectation, and that"
-                                " no special characters (spaces, etc.) were used in sample names."
-                            )
-                        ),
-                    ),
-                    title="Batch Query Error",
-                    easy_close=True,
-                    footer=None,
-                )
-                ui.modal_show(m)
-                return render.DataTable(pd.DataFrame({"Failed Query. Fix Input File": []}))
+            with reactive.isolate():
+                if input.search_type_batch() == "STRprofiler Database":
+                    try:
+                        return render.DataTable(output_df())
+                    except Exception:
+                        m = ui.modal(
+                            ui.div(
+                                {"style": "font-size: 18px"},
+                                ui.HTML(
+                                    (
+                                        "There was a fatal error in the query.<br><br>"
+                                        "Ensure marker names match expectation, and that"
+                                        " no special characters (spaces, etc.) were used in sample names."
+                                    )
+                                ),
+                            ),
+                            title="Batch Query Error",
+                            easy_close=True,
+                            footer=None,
+                        )
+                        ui.modal_show(m)
+                        return render.DataTable(pd.DataFrame({"Failed Query. Fix Input File": []}))
+                elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
+                    return render.DataTable(pd.DataFrame({"CASTR Batch Query": ['Download Results']}))
 
         # File input loading
         @reactive.calc
@@ -686,7 +849,7 @@ def create_app(db=None):
                 ui.remove_ui("#inserted-downloader2")
                 return pd.DataFrame({"": []})
             try:
-                query_df = sp.str_ingress(
+                query_df = utils.str_ingress(
                     [file[0]["datapath"]],
                     sample_col="Sample",
                     marker_col="Marker",
@@ -713,39 +876,81 @@ def create_app(db=None):
                 return pd.DataFrame({"Failed Query. Fix Input File": []})
 
             if res_click_file() == 0:
-                ui.insert_ui(
-                    ui.div(
-                        {"id": "inserted-downloader2"},
-                        ui.download_button(
-                            "download2", "Download CSV", width="25%", class_="btn-primary"
+                if input.search_type_batch() == "STRprofiler Database":
+                    ui.insert_ui(
+                        ui.div(
+                            {"id": "inserted-downloader2"},
+                            ui.download_button(
+                                "download2", "Download CSV", width="25%", class_="btn-primary"
+                            ),
                         ),
-                    ),
-                    selector="#res_card_batch",
-                    where="beforeEnd",
-                )
-                res_click_file.set(1)
-            return _batch_query(
-                query_df,
-                str_database(),
-                input.score_amel_batch(),
-                input.mix_threshold_batch(),
-                input.tan_threshold_batch(),
-                input.mas_q_threshold_batch(),
-                input.mas_r_threshold_batch(),
-            )
+                        selector="#res_card_batch",
+                        where="beforeEnd",
+                    )
+                    res_click_file.set(1)
+                elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
+                    ui.insert_ui(
+                        ui.div(
+                            {"id": "inserted-downloader2"},
+                            ui.download_button(
+                                "download2", "Download XLSX", width="25%", class_="btn-primary"
+                                # TO DO: Adjust spacing on 'results' section. XLSX button is too far down.
+                            ),
+                        ),
+                        selector="#res_card_batch",
+                        where="beforeEnd",
+                    )
+                    res_click_file.set(1)
+
+            with reactive.isolate():
+                if input.search_type_batch() == "STRprofiler Database":
+                    results = _batch_query(
+                        query_df,
+                        str_database(),
+                        input.score_amel_batch(),
+                        input.mix_threshold_batch(),
+                        input.tan_threshold_batch(),
+                        input.mas_q_threshold_batch(),
+                        input.mas_r_threshold_batch(),
+                    )
+                elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
+                    clastr_query = [(lambda d: d.update(description=key) or d)(val) for (key, val) in query_df.items()]
+                    malformed_markers = utils.validate_api_markers(query_df[next(iter(query_df))].keys())
+                    if malformed_markers:
+                        notify_modal(malformed_markers)
+
+                    results = _clastr_batch_query(
+                                    clastr_query,
+                                    input.batch_query_filter(),
+                                    input.score_amel_batch(),
+                                    input.batch_query_filter_threshold()
+                                )
+                    # TO DO: Does this need to be async?
+
+            return results
+
+        # File input loading
+        @reactive.effect
+        @reactive.event(input.search_type_batch)
+        def _():
+            ui.remove_ui("#inserted-downloader2")
+            res_click_file.set(0)
+            # TO DO: Remove batch results table when changing methods.
 
         # Dealing with dowloading results, when requested.
         # Note that batch_query_results() is a reactive Calc result.
         @render.download(
-            filename="STR_Batch_Results_"
-            + date.today().isoformat()
-            + "_"
-            + time.strftime("%Hh-%Mm", time.localtime())
-            + ".csv"
+            filename=lambda: "STR_Batch_Results_" + date.today().isoformat() + "_" + time.strftime("%Hh-%Mm", time.localtime()) + ".csv"
+            if f"{input.search_type_batch()}" == 'STRprofiler Database'
+            else "STR_Batch_Results_" + date.today().isoformat() + "_" + time.strftime("%Hh-%Mm", time.localtime()) + ".xlsx"
         )
         def download2():
             if batch_query_results() is not None:
-                yield batch_query_results().to_csv(index=False)
+                if input.search_type_batch() == "STRprofiler Database":
+                    yield batch_query_results().to_csv(index=False)
+                if input.search_type_batch() == "Cellosaurus Database (CLASTR)":
+                    for chunk in batch_query_results().iter_content(chunk_size=128):
+                        yield chunk
 
         # Dealing with passing example file to user.
         @render.download()
@@ -776,7 +981,7 @@ def create_app(db=None):
             if file is None:
                 ui.remove_ui("#inserted-downloader3")
                 return pd.DataFrame({"": []})
-            query_df = sp.str_ingress(
+            query_df = utils.str_ingress(
                 [file[0]["datapath"]],
                 sample_col="Sample",
                 marker_col="Marker",

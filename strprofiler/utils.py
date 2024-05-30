@@ -35,17 +35,38 @@ def _clean_element(x):
     return ",".join(sorted_elements)
 
 
-def _pentafix(samps_dict):
+def _pentafix(samps_dict, reverse=False):
     """Takes a dictionary of alleles and returns a dictionary with common Penta markers renamed for consistency."""
-    if "Penta D" in samps_dict.keys():
-        samps_dict["PentaD"] = samps_dict.pop("Penta D")
-    elif "Penta_D" in samps_dict.keys():
-        samps_dict["PentaD"] = samps_dict.pop("Penta_D")
+    if not reverse:
+        if "Penta C" in samps_dict.keys():
+            samps_dict["PentaC"] = samps_dict.pop("Penta C")
+        elif "Penta_C" in samps_dict.keys():
+            samps_dict["PentaC"] = samps_dict.pop("Penta_C")
 
-    if "Penta E" in samps_dict.keys():
-        samps_dict["PentaE"] = samps_dict.pop("Penta E")
-    elif "Penta_E" in samps_dict.keys():
-        samps_dict["PentaE"] = samps_dict.pop("Penta_E")
+        if "Penta D" in samps_dict.keys():
+            samps_dict["PentaD"] = samps_dict.pop("Penta D")
+        elif "Penta_D" in samps_dict.keys():
+            samps_dict["PentaD"] = samps_dict.pop("Penta_D")
+
+        if "Penta E" in samps_dict.keys():
+            samps_dict["PentaE"] = samps_dict.pop("Penta E")
+        elif "Penta_E" in samps_dict.keys():
+            samps_dict["PentaE"] = samps_dict.pop("Penta_E")
+    else:
+        if "PentaC" in samps_dict.keys():
+            samps_dict["Penta C"] = samps_dict.pop("PentaC")
+        elif "Penta_C" in samps_dict.keys():
+            samps_dict["Penta C"] = samps_dict.pop("Penta_C")
+
+        if "PentaD" in samps_dict.keys():
+            samps_dict["Penta D"] = samps_dict.pop("PentaD")
+        elif "Penta_D" in samps_dict.keys():
+            samps_dict["Penta D"] = samps_dict.pop("Penta_D")
+
+        if "PentaE" in samps_dict.keys():
+            samps_dict["Penta E"] = samps_dict.pop("PentaE")
+        elif "Penta_E" in samps_dict.keys():
+            samps_dict["Penta E"] = samps_dict.pop("Penta_E")
 
     return samps_dict
 
@@ -119,7 +140,8 @@ def _make_html(dataframe: pd.DataFrame):
     <div style="width:95%; margin:auto;">
         {table_html}
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+    integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready( function () {{
@@ -185,9 +207,9 @@ def str_ingress(
         elif path.suffix == ".txt":
             df = pd.read_csv(path, sep="\t")
         else:
-            sys.exit('File extension: ' + path.suffix + ' in file: ' + str(path) + ' is not supported.')
+            sys.exit("File extension: " + path.suffix + " in file: " + str(path) + " is not supported.")
 
-        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+        df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
 
         df.columns = df.columns.str.strip()
 
@@ -422,3 +444,56 @@ def make_summary(
     summ_out.update(alleles)
 
     return summ_out
+
+
+def validate_api_markers(markers):
+    """ Compare list of markers against controlled list of markers names from CLASTR.
+    :param markers: List of markers to compare against controlled marker name list.
+    :type markers: list
+    :return: List of non-compliant marker names.
+    :rtype: list
+    """
+
+    valid_api_markers = ["Amel",
+                         "Amelogenin",
+                         "CSF1PO",
+                         "D2S1338",
+                         "D3S1358",
+                         "D5S818",
+                         "D7S820",
+                         "D8S1179",
+                         "D13S317",
+                         "D16S539",
+                         "D18S51",
+                         "D19S433",
+                         "D21S11",
+                         "FGA",
+                         "Penta D",
+                         "Penta E",
+                         "PentaD",
+                         "PentaE",
+                         "TH01",
+                         "TPOX",
+                         "vWA",
+                         "D1S1656",
+                         "D2S441",
+                         "D6S1043",
+                         "D10S1248",
+                         "D12S391",
+                         "D22S1045",
+                         "DXS101",
+                         "DYS391",
+                         "F13A01",
+                         "F13B",
+                         "FESFPS",
+                         "LPL",
+                         "Penta C",
+                         "PentaC",
+                         "SE33"]
+
+    # remove extra fields, if present as keys may come from _clastr_query or other.
+    query_markers = [marker for marker in markers if marker not in ["algorithm", "includeAmelogenin", "scoreFilter", "description"]]
+
+    missing_markers = list(set(query_markers) - set(valid_api_markers))
+
+    return missing_markers

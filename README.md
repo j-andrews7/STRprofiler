@@ -8,7 +8,7 @@
 [![PyPI license](https://img.shields.io/pypi/l/strprofiler.svg)](https://pypi.python.org/pypi/strprofiler/)
 [![DOI](https://zenodo.org/badge/523477912.svg)](https://zenodo.org/badge/latestdoi/523477912)
 
-**STRprofiler** is a simple python utility to compare short tandem repeat (STR) profiles. In particular, it is designed to aid research labs in comparing models (e.g. cell lines & xenografts) generated from primary tissue samples to ensure contamination has not occurred. It includes basic checks for sample mixing and contamination.
+**STRprofiler** is a python package, CLI tool, and Shiny application to compare short tandem repeat (STR) profiles. In particular, it is designed to aid research labs in comparing models (e.g. cell lines & xenografts) generated from primary tissue samples to ensure contamination has not occurred. It includes basic checks for sample mixing and contamination and provides a simple interface to conveniently query the [Cellosaurus database via the CLASTR API](https://www.cellosaurus.org/str-search/).
 
 **STRprofiler is intended only for research purposes.**
 
@@ -49,24 +49,77 @@ Full usage information can be found by running `strprofiler --help`.
 
  STRprofiler compares STR profiles to each other.  
 
-╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --tan_threshold    -tanth   FLOAT        Minimum Tanabe score to report as potential matches in summary table. [default: 80]                          │
-│ --mas_q_threshold  -masqth  FLOAT        Minimum Masters (vs. query) score to report as potential matches in summary table. [default: 80]             │
-│ --mas_r_threshold  -masrth  FLOAT        Minimum Masters (vs. reference) score to report as potential matches in summary table. [default: 80]         │
-│ --mix_threshold    -mix     INTEGER      Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing.                 |
-|                                            [default: 3]                                                                                               │
-│ --sample_map       -sm      PATH         Path to sample map in csv format for renaming. First column should be sample names as given                  |
-|                                            in STR file(s),  second should be new names to assign. No header.                                          │
-│ --database         -db      PATH         Path to an STR database file in csv, xlsx, tsv, or txt format.                                               │
-│ --amel_col         -acol    TEXT         Name of Amelogenin column in STR file(s). [default: AMEL]                                                    │
-│ --sample_col       -scol    TEXT         Name of sample column in STR file(s). [default: Sample]                                                      │
-│ --marker_col       -mcol    TEXT         Name of marker column in STR file(s). Only used if format is 'wide'. [default: Marker]                       │
-│ --penta_fix        -pfix                 Whether to try to harmonize PentaE/D allele spelling. [default: True]                                        │
-│ --score_amel       -amel                 Use Amelogenin for similarity scoring. [default: False]                                                      │
-│ --output_dir       -o       PATH         Path to the output directory. [default: ./STRprofiler]                                                       │
-│ --version                                Show the version and exit.                                                                                   │
-│ --help                                   Show this message and exit.                                                                                  │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────────────────╮
+│ --tan_threshold    -tanth   FLOAT    Minimum Tanabe score to report as potential matches |
+|                                      in summary table. [default: 80]                     │
+│ --mas_q_threshold  -masqth  FLOAT    Minimum Masters (vs. query) score to report as      |
+|                                      potential matches in summary table. [default: 80]   │
+│ --mas_r_threshold  -masrth  FLOAT    Minimum Masters (vs. reference) score to report as  |
+|                                      potential matches in summary table. [default: 80]   │
+│ --mix_threshold    -mix     INTEGER  Number of markers with >= 2 alleles allowed before  |
+|                                      a sample is flagged for potential mixing.           |
+|                                      [default: 3]                                        │
+│ --sample_map       -sm      PATH     Path to sample map in csv format for renaming.      |
+|                                      First column should be sample names as given in     |
+|                                      STR file(s), second should be new names to assign.  | 
+|                                      No header.                                          │
+│ --database         -db      PATH     Path to an STR database file in csv, xlsx, tsv,     |
+|                                      or txt format.                                      │
+│ --amel_col         -acol    STR      Name of Amelogenin column in STR file(s).           |
+|                                      [default: 'AMEL']                                   │
+│ --sample_col       -scol    STR      Name of sample column in STR file(s).               |
+|                                      [default: 'Sample']                                 │
+│ --marker_col       -mcol    STR      Name of marker column in STR file(s).               |
+|                                      Only used if format is 'wide'. [default: 'Marker']  │
+│ --penta_fix        -pfix    FLAG     Whether to try to harmonize PentaE/D allele         |
+|                                      spelling. [default: True]                           │
+│ --score_amel       -amel    FLAG     Use Amelogenin for similarity scoring.              |
+|                                      [default: False]                                    │
+│ --output_dir       -o       PATH     Path to the output directory.                       |
+|                                     [default: ./STRprofiler]                             │
+│ --version                            Show the version and exit.                          │
+│ --help                               Show this message and exit                          │
+╰──────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+**CLASTR**
+
+Additionally, the [Cellosaurus](https://www.cellosaurus.org/description.html) (Bairoch, 2018) cell line database can be queried via the [CLASTR](https://www.cellosaurus.org/str-search/) (Robin, Capes-Davis, and Bairoch, 2019) [REST API](https://www.cellosaurus.org/str-search/help.html#5).  
+
+`clastr -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
+
+Full usage information can be found by running `clastr --help`.
+
+```bash
+ Usage: clastr [OPTIONS] INPUT_FILES...   
+
+**clastr** compares STR profiles to the human Cellosaurus knowledge base using the CLASTR REST API.
+
+╭─ Options ────────────────────────────────────────────────────────────────────────────────╮
+│ --search_algorithm  -sa    INT  Search algorithm to use in the CLASTR query.             |
+|                                 1 - Tanabe, 2 - Masters (vs. query);                     |
+|                                 3 - Masters (vs. reference) [default: 1]                 │
+│ --scoring_mode      -sm    INT  Search mode to account for missing alleles in query or   |
+|                                 reference. 1 - Non-empty markers, 2 - Query markers,     |
+|                                 3 - Reference markers. [default: 1]                      │
+│ --score_filter      -sf    INT  Minimum score to report as potential matches in          |
+|                                 summary table. [default: 80]                             │
+│ --max_results       -mr    INT  Filter defining the maximum number of results to be      |
+|                                 returned. [default: 200]                                 │
+│ --min_markers       -mm    INT  Filter defining the minimum number of markers for        |
+|                                 matches to be reported. [default: 8]                     │
+│ --sample_col        -scol  STR  Name of sample column in STR file(s).                    |
+|                                 [default: 'Sample']                                      │
+│ --marker_col        -mcol  STR  Name of marker column in STR file(s).                    |
+|                                 Only used if format is 'wide'. [default: 'Marker']       │
+│ --penta_fix         -pfix  FLAG Whether to try to harmonize PentaE/D allele spelling.    |
+|                                 [default: True]                                          │
+│ --score_amel        -amel  FLAG Use Amelogenin for similarity scoring. [default: False]  │
+│ --output_dir        -o     PATH Path to the output directory. [default: ./STRprofiler]   │
+│ --version                       Show the version and exit.                               │
+│ --help                          Show this message and exit.                              │
+╰──────────────────────────────────────────────────────────────────────────────────────────╯
+
 ```
 
 ## Input Files(s)
@@ -149,6 +202,10 @@ In addition to the marker columns, this output contains the following columns:
 | **masters_query_score** | Masters (vs query) similarity score.                         |
 | **masters_ref_score**   | Masters (vs reference) similarity score.                     |
 
+**clastr**
+
+Output for `clastr` is provided in XLSX format. Results follow the CLASTR format, documented here: https://www.cellosaurus.org/str-search/help.html#4
+
 ## Database Comparison
 
 **STRprofiler** can be also used to compare batches of samples against a larger database of samples. 
@@ -157,13 +214,24 @@ In addition to the marker columns, this output contains the following columns:
 
 In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s).
 
+### Database Format
+
+The database should be formatted as a samples by markers matrix and saved as a csv file, e.g:
+
+|Sample       |Amelogenin|CSF1PO|D13S317|D16S539|D18S51|D19S433|D21S11 |D2S1338|D3S1358|D5S818|D7S820|D8S1179|FGA|TH01 |TPOX|vWA|PentaE |PentaD |
+|-------------|----------|------|-------|-------|------|-------|-------|-------|-------|------|------|-------|---|-----|----|---|-------|-------|
+|sample1      |X,Y       |12    |8      |13     |14    |14     |31,31.2|17,19  |15     |11,12 |11,12 |12,15  |23 |7,9.3|8   |18 |       |       |
+|sample2      |X         |10    |9      |13     |16    |12,14  |29     |20,23  |15,16  |12,13 |9,12  |14,15  |18 |7    |8,9 |15 |       |       |
+
+Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns.
+
 ## The STRprofiler App
 
 New in v0.2.0 is `strprofiler-app`, a command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
 
 This application can provide a convenient portal to a group's STR database and can be hosted on standard Shiny servers, Posit Connect instances, or ShinyApps.io. 
 
-An example of the application can be seen [here](https://hg99x7-jared0andrews.shinyapps.io/strprofiler/).
+An example of the application can be seen [here](https:sj-bakerlab.shinyapps.io/strprofiler/).
 
 ### Deploying an `strprofiler` App
 
@@ -179,20 +247,21 @@ app = create_app(db=database)
 ```
 
 If no database is provided, an example database included with the package will be used. 
-This app can then be deployed to any of the above endpoints as [one would with any other Shiny app](https://shiny.posit.co/py/docs/deploy.html).
+The database file uses same format as for the standard `strprofiler` command.
+
+Then create a requirements.txt file in the same directory with `strprofiler` listed:
+
+```
+strprofiler>=0.3.0
+```
+
+This app can then be deployed to any of the above endpoints as [one would with any other Shiny app](https://shiny.posit.co/py/docs/deploy.html), e.g.:
+
+```
+rsconnect deploy shiny -n your_server -t STRprofiler .
+```
 
 Alternatively, one could export it as a shinylive app and host it on Github pages or similar.
-
-#### Database Format
-
-The database should be formatted as a samples by markers matrix and saved as a csv, tsv, tab-delimited txt, or xlsx file, the same format as for the standard `strprofiler` command, e.g:
-
-|Sample       |Amelogenin|CSF1PO|D13S317|D16S539|D18S51|D19S433|D21S11 |D2S1338|D3S1358|D5S818|D7S820|D8S1179|FGA|TH01 |TPOX|vWA|PentaE |PentaD |
-|-------------|----------|------|-------|-------|------|-------|-------|-------|-------|------|------|-------|---|-----|----|---|-------|-------|
-|sample1      |X,Y       |12    |8      |13     |14    |14     |31,31.2|17,19  |15     |11,12 |11,12 |12,15  |23 |7,9.3|8   |18 |       |       |
-|sample2      |X         |10    |9      |13     |16    |12,14  |29     |20,23  |15,16  |12,13 |9,12  |14,15  |18 |7    |8,9 |15 |       |       |
-
-Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns.
 
 ## Contributing
 You can contribute by creating [issues](https://github.com/j-andrews7/strprofiler/issues) to highlight bugs and make suggestions for additional features.
@@ -200,10 +269,19 @@ You can contribute by creating [issues](https://github.com/j-andrews7/strprofile
 
 ## License
 
-**STRprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. It is released with zero warranty for any purpose and the authors retain no liability for its use. [Read the full license](https://github.com/j-andrews7/strprofiler/blob/master/LICENSE) for additional details.
+**STRprofiler** is released on the MIT license. 
+You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. 
+It is released with zero warranty for any purpose and the authors retain no liability for its use. 
+[Read the full license](https://github.com/j-andrews7/strprofiler/blob/master/LICENSE) for additional details.
 
-## Reference
+## References
 
-If you use **strprofiler** in your research, please cite the DOI:
+If you use **STRprofiler** in your research, please cite the DOI:
 
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.2.0 (v0.2.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.3.0 (v0.3.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
+
+If you use the `clastr` command or functionality from the Shiny application, please cite the Cellosaurus and CLASTR publications:
+
+Bairoch A. (2018) The Cellosaurus, a cell line knowledge resource. Journal of Biomolecular Techniques. 29:25-38. DOI: 10.7171/jbt.18-2902-002; PMID: 29805321 
+
+Robin, T., Capes-Davis, A. & Bairoch, A. (2019) CLASTR: the Cellosaurus STR Similarity Search Tool - A Precious Help for Cell Line Authentication. International Journal of Cancer. PubMed: 31444973  DOI: 10.1002/IJC.32639
