@@ -259,7 +259,10 @@ You can contribute by creating [issues](https://github.com/j-andrews7/strprofile
 
 ## License
 
-**STRprofiler** is released on the MIT license. You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. It is released with zero warranty for any purpose and the authors retain no liability for its use. [Read the full license](https://github.com/j-andrews7/strprofiler/blob/master/LICENSE) for additional details.
+**STRprofiler** is released on the MIT license. 
+You are free to use, modify, or redistribute it in almost any way, provided you state changes to the code, disclose the source, and use the same license. 
+It is released with zero warranty for any purpose and the authors retain no liability for its use. 
+[Read the full license](https://github.com/j-andrews7/strprofiler/blob/master/LICENSE) for additional details.
 
 ## References
 
