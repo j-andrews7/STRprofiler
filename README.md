@@ -249,7 +249,17 @@ app = create_app(db=database)
 If no database is provided, an example database included with the package will be used. 
 The database file uses same format as for the standard `strprofiler` command.
 
-This app can then be deployed to any of the above endpoints as [one would with any other Shiny app](https://shiny.posit.co/py/docs/deploy.html).
+Then create a requirements.txt file in the same directory with `strprofiler` listed:
+
+```
+strprofiler>=0.3.0
+```
+
+This app can then be deployed to any of the above endpoints as [one would with any other Shiny app](https://shiny.posit.co/py/docs/deploy.html), e.g.:
+
+```
+rsconnect deploy shiny -n your_server -t STRprofiler .
+```
 
 Alternatively, one could export it as a shinylive app and host it on Github pages or similar.
 

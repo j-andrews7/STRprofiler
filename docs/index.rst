@@ -251,7 +251,16 @@ First, make your app.py file:
 If no database is provided, an example database included with the package will be used. 
 The database file should be a csv file with the same format as described above.
 
+Then create a requirements.txt file in the same directory with `strprofiler` listed:
+
+.. code:: bash
+   strprofiler>=0.3.0
+
 This app can then be deployed to any of the above endpoints as `one would with any other Shiny app <https://shiny.posit.co/py/docs/deploy.html>`__.
+
+.. code:: bash
+   rsconnect deploy shiny -n your_server -t STRprofiler .
+
 
 Alternatively, one could export it as a shinylive app and host it on Github pages or similar.
 
