@@ -62,7 +62,7 @@ def _clastr_query(query, query_filter, include_amelogenin, score_filter):
     df = pd.DataFrame.from_dict(r.json()["results"])
 
     if df.empty:
-        return pd.DataFrame({"No Clastr Result": []})
+        return pd.DataFrame({"No CLASTR Result": []})
 
     flattened = [flatten(d) for d in r.json()["results"]]
     df = pd.DataFrame(flattened)
