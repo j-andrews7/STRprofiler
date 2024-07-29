@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.1
+
+**Release date: 07/29/2024**
+
+ - Catch no results and display a more helpful message - [#30](https://github.com/j-andrews7/STRprofiler/issues/30).
+
 ## v0.3.0
 
 **Release date: 05/30/2024**
