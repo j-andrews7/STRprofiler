@@ -2,6 +2,8 @@ import requests
 import json
 import pandas as pd
 import numpy as np
+import io
+import warnings
 from flatten_json import flatten
 from strprofiler.utils import _pentafix, validate_api_markers
 
@@ -291,6 +293,14 @@ if __name__ == "__main__":
         }]
 
     r = _clastr_batch_query(batch_data, "Tanabe", False, 70)
+
+    with warnings.catch_warnings():  # read_excel throws noisy "UserWarning: Workbook contains no default style, apply openpyxl's default"
+        warnings.simplefilter("ignore")
+        with io.BytesIO(r.content) as fh:
+            for i in range(0, len(batch_data)):
+                df = pd.io.excel.read_excel(fh, sheet_name=i)
+                df = df.iloc[:, :-1]
+                print(df)
 
     with open("testing.xlsx", "wb") as fd:
         for chunk in r.iter_content(chunk_size=128):

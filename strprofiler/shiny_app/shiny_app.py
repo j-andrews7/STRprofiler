@@ -1,5 +1,5 @@
 import shinyswatch
-from shiny import App, reactive, render, ui
+from shiny import App, reactive, render, ui, req
 from shiny.types import FileInfo, ImgData
 import pandas as pd
 from faicons import icon_svg
@@ -12,8 +12,11 @@ from datetime import date
 import time
 import importlib.resources
 import importlib.metadata
+import io
+import warnings
 
 version = "v" + importlib.metadata.version("strprofiler")
+
 
 def database_load(file):
     """
@@ -37,9 +40,6 @@ def database_load(file):
             penta_fix=True,
         ).to_dict(orient="index")
     except Exception as e:
-        print("The file failed to load. Reported error:")
-        print(str(e))
-
         m = ui.modal(
             ui.HTML(
                 "The file failed to load.<br>Check if sample ID names are duplicated.<br><br>Reported error:<br>"
@@ -280,7 +280,8 @@ def create_app(db=None):
                                     ui.panel_conditional(
                                         "input.search_type_batch === 'STRprofiler Database'",
                                         ui.row(
-                                            ui.column(6,
+                                            ui.column(
+                                                6,
                                                 ui.input_numeric(
                                                     "mix_threshold_batch",
                                                     "'Mixed' Sample Threshold",
@@ -294,7 +295,8 @@ def create_app(db=None):
                                                     width="100%",
                                                 )
                                             ),
-                                            ui.column(6,
+                                            ui.column(
+                                                6,
                                                 ui.input_numeric(
                                                     "tan_threshold_batch",
                                                     "Tanabe Filter Threshold",
@@ -313,7 +315,8 @@ def create_app(db=None):
                                     ui.panel_conditional(
                                         "input.search_type_batch === 'Cellosaurus Database (CLASTR)'",
                                         ui.row(
-                                            ui.column(6,
+                                            ui.column(
+                                                6,
                                                 ui.input_select(
                                                     "batch_query_filter",
                                                     "Similarity Score Filter",
@@ -325,7 +328,8 @@ def create_app(db=None):
                                                     width="100%"
                                                 )
                                             ),
-                                            ui.column(6,
+                                            ui.column(
+                                                6,
                                                 ui.input_numeric(
                                                     "batch_query_filter_threshold",
                                                     "Similarity Score Filter Threshold",
@@ -357,7 +361,7 @@ def create_app(db=None):
                                 ),
                                 position="left",
                             ),
-                            ui.panel_main(
+                            ui.panel_main(  # This is where batch query results live.
                                 ui.row(
                                     ui.column(3, ui.tags.h3("Results")),
                                     ui.column(6, ui.p("")),
@@ -366,6 +370,7 @@ def create_app(db=None):
                                     12,
                                     {"id": "res_card_batch"},
                                     ui.output_data_frame("out_batch_df"),
+                                    ui.output_ui("dyn_ui_nav"),
                                     ui.p(""),
                                 ),
                             ),
@@ -406,7 +411,8 @@ def create_app(db=None):
                                     "score_amel_file", "Score Amelogenin", value=False
                                 ),
                                 ui.row(
-                                    ui.column(6,
+                                    ui.column(
+                                        6,
                                         ui.input_numeric(
                                             "mix_threshold_file",
                                             "'Mixed' Sample Threshold",
@@ -420,7 +426,8 @@ def create_app(db=None):
                                             width="100%",
                                         )
                                     ),
-                                    ui.column(6,
+                                    ui.column(
+                                        6,
                                         ui.input_numeric(
                                             "tan_threshold_file",
                                             "Tanabe Filter Threshold",
@@ -585,7 +592,7 @@ def create_app(db=None):
         @reactive.event(input.database_upload)
         def _():
             if input.database_upload():
-                file: list[FileInfo] | None = input.database_upload()
+                file: list[FileInfo] | None = req(input.database_upload())
             else:
                 return
             str_database.set(database_load(file[0]["datapath"]))
@@ -814,40 +821,45 @@ def create_app(db=None):
         @render.data_frame
         def out_batch_df():
             output_df.set(batch_query_results())
-            with reactive.isolate():
-                if input.search_type_batch() == "STRprofiler Database":
-                    try:
-                        return render.DataTable(output_df())
-                    except Exception:
-                        m = ui.modal(
-                            ui.div(
-                                {"style": "font-size: 18px"},
-                                ui.HTML(
-                                    (
-                                        "There was a fatal error in the query.<br><br>"
-                                        "Ensure marker names match expectation, and that"
-                                        " no special characters (spaces, etc.) were used in sample names."
-                                    )
-                                ),
+            if input.search_type_batch() == "STRprofiler Database":
+                try:
+                    return render.DataTable(output_df())
+                except Exception:
+                    m = ui.modal(
+                        ui.div(
+                            {"style": "font-size: 18px"},
+                            ui.HTML(
+                                (
+                                    "There was a fatal error in the query.<br><br>"
+                                    "Ensure marker names match expectation, and that"
+                                    " no special characters (spaces, etc.) were used in sample names."
+                                )
                             ),
-                            title="Batch Query Error",
-                            easy_close=True,
-                            footer=None,
-                        )
-                        ui.modal_show(m)
-                        return render.DataTable(pd.DataFrame({"Failed Query. Fix Input File": []}))
-                elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
-                    return render.DataTable(pd.DataFrame({"CASTR Batch Query": ['Download Results']}))
+                        ),
+                        title="Batch Query Error",
+                        easy_close=True,
+                        footer=None,
+                    )
+                    ui.modal_show(m)
+                    return render.DataTable(pd.DataFrame({"Failed Query. Fix Input File": []}))
+            elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
+                with warnings.catch_warnings():
+                    # read_excel throws noisy "UserWarning: Workbook contains no default style, apply openpyxl's default"
+                    warnings.simplefilter("ignore")
+                    with io.BytesIO(output_df().content) as fh:
+                        df = pd.io.excel.read_excel(fh, sheet_name=input.selected_results())
+                        df = df.iloc[:, :-1]
+                return df
 
         # File input loading
         @reactive.calc
-        @reactive.event(input.csv_query)
+        @reactive.event(input.csv_query, input.search_type_batch)
         def batch_query_results():
 
-            file: list[FileInfo] | None = input.file1()
+            file: list[FileInfo] | None = req(input.file1())
             if file is None:
                 ui.remove_ui("#inserted-downloader2")
-                return pd.DataFrame({"": []})
+                return pd.DataFrame({" ": []})
             try:
                 query_df = utils.str_ingress(
                     [file[0]["datapath"]],
@@ -874,6 +886,9 @@ def create_app(db=None):
                 )
                 ui.modal_show(m)
                 return pd.DataFrame({"Failed Query. Fix Input File": []})
+
+            ui.remove_ui("#result_selector")
+            # refresh the ui for the selector as each file / query may be unique.
 
             if res_click_file() == 0:
                 if input.search_type_batch() == "STRprofiler Database":
@@ -927,6 +942,21 @@ def create_app(db=None):
                                 )
                     # TO DO: Does this need to be async?
 
+                    ui.insert_ui(
+                        ui.div(
+                            {"id": "result_selector"},
+                            ui.input_select(
+                                "selected_results",
+                                "Choose Sample:",
+                                dict((value, value) for count, value in enumerate(query_df))
+                            ),
+                        ),
+                        selector="#res_card_batch",
+                        where="beforeBegin",
+                    )
+                    # add results selector. With picklist populated by sample name,
+                    # backend selector is 0..n for excel page selection from API return
+
             return results
 
         # File input loading
@@ -977,10 +1007,10 @@ def create_app(db=None):
         @reactive.event(input.csv_query2)
         def file_query_results():
 
-            file: list[FileInfo] | None = input.file2()
+            file: list[FileInfo] | None = req(input.file2())
             if file is None:
                 ui.remove_ui("#inserted-downloader3")
-                return pd.DataFrame({"": []})
+                return pd.DataFrame({" ": []})
             query_df = utils.str_ingress(
                 [file[0]["datapath"]],
                 sample_col="Sample",

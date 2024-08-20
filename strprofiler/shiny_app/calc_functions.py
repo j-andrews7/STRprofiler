@@ -105,7 +105,14 @@ def _single_query(
                 query=query, reference=r, use_amel=use_amel, amel_col="Amelogenin"
             )
         except ZeroDivisionError:
-            pass
+            scores = {'n_shared_markers': False,
+                      'query_sample': False,
+                      'n_shared_alleles': False,
+                      'n_query_alleles': False,
+                      'n_reference_alleles': False,
+                      'tanabe_score': False,
+                      'masters_query_score': False,
+                      'masters_ref_score': False}
 
         # Create dict of scores for each sample comparison.
         samp_out = OrderedDict({"Sample": sa})
