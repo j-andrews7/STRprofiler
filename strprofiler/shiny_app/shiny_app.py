@@ -56,7 +56,7 @@ def database_load(file):
         ui.modal_show(m)
 
         f = importlib.resources.files("strprofiler.shiny_app")
-        str_database = database_load(f.joinpath("www/jax_database.csv"))
+        str_database = database_load(f.joinpath("www/main_database.csv"))
 
     return str_database
 
@@ -117,8 +117,8 @@ def create_app(db=None):
         init_db_name = db
     else:
         print("Reloading: ", db)
-        init_db = database_load(f.joinpath("www/jax_database.csv"))
-        init_db_name = "jax_database.csv"
+        init_db = database_load(f.joinpath("www/main_database.csv"))
+        init_db_name = "main_database.csv"
     stack = ui.HTML(
         (
             '<svg xmlns="http://www.w3.org/2000/svg" height="100%" fill="currentColor"'
@@ -150,41 +150,53 @@ def create_app(db=None):
                             {"id": "sidebar"},
                             ui.tags.h3("Options"),
                             ui.card(
-                                ui.input_switch(
-                                    "score_amel_query", "Score Amelogenin", value=False
+                                ui.tooltip(
+                                    ui.input_switch(
+                                        "score_amel_query", "Score Amelogenin", value=False
+                                    ),
+                                    "Include Amelogenin in similarity scoring"
                                 ),
                                 ui.row(
                                     ui.column(
                                         6,
-                                        ui.input_numeric(
-                                            "mix_threshold_query",
-                                            "'Mixed' Sample Threshold",
-                                            value=3,
-                                            width="100%",
+                                        ui.tooltip(
+                                            ui.input_numeric(
+                                                "mix_threshold_query",
+                                                "'Mixed' Sample Threshold",
+                                                value=3,
+                                                width="100%",
+                                            ),
+                                            "Multi-allelic marker count required to indicate potential sample mixing"
                                         ),
                                     ),
                                     ui.column(
                                         6,
-                                        ui.input_select(
-                                            "query_filter",
-                                            "Similarity Score Filter",
-                                            choices=[
-                                                "Tanabe",
-                                                "Masters Query",
-                                                "Masters Reference",
-                                            ],
-                                            width="100%",
+                                        ui.tooltip(
+                                            ui.input_select(
+                                                "query_filter",
+                                                "Similarity Score Filter",
+                                                choices=[
+                                                    "Tanabe",
+                                                    "Masters Query",
+                                                    "Masters Reference",
+                                                ],
+                                                width="100%",
+                                            ),
+                                            "Similiarity score method used for computation"
                                         ),
                                     ),
                                 ),
                                 ui.output_image(
                                     "image", height="50px", fill=True, inline=True
                                 ),
-                                ui.input_numeric(
-                                    "query_filter_threshold",
-                                    "Similarity Score Filter Threshold",
-                                    value=80,
-                                    width="100%",
+                                ui.tooltip(
+                                    ui.input_numeric(
+                                        "query_filter_threshold",
+                                        "Similarity Score Filter Threshold",
+                                        value=80,
+                                        width="100%",
+                                    ),
+                                    "Score threshold used to filter results"
                                 ),
                             ),
                             position="right",
@@ -208,10 +220,13 @@ def create_app(db=None):
                             ui.row(
                                 ui.column(
                                     4,
-                                    ui.input_action_button(
-                                        "demo_data",
-                                        "Load Example Data",
-                                        class_="btn-primary",
+                                    ui.tooltip(
+                                        ui.input_action_button(
+                                            "demo_data",
+                                            "Load Example Data",
+                                            class_="btn-primary",
+                                        ),
+                                        "Example taken from loaded database"
                                     ),
                                 ),
                                 ui.column(4, ui.output_ui("loaded_example_text")),
@@ -274,41 +289,59 @@ def create_app(db=None):
                                         width="100%"
                                 ),
                                 ui.card(
-                                    ui.input_switch(
-                                        "score_amel_batch", "Score Amelogenin", value=False
+                                    ui.column(
+                                        4,
+                                        ui.tooltip(
+                                            ui.input_switch(
+                                                "score_amel_batch", "Score Amelogenin", value=False
+                                            ),
+                                            "Include Amelogenin in similarity scoring"
+                                        ),
                                     ),
                                     ui.panel_conditional(
                                         "input.search_type_batch === 'STRprofiler Database'",
                                         ui.row(
                                             ui.column(
                                                 6,
-                                                ui.input_numeric(
-                                                    "mix_threshold_batch",
-                                                    "'Mixed' Sample Threshold",
-                                                    value=3,
-                                                    width="100%",
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "mix_threshold_batch",
+                                                        "'Mixed' Sample Threshold",
+                                                        value=3,
+                                                        width="100%",
+                                                    ),
+                                                    "Multi-allelic marker count required to indicate potential sample mixing"
                                                 ),
-                                                ui.input_numeric(
-                                                    "mas_q_threshold_batch",
-                                                    "Masters (vs. query) Filter Threshold",
-                                                    value=80,
-                                                    width="100%",
-                                                )
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "mas_q_threshold_batch",
+                                                        "Masters (vs. query) Filter Threshold",
+                                                        value=80,
+                                                        width="100%",
+                                                    ),
+                                                    "Masters (vs. query) score threshold used to filter results"
+                                                ),
                                             ),
                                             ui.column(
                                                 6,
-                                                ui.input_numeric(
-                                                    "tan_threshold_batch",
-                                                    "Tanabe Filter Threshold",
-                                                    value=80,
-                                                    width="100%",
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "tan_threshold_batch",
+                                                        "Tanabe Filter Threshold",
+                                                        value=80,
+                                                        width="100%",
+                                                    ),
+                                                    "Tanabe score threshold used to filter results"
                                                 ),
-                                                ui.input_numeric(
-                                                    "mas_r_threshold_batch",
-                                                    "Masters (vs. reference) Filter Threshold",
-                                                    value=80,
-                                                    width="100%",
-                                                )
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "mas_r_threshold_batch",
+                                                        "Masters (vs. ref.) Filter Threshold",
+                                                        value=80,
+                                                        width="100%",
+                                                    ),
+                                                    "Masters (vs. reference) score threshold used to filter results"
+                                                ),
                                             )
                                         )
                                     ),
@@ -317,24 +350,30 @@ def create_app(db=None):
                                         ui.row(
                                             ui.column(
                                                 6,
-                                                ui.input_select(
-                                                    "batch_query_filter",
-                                                    "Similarity Score Filter",
-                                                    choices=[
-                                                        "Tanabe",
-                                                        "Masters Query",
-                                                        "Masters Reference",
-                                                    ],
-                                                    width="100%"
-                                                )
+                                                ui.tooltip(
+                                                    ui.input_select(
+                                                        "batch_query_filter",
+                                                        "Similarity Score Filter",
+                                                        choices=[
+                                                            "Tanabe",
+                                                            "Masters Query",
+                                                            "Masters Reference",
+                                                        ],
+                                                        width="100%"
+                                                    ),
+                                                    "Similiarity score method used for computation"
+                                                ),
                                             ),
                                             ui.column(
                                                 6,
-                                                ui.input_numeric(
-                                                    "batch_query_filter_threshold",
-                                                    "Similarity Score Filter Threshold",
-                                                    value=80,
-                                                    width="100%"
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "batch_query_filter_threshold",
+                                                        "Similarity Score Filter Threshold",
+                                                        value=80,
+                                                        width="100%"
+                                                    ),
+                                                    "Score threshold used to filter results"
                                                 )
                                             )
                                         )
@@ -361,7 +400,7 @@ def create_app(db=None):
                                 ),
                                 position="left",
                             ),
-                            ui.panel_main(  # This is where batch query results live.
+                            ui.panel_main(
                                 ui.row(
                                     ui.column(3, ui.tags.h3("Results")),
                                     ui.column(6, ui.p("")),
@@ -393,8 +432,13 @@ def create_app(db=None):
                     ),
                     ui.hr(),
                     ui.output_ui("database_file"),
-                    ui.input_action_button(
-                        "reset_db", "Reset Custom Database", class_="btn-danger"
+                    ui.layout_columns(
+                        ui.download_button(
+                            "example_db", "Download Example Database", class_="btn-secondary"
+                        ),
+                        ui.input_action_button(
+                            "reset_db", "Reset Custom Database", class_="btn-danger"
+                        ),
                     ),
                     col_widths=(-3, 6, -3),
                 ),
@@ -407,38 +451,56 @@ def create_app(db=None):
                             {"id": "novel_query_sidebar"},
                             ui.tags.h3("Options"),
                             ui.card(
-                                ui.input_switch(
-                                    "score_amel_file", "Score Amelogenin", value=False
+                                ui.column(
+                                        4,
+                                        ui.tooltip(
+                                            ui.input_switch(
+                                                "score_amel_file", "Score Amelogenin", value=False
+                                            ),
+                                            "Include Amelogenin in similarity scoring"
+                                        ),
                                 ),
                                 ui.row(
                                     ui.column(
                                         6,
-                                        ui.input_numeric(
-                                            "mix_threshold_file",
-                                            "'Mixed' Sample Threshold",
-                                            value=3,
-                                            width="100%",
+                                        ui.tooltip(
+                                            ui.input_numeric(
+                                                "mix_threshold_file",
+                                                "'Mixed' Sample Threshold",
+                                                value=3,
+                                                width="100%",
+                                            ),
+                                            "Multi-allelic marker count required to indicate potential sample mixing"
                                         ),
-                                        ui.input_numeric(
-                                            "mas_q_threshold_file",
-                                            "Masters (vs. query) Filter Threshold",
-                                            value=80,
-                                            width="100%",
-                                        )
+                                        ui.tooltip(
+                                            ui.input_numeric(
+                                                "mas_q_threshold_file",
+                                                "Masters (vs. query) Filter Threshold",
+                                                value=80,
+                                                width="100%",
+                                            ),
+                                            "Masters (vs. query) score threshold used to filter results"
+                                        ),
                                     ),
                                     ui.column(
                                         6,
-                                        ui.input_numeric(
-                                            "tan_threshold_file",
-                                            "Tanabe Filter Threshold",
-                                            value=80,
-                                            width="100%",
+                                        ui.tooltip(
+                                            ui.input_numeric(
+                                                "tan_threshold_file",
+                                                "Tanabe Filter Threshold",
+                                                value=80,
+                                                width="100%",
+                                            ),
+                                            "Tanabe score threshold used to filter results"
                                         ),
-                                        ui.input_numeric(
-                                            "mas_r_threshold_file",
-                                            "Masters (vs. reference) Filter Threshold",
-                                            value=80,
-                                            width="100%",
+                                        ui.tooltip(
+                                            ui.input_numeric(
+                                                "mas_r_threshold_file",
+                                                "Masters (vs. reference) Filter Threshold",
+                                                value=80,
+                                                width="100%",
+                                            ),
+                                            "Masters (vs. reference) score threshold used to filter results"
                                         )
                                     )
                                 )
@@ -567,6 +629,11 @@ def create_app(db=None):
             def _marker_ui(id):
                 return ui.column(2, ui.input_text(id, id, placeholder=""))
             return ui.row([_marker_ui(marker) for marker in markers()])
+
+        @render.download()
+        def example_db():
+            path = str(f.joinpath("www/Example_Custom_Database.csv"))
+            return path
 
         @reactive.effect
         @reactive.event(input.reset_db)
@@ -849,7 +916,7 @@ def create_app(db=None):
                     with io.BytesIO(output_df().content) as fh:
                         df = pd.io.excel.read_excel(fh, sheet_name=input.selected_results())
                         df = df.iloc[:, :-1]
-                return df
+                return render.DataTable(df)
 
         # File input loading
         @reactive.calc
