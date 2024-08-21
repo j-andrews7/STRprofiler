@@ -23,7 +23,7 @@ The report will differ depending on if an individual sample or batch of samples 
 
 ## Default Database
 
-Current data underlying the default database were provided by [The Jackson Laboratory PDX program](https://tumor.informatics.jax.org/mtbwi/pdxSearch.do).
+Current data underlying the default database were provided by [The Jackson Laboratory PDX program](https://tumor.informatics.jax.org/mtbwi/pdxSearch.do), and the [NCI Patient-Derived Models Repository (PDMR)](https://pdmr.cancer.gov/).
 
 If this app is hosted with a custom database, please contact the host for information on the database source.  
 
