@@ -84,14 +84,6 @@ When `Cellosaurus Database (CLASTR)` is selected as the search type, a report is
 
 Users can upload custom database files. The files must be in CSV format. A 'Sample' header must be present, but custom marker names may be used. Note that to score `Amelogenin` using the option provided, there must be a `Amelogenin` header in the uploaded file.  
 
-
----
-
-# Within File Query
-
-For batch samples entered in the **Within File Query** tab, `STRprofiler` will generate a report that mirrors the batch query above, except that samples will be queried against each other rather than against the database. The report is filtered to include only those samples with greater than or equal to the `Similarity Score Filter Threshold` defined by the user.  
-
-
 ---
 
 # Reported Similarity Scores
@@ -126,9 +118,9 @@ For batch samples entered in the **Within File Query** tab, `STRprofiler` will g
 * Similarity Score Filter: is the similiarity score used for result filtering. [default: Tanabe]
 * Similarity Score Filter Threshold: is the threshold to filter results. Only those samples with >= the threshold will appear in results. [default: 80]
 
-## Batch and File Query Specific
+## Batch Query Specific
 
-`STRprofiler Database` options: 
+`STRprofiler Database` and `Within File` options: 
 
 * Amelogenin scoring is excluded by default but can be included by selecting the option.
 * Tanabe Filter Threshold: is the Tanabe score threshold over which a sample is considered a match in batch and file queries. [default: 80] 
