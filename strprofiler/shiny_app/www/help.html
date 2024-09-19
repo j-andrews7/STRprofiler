@@ -1526,7 +1526,8 @@ of samples is provided.</p>
 <div id="default-database" class="section level2">
 <h2>Default Database</h2>
 <p>Current data underlying the default database were provided by <a href="https://tumor.informatics.jax.org/mtbwi/pdxSearch.do">The Jackson
-Laboratory PDX program</a>.</p>
+Laboratory PDX program</a>, and the <a href="https://pdmr.cancer.gov/">NCI Patient-Derived Models Repository
+(PDMR)</a>.</p>
 <p>If this app is hosted with a custom database, please contact the host
 for information on the database source.</p>
 </div>
@@ -1702,16 +1703,6 @@ file.</p>
 <hr />
 </div>
 </div>
-<div id="within-file-query" class="section level1">
-<h1>Within File Query</h1>
-<p>For batch samples entered in the <strong>Within File Query</strong>
-tab, <code>STRprofiler</code> will generate a report that mirrors the
-batch query above, except that samples will be queried against each
-other rather than against the database. The report is filtered to
-include only those samples with greater than or equal to the
-<code>Similarity Score Filter Threshold</code> defined by the user.</p>
-<hr />
-</div>
 <div id="reported-similarity-scores" class="section level1">
 <h1>Reported Similarity Scores</h1>
 <ol style="list-style-type: decimal">
@@ -1756,9 +1747,10 @@ results. Only those samples with &gt;= the threshold will appear in
 results. [default: 80]</li>
 </ul>
 </div>
-<div id="batch-and-file-query-specific" class="section level2">
-<h2>Batch and File Query Specific</h2>
-<p><code>STRprofiler Database</code> options:</p>
+<div id="batch-query-specific" class="section level2">
+<h2>Batch Query Specific</h2>
+<p><code>STRprofiler Database</code> and <code>Within File</code>
+options:</p>
 <ul>
 <li>Amelogenin scoring is excluded by default but can be included by
 selecting the option.</li>

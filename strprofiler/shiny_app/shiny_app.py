@@ -1,5 +1,5 @@
 import shinyswatch
-from shiny import App, reactive, render, ui
+from shiny import App, reactive, render, ui, req
 from shiny.types import FileInfo, ImgData
 import pandas as pd
 from faicons import icon_svg
@@ -12,8 +12,11 @@ from datetime import date
 import time
 import importlib.resources
 import importlib.metadata
+import io
+import warnings
 
 version = "v" + importlib.metadata.version("strprofiler")
+
 
 def database_load(file):
     """
@@ -37,9 +40,6 @@ def database_load(file):
             penta_fix=True,
         ).to_dict(orient="index")
     except Exception as e:
-        print("The file failed to load. Reported error:")
-        print(str(e))
-
         m = ui.modal(
             ui.HTML(
                 "The file failed to load.<br>Check if sample ID names are duplicated.<br><br>Reported error:<br>"
@@ -56,7 +56,7 @@ def database_load(file):
         ui.modal_show(m)
 
         f = importlib.resources.files("strprofiler.shiny_app")
-        str_database = database_load(f.joinpath("www/jax_database.csv"))
+        str_database = database_load(f.joinpath("www/main_database.csv"))
 
     return str_database
 
@@ -117,8 +117,8 @@ def create_app(db=None):
         init_db_name = db
     else:
         print("Reloading: ", db)
-        init_db = database_load(f.joinpath("www/jax_database.csv"))
-        init_db_name = "jax_database.csv"
+        init_db = database_load(f.joinpath("www/main_database.csv"))
+        init_db_name = "main_database.csv"
     stack = ui.HTML(
         (
             '<svg xmlns="http://www.w3.org/2000/svg" height="100%" fill="currentColor"'
@@ -150,41 +150,53 @@ def create_app(db=None):
                             {"id": "sidebar"},
                             ui.tags.h3("Options"),
                             ui.card(
-                                ui.input_switch(
-                                    "score_amel_query", "Score Amelogenin", value=False
+                                ui.tooltip(
+                                    ui.input_switch(
+                                        "score_amel_query", "Score Amelogenin", value=False
+                                    ),
+                                    "Include Amelogenin in similarity scoring"
                                 ),
                                 ui.row(
                                     ui.column(
                                         6,
-                                        ui.input_numeric(
-                                            "mix_threshold_query",
-                                            "'Mixed' Sample Threshold",
-                                            value=3,
-                                            width="100%",
+                                        ui.tooltip(
+                                            ui.input_numeric(
+                                                "mix_threshold_query",
+                                                "'Mixed' Sample Threshold",
+                                                value=3,
+                                                width="100%",
+                                            ),
+                                            "Multi-allelic marker count required to indicate potential sample mixing"
                                         ),
                                     ),
                                     ui.column(
                                         6,
-                                        ui.input_select(
-                                            "query_filter",
-                                            "Similarity Score Filter",
-                                            choices=[
-                                                "Tanabe",
-                                                "Masters Query",
-                                                "Masters Reference",
-                                            ],
-                                            width="100%",
+                                        ui.tooltip(
+                                            ui.input_select(
+                                                "query_filter",
+                                                "Similarity Score Filter",
+                                                choices=[
+                                                    "Tanabe",
+                                                    "Masters Query",
+                                                    "Masters Reference",
+                                                ],
+                                                width="100%",
+                                            ),
+                                            "Similiarity score method used for computation"
                                         ),
                                     ),
                                 ),
                                 ui.output_image(
                                     "image", height="50px", fill=True, inline=True
                                 ),
-                                ui.input_numeric(
-                                    "query_filter_threshold",
-                                    "Similarity Score Filter Threshold",
-                                    value=80,
-                                    width="100%",
+                                ui.tooltip(
+                                    ui.input_numeric(
+                                        "query_filter_threshold",
+                                        "Similarity Score Filter Threshold",
+                                        value=80,
+                                        width="100%",
+                                    ),
+                                    "Score threshold used to filter results"
                                 ),
                             ),
                             position="right",
@@ -208,10 +220,13 @@ def create_app(db=None):
                             ui.row(
                                 ui.column(
                                     4,
-                                    ui.input_action_button(
-                                        "demo_data",
-                                        "Load Example Data",
-                                        class_="btn-primary",
+                                    ui.tooltip(
+                                        ui.input_action_button(
+                                            "demo_data",
+                                            "Load Example Data",
+                                            class_="btn-primary",
+                                        ),
+                                        "Example taken from loaded database"
                                     ),
                                 ),
                                 ui.column(4, ui.output_ui("loaded_example_text")),
@@ -270,67 +285,95 @@ def create_app(db=None):
                                 ui.input_select(
                                         "search_type_batch",
                                         "Search Type",
-                                        ["STRprofiler Database", "Cellosaurus Database (CLASTR)"],
+                                        ["STRprofiler Database", "Cellosaurus Database (CLASTR)", "Within File Query"],
                                         width="100%"
                                 ),
                                 ui.card(
-                                    ui.input_switch(
-                                        "score_amel_batch", "Score Amelogenin", value=False
+                                    ui.column(
+                                        4,
+                                        ui.tooltip(
+                                            ui.input_switch(
+                                                "score_amel_batch", "Score Amelogenin", value=False
+                                            ),
+                                            "Include Amelogenin in similarity scoring"
+                                        ),
                                     ),
                                     ui.panel_conditional(
-                                        "input.search_type_batch === 'STRprofiler Database'",
+                                        "input.search_type_batch === 'STRprofiler Database' | input.search_type_batch === 'Within File Query'",
                                         ui.row(
-                                            ui.column(6,
-                                                ui.input_numeric(
-                                                    "mix_threshold_batch",
-                                                    "'Mixed' Sample Threshold",
-                                                    value=3,
-                                                    width="100%",
+                                            ui.column(
+                                                6,
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "mix_threshold_batch",
+                                                        "'Mixed' Sample Threshold",
+                                                        value=3,
+                                                        width="100%",
+                                                    ),
+                                                    "Multi-allelic marker count required to indicate potential sample mixing"
                                                 ),
-                                                ui.input_numeric(
-                                                    "mas_q_threshold_batch",
-                                                    "Masters (vs. query) Filter Threshold",
-                                                    value=80,
-                                                    width="100%",
-                                                )
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "mas_q_threshold_batch",
+                                                        "Masters (vs. query) Filter Threshold",
+                                                        value=80,
+                                                        width="100%",
+                                                    ),
+                                                    "Masters (vs. query) score threshold used to filter results"
+                                                ),
                                             ),
-                                            ui.column(6,
-                                                ui.input_numeric(
-                                                    "tan_threshold_batch",
-                                                    "Tanabe Filter Threshold",
-                                                    value=80,
-                                                    width="100%",
+                                            ui.column(
+                                                6,
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "tan_threshold_batch",
+                                                        "Tanabe Filter Threshold",
+                                                        value=80,
+                                                        width="100%",
+                                                    ),
+                                                    "Tanabe score threshold used to filter results"
                                                 ),
-                                                ui.input_numeric(
-                                                    "mas_r_threshold_batch",
-                                                    "Masters (vs. reference) Filter Threshold",
-                                                    value=80,
-                                                    width="100%",
-                                                )
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "mas_r_threshold_batch",
+                                                        "Masters (vs. ref.) Filter Threshold",
+                                                        value=80,
+                                                        width="100%",
+                                                    ),
+                                                    "Masters (vs. reference) score threshold used to filter results"
+                                                ),
                                             )
                                         )
                                     ),
                                     ui.panel_conditional(
                                         "input.search_type_batch === 'Cellosaurus Database (CLASTR)'",
                                         ui.row(
-                                            ui.column(6,
-                                                ui.input_select(
-                                                    "batch_query_filter",
-                                                    "Similarity Score Filter",
-                                                    choices=[
-                                                        "Tanabe",
-                                                        "Masters Query",
-                                                        "Masters Reference",
-                                                    ],
-                                                    width="100%"
-                                                )
+                                            ui.column(
+                                                6,
+                                                ui.tooltip(
+                                                    ui.input_select(
+                                                        "batch_query_filter",
+                                                        "Similarity Score Filter",
+                                                        choices=[
+                                                            "Tanabe",
+                                                            "Masters Query",
+                                                            "Masters Reference",
+                                                        ],
+                                                        width="100%"
+                                                    ),
+                                                    "Similiarity score method used for computation"
+                                                ),
                                             ),
-                                            ui.column(6,
-                                                ui.input_numeric(
-                                                    "batch_query_filter_threshold",
-                                                    "Similarity Score Filter Threshold",
-                                                    value=80,
-                                                    width="100%"
+                                            ui.column(
+                                                6,
+                                                ui.tooltip(
+                                                    ui.input_numeric(
+                                                        "batch_query_filter_threshold",
+                                                        "Similarity Score Filter Threshold",
+                                                        value=80,
+                                                        width="100%"
+                                                    ),
+                                                    "Score threshold used to filter results"
                                                 )
                                             )
                                         )
@@ -366,6 +409,7 @@ def create_app(db=None):
                                     12,
                                     {"id": "res_card_batch"},
                                     ui.output_data_frame("out_batch_df"),
+                                    ui.output_ui("dyn_ui_nav"),
                                     ui.p(""),
                                 ),
                             ),
@@ -388,88 +432,15 @@ def create_app(db=None):
                     ),
                     ui.hr(),
                     ui.output_ui("database_file"),
-                    ui.input_action_button(
-                        "reset_db", "Reset Custom Database", class_="btn-danger"
+                    ui.layout_columns(
+                        ui.download_button(
+                            "example_db", "Download Example Database", class_="btn-secondary"
+                        ),
+                        ui.input_action_button(
+                            "reset_db", "Reset Custom Database", class_="btn-danger"
+                        ),
                     ),
                     col_widths=(-3, 6, -3),
-                ),
-            ),
-            ui.nav_panel(
-                "Within File Query",
-                ui.card(
-                    ui.layout_sidebar(
-                        ui.panel_sidebar(
-                            {"id": "novel_query_sidebar"},
-                            ui.tags.h3("Options"),
-                            ui.card(
-                                ui.input_switch(
-                                    "score_amel_file", "Score Amelogenin", value=False
-                                ),
-                                ui.row(
-                                    ui.column(6,
-                                        ui.input_numeric(
-                                            "mix_threshold_file",
-                                            "'Mixed' Sample Threshold",
-                                            value=3,
-                                            width="100%",
-                                        ),
-                                        ui.input_numeric(
-                                            "mas_q_threshold_file",
-                                            "Masters (vs. query) Filter Threshold",
-                                            value=80,
-                                            width="100%",
-                                        )
-                                    ),
-                                    ui.column(6,
-                                        ui.input_numeric(
-                                            "tan_threshold_file",
-                                            "Tanabe Filter Threshold",
-                                            value=80,
-                                            width="100%",
-                                        ),
-                                        ui.input_numeric(
-                                            "mas_r_threshold_file",
-                                            "Masters (vs. reference) Filter Threshold",
-                                            value=80,
-                                            width="100%",
-                                        )
-                                    )
-                                )
-                            ),
-                            ui.input_file(
-                                "file2",
-                                "CSV Input File:",
-                                accept=[".csv"],
-                                multiple=False,
-                                width="100%",
-                            ),
-                            ui.input_action_button(
-                                "csv_query2",
-                                "CSV Query",
-                                class_="btn-primary",
-                                width="100%",
-                            ),
-                            ui.download_button(
-                                "example_file2",
-                                "Download Example Batch File",
-                                class_="btn-secondary",
-                                width="100%",
-                            ),
-                            position="left",
-                        ),
-                        ui.panel_main(
-                            ui.row(
-                                ui.column(3, ui.tags.h3("Results")),
-                                ui.column(6, ui.p("")),
-                            ),
-                            ui.column(
-                                12,
-                                {"id": "res_card_file"},
-                                ui.output_data_frame("out_file_df"),
-                                ui.p(""),
-                            ),
-                        ),
-                    ),
                 ),
             ),
             ui.nav_panel(
@@ -511,7 +482,6 @@ def create_app(db=None):
         reset_count = reactive.value(0)
         reset_count_db = reactive.value(0)
         res_click = reactive.value(0)
-        res_click_batch = reactive.value(0)
         res_click_file = reactive.value(0)
         str_database = reactive.value(init_db)
         db_name = reactive.value(init_db_name)
@@ -561,6 +531,11 @@ def create_app(db=None):
                 return ui.column(2, ui.input_text(id, id, placeholder=""))
             return ui.row([_marker_ui(marker) for marker in markers()])
 
+        @render.download()
+        def example_db():
+            path = str(f.joinpath("www/Example_Custom_Database.csv"))
+            return path
+
         @reactive.effect
         @reactive.event(input.reset_db)
         def _():
@@ -585,7 +560,7 @@ def create_app(db=None):
         @reactive.event(input.database_upload)
         def _():
             if input.database_upload():
-                file: list[FileInfo] | None = input.database_upload()
+                file: list[FileInfo] | None = req(input.database_upload())
             else:
                 return
             str_database.set(database_load(file[0]["datapath"]))
@@ -814,40 +789,45 @@ def create_app(db=None):
         @render.data_frame
         def out_batch_df():
             output_df.set(batch_query_results())
-            with reactive.isolate():
-                if input.search_type_batch() == "STRprofiler Database":
-                    try:
-                        return render.DataTable(output_df())
-                    except Exception:
-                        m = ui.modal(
-                            ui.div(
-                                {"style": "font-size: 18px"},
-                                ui.HTML(
-                                    (
-                                        "There was a fatal error in the query.<br><br>"
-                                        "Ensure marker names match expectation, and that"
-                                        " no special characters (spaces, etc.) were used in sample names."
-                                    )
-                                ),
+            if input.search_type_batch() == "STRprofiler Database" or input.search_type_batch() == "Within File Query":
+                try:
+                    return render.DataTable(output_df())
+                except Exception:
+                    m = ui.modal(
+                        ui.div(
+                            {"style": "font-size: 18px"},
+                            ui.HTML(
+                                (
+                                    "There was a fatal error in the query.<br><br>"
+                                    "Ensure marker names match expectation, and that"
+                                    " no special characters (spaces, etc.) were used in sample names."
+                                )
                             ),
-                            title="Batch Query Error",
-                            easy_close=True,
-                            footer=None,
-                        )
-                        ui.modal_show(m)
-                        return render.DataTable(pd.DataFrame({"Failed Query. Fix Input File": []}))
-                elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
-                    return render.DataTable(pd.DataFrame({"CASTR Batch Query": ['Download Results']}))
+                        ),
+                        title="Batch Query Error",
+                        easy_close=True,
+                        footer=None,
+                    )
+                    ui.modal_show(m)
+                    return render.DataTable(pd.DataFrame({"Failed Query. Fix Input File": []}))
+            elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
+                with warnings.catch_warnings():
+                    # read_excel throws noisy "UserWarning: Workbook contains no default style, apply openpyxl's default"
+                    warnings.simplefilter("ignore")
+                    with io.BytesIO(output_df().content) as fh:
+                        df = pd.io.excel.read_excel(fh, sheet_name=input.selected_results())
+                        df = df.iloc[:, :-1]
+                return render.DataTable(df)
 
         # File input loading
         @reactive.calc
-        @reactive.event(input.csv_query)
+        @reactive.event(input.csv_query, input.search_type_batch)
         def batch_query_results():
 
-            file: list[FileInfo] | None = input.file1()
+            file: list[FileInfo] | None = req(input.file1())
             if file is None:
                 ui.remove_ui("#inserted-downloader2")
-                return pd.DataFrame({"": []})
+                return pd.DataFrame({" ": []})
             try:
                 query_df = utils.str_ingress(
                     [file[0]["datapath"]],
@@ -875,8 +855,11 @@ def create_app(db=None):
                 ui.modal_show(m)
                 return pd.DataFrame({"Failed Query. Fix Input File": []})
 
+            ui.remove_ui("#result_selector")
+            # refresh the ui for the selector as each file / query may be unique.
+
             if res_click_file() == 0:
-                if input.search_type_batch() == "STRprofiler Database":
+                if input.search_type_batch() == "STRprofiler Database" or input.search_type_batch() == "Within File Query":
                     ui.insert_ui(
                         ui.div(
                             {"id": "inserted-downloader2"},
@@ -927,6 +910,31 @@ def create_app(db=None):
                                 )
                     # TO DO: Does this need to be async?
 
+                    ui.insert_ui(
+                        ui.div(
+                            {"id": "result_selector"},
+                            ui.input_select(
+                                "selected_results",
+                                "Choose Sample:",
+                                dict((value, value) for count, value in enumerate(query_df))
+                            ),
+                        ),
+                        selector="#res_card_batch",
+                        where="beforeBegin",
+                    )
+                    # add results selector. With picklist populated by sample name,
+                    # backend selector is 0..n for excel page selection from API return
+
+                elif input.search_type_batch() == "Within File Query":
+                    results = _file_query(
+                                query_df,
+                                input.score_amel_batch(),
+                                input.mix_threshold_batch(),
+                                input.tan_threshold_batch(),
+                                input.mas_q_threshold_batch(),
+                                input.mas_r_threshold_batch(),
+                            )
+
             return results
 
         # File input loading
@@ -941,12 +949,12 @@ def create_app(db=None):
         # Note that batch_query_results() is a reactive Calc result.
         @render.download(
             filename=lambda: "STR_Batch_Results_" + date.today().isoformat() + "_" + time.strftime("%Hh-%Mm", time.localtime()) + ".csv"
-            if f"{input.search_type_batch()}" == 'STRprofiler Database'
+            if f"{input.search_type_batch()}" == 'STRprofiler Database' or f"{input.search_type_batch()}" == 'Within File Query'
             else "STR_Batch_Results_" + date.today().isoformat() + "_" + time.strftime("%Hh-%Mm", time.localtime()) + ".xlsx"
         )
         def download2():
             if batch_query_results() is not None:
-                if input.search_type_batch() == "STRprofiler Database":
+                if input.search_type_batch() == "STRprofiler Database" or input.search_type_batch() == "Within File Query":
                     yield batch_query_results().to_csv(index=False)
                 if input.search_type_batch() == "Cellosaurus Database (CLASTR)":
                     for chunk in batch_query_results().iter_content(chunk_size=128):
@@ -955,77 +963,6 @@ def create_app(db=None):
         # Dealing with passing example file to user.
         @render.download()
         def example_file1():
-            path = str(f.joinpath("www/Example_Batch_File.csv"))
-            return path
-
-        ################
-        # File many to many query
-
-        # On click of CSV Query, load file (or catch empty)
-        # This effect catches any Calc change below (file loaded or not)
-        # and if present uses the query DF as input to batch query.
-        # Results are saved out to a file.
-        @output
-        @render.data_frame
-        def out_file_df():
-            output_df.set(file_query_results())
-            if output_df() is not None:
-                return render.DataTable(output_df())
-
-        # File input loading
-        @reactive.calc
-        @reactive.event(input.csv_query2)
-        def file_query_results():
-
-            file: list[FileInfo] | None = input.file2()
-            if file is None:
-                ui.remove_ui("#inserted-downloader3")
-                return pd.DataFrame({"": []})
-            query_df = utils.str_ingress(
-                [file[0]["datapath"]],
-                sample_col="Sample",
-                marker_col="Marker",
-                sample_map=None,
-                penta_fix=True,
-            ).to_dict(orient="index")
-
-            if res_click_batch() == 0:
-                ui.insert_ui(
-                    ui.div(
-                        {"id": "inserted-downloader3"},
-                        ui.download_button(
-                            "download3", "Download CSV", width="25%", class_="btn-primary"
-                        ),
-                    ),
-                    selector="#res_card_file",
-                    where="beforeEnd",
-                )
-                res_click_batch.set(1)
-            return _file_query(
-                query_df,
-                input.score_amel_file(),
-                input.mix_threshold_file(),
-                input.tan_threshold_file(),
-                input.mas_q_threshold_file(),
-                input.mas_r_threshold_file(),
-            )
-
-        # Dealing with dowloading results, when requested.
-        # Note that file_query_results() is a reactive Calc result.
-        @render.download(
-            filename="STR_Results_"
-            + date.today().isoformat()
-            + "_"
-            + time.strftime("%Hh-%Mm", time.localtime())
-            + ".csv"
-        )
-        def download3():
-            if file_query_results() is not None:
-                yield file_query_results().to_csv(index=False)
-
-        # Dealing with passing example file to user.
-        @render.download()
-        def example_file2():
             path = str(f.joinpath("www/Example_Batch_File.csv"))
             return path
 
