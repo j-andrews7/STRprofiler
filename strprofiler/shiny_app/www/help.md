@@ -137,7 +137,7 @@ Users can upload custom database files. The files must be in CSV format. A 'Samp
 # References
 
 `STRprofiler` is provided under the MIT license. If you use this app in your research please cite:    
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>: v0.3.0. Zenodo. <a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a>
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>: v0.4.0. Zenodo. <a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a>
 
 Bairoch A. (2018) The Cellosaurus, a cell line knowledge resource. Journal of Biomolecular Techniques. 29:25-38. DOI: 10.7171/jbt.18-2902-002; PMID: 29805321 
 
