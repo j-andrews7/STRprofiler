@@ -444,7 +444,7 @@ def create_app(db=None):
                 ),
             ),
             ui.nav_panel(
-                "About",
+                "Usage Guide",
                 ui.panel_main(
                     ui.tags.iframe(
                         src="help.html",

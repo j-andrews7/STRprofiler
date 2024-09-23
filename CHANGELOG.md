@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.0
+
+**Release date: 09/27/2024**
+
+ - Tooltips added to inputs in Shiny application.
+ - More graceful handling of edge cases that returned unhelpful feedback.
+ - Better display of batch results in app that don't require download for viewing.
+
 ## v0.3.1
 
 **Release date: 07/29/2024**
