@@ -8,7 +8,7 @@ import json
 import strprofiler.utils as utils
 
 
-@click.command()
+@click.command(name="clastr")
 @click.option(
     "-sa",
     "--search_algorithm",
@@ -116,7 +116,7 @@ def clastr_query(
     penta_fix=True,
     score_amel=False,
 ):
-    """clastr_query compares STR profiles to the human Cellosaurus knowledge base using the CLASTR REST API.
+    """clastr compares STR profiles to the human Cellosaurus knowledge base via the CLASTR REST API.
 
     :param input_files: List of input STR files in csv, xlsx, tsv, or txt format.
     :type input_files: click.Path
@@ -172,7 +172,7 @@ def clastr_query(
 
     print("Search algorithm: " + str(search_algorithm), file=log_file)
     print("Scoring mode: " + str(scoring_mode), file=log_file)
-    print("Score filter: " + str(marker_col), file=log_file)
+    print("Score filter: " + str(score_filter), file=log_file)
     print("Max results: " + str(max_results), file=log_file)
     print("Min markers: " + str(min_markers), file=log_file)
     print("Sample map: " + str(sample_map), file=log_file)
