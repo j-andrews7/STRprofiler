@@ -24,9 +24,7 @@ flatten-json = "^0.1.14"
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
-strprofiler = 'strprofiler.strprofiler:strprofiler'
-clastr = 'strprofiler.clastr:clastr_query'
-strprofiler-app = 'strprofiler.strprofiler:local_shiny_app'
+strprofiler = 'strprofiler.cli:cli'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
