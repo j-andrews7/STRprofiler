@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.4.0
+
+**Release date: 09/30/2024**
+
+ - Restructured app to use subcommands:
+   - `strprofiler` is now `strprofiler compare`
+   - `strprofiler-app` is now `strprofiler app`
+   - `clastr` is now `strprofiler claster`
+   - Parameters remain the same for each.
+ - Tooltips added to inputs in Shiny application.
+ - More graceful handling of edge cases that returned unhelpful feedback.
+ - Better display of batch results in app that don't require download for viewing.
+
 ## v0.3.1
 
 **Release date: 07/29/2024**

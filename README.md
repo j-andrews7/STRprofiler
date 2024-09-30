@@ -40,7 +40,7 @@ pip install strprofiler
 
 **STRprofiler** can be run directly from the command line. 
 
-`strprofiler -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
+`strprofiler compare -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
 
 Full usage information can be found by running `strprofiler --help`.
 
@@ -86,7 +86,7 @@ Full usage information can be found by running `strprofiler --help`.
 
 Additionally, the [Cellosaurus](https://www.cellosaurus.org/description.html) (Bairoch, 2018) cell line database can be queried via the [CLASTR](https://www.cellosaurus.org/str-search/) (Robin, Capes-Davis, and Bairoch, 2019) [REST API](https://www.cellosaurus.org/str-search/help.html#5).  
 
-`clastr -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
+`strprofiler clastr -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
 
 Full usage information can be found by running `clastr --help`.
 
@@ -204,13 +204,14 @@ In addition to the marker columns, this output contains the following columns:
 
 **clastr**
 
-Output for `clastr` is provided in XLSX format. Results follow the CLASTR format, documented here: https://www.cellosaurus.org/str-search/help.html#4
+Output for `strprofiler clastr` is provided in XLSX format. 
+Results follow the CLASTR format, documented here: https://www.cellosaurus.org/str-search/help.html#4
 
 ## Database Comparison
 
 **STRprofiler** can be also used to compare batches of samples against a larger database of samples. 
 
-`strprofiler -db ExampleSTR_database.csv -o ./strprofiler_output STR1.xlsx`
+`strprofiler compare -db ExampleSTR_database.csv -o ./strprofiler_output STR1.xlsx`
 
 In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s).
 
@@ -227,7 +228,7 @@ Optionally, one may provide two metadata columns - "Center" and "Passage", which
 
 ## The STRprofiler App
 
-New in v0.2.0 is `strprofiler-app`, a command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
+New in v0.2.0 is `strprofiler app`, a command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
 
 This application can provide a convenient portal to a group's STR database and can be hosted on standard Shiny servers, Posit Connect instances, or ShinyApps.io. 
 
@@ -252,7 +253,7 @@ The database file uses same format as for the standard `strprofiler` command.
 Then create a requirements.txt file in the same directory with `strprofiler` listed:
 
 ```
-strprofiler>=0.3.0
+strprofiler>=0.4.0
 ```
 
 This app can then be deployed to any of the above endpoints as [one would with any other Shiny app](https://shiny.posit.co/py/docs/deploy.html), e.g.:
@@ -278,7 +279,7 @@ It is released with zero warranty for any purpose and the authors retain no liab
 
 If you use **STRprofiler** in your research, please cite the DOI:
 
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.3.0 (v0.3.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.4.0 (v0.4.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
 
 If you use the `clastr` command or functionality from the Shiny application, please cite the Cellosaurus and CLASTR publications:
 

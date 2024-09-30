@@ -196,7 +196,7 @@ def create_app(db=None):
                                         value=80,
                                         width="100%",
                                     ),
-                                    "Score threshold used to filter results"
+                                    "Score threshold that must be met for result to be displayed"
                                 ),
                             ),
                             position="right",
@@ -245,7 +245,7 @@ def create_app(db=None):
                                             class_="btn-success",
                                             width="45%",
                                         ),
-                                        "Query STRprofiler Database",
+                                        "Submit query",
                                         id="tt_selected_search",
                                         placement="left",
                                     ),
@@ -319,7 +319,7 @@ def create_app(db=None):
                                                         value=80,
                                                         width="100%",
                                                     ),
-                                                    "Masters (vs. query) score threshold used to filter results"
+                                                    "Masters (vs. query) score that must be met for result to be displayed"
                                                 ),
                                             ),
                                             ui.column(
@@ -331,7 +331,7 @@ def create_app(db=None):
                                                         value=80,
                                                         width="100%",
                                                     ),
-                                                    "Tanabe score threshold used to filter results"
+                                                    "Tanabe score that must be met for result to be displayed"
                                                 ),
                                                 ui.tooltip(
                                                     ui.input_numeric(
@@ -340,7 +340,7 @@ def create_app(db=None):
                                                         value=80,
                                                         width="100%",
                                                     ),
-                                                    "Masters (vs. reference) score threshold used to filter results"
+                                                    "Masters (vs. reference) score that must be met for result to be displayed"
                                                 ),
                                             )
                                         )
@@ -373,7 +373,7 @@ def create_app(db=None):
                                                         value=80,
                                                         width="100%"
                                                     ),
-                                                    "Score threshold used to filter results"
+                                                    "Score threshold that must be met for result to be displayed"
                                                 )
                                             )
                                         )
@@ -444,7 +444,7 @@ def create_app(db=None):
                 ),
             ),
             ui.nav_panel(
-                "About",
+                "Usage Guide",
                 ui.panel_main(
                     ui.tags.iframe(
                         src="help.html",

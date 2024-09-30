@@ -10,7 +10,7 @@ from strprofiler.shiny_app.shiny_app import create_app
 import strprofiler.utils as utils
 
 
-@click.command()
+@click.command(name="compare")
 @click.option(
     "-tanth",
     "--tan_threshold",
@@ -123,41 +123,7 @@ def strprofiler(
     penta_fix=True,
     score_amel=False,
 ):
-    """STRprofiler compares STR profiles to each other.
-
-    :param input_files: List of input STR files in csv, xlsx, tsv, or txt format.
-    :type input_files: click.Path
-    :param sample_map: Path to sample map in csv format for renaming.
-        First column should be sample names as given in STR file(s),
-        second should be new names to assign. No header., defaults to None
-    :type sample_map: str, optional
-    :param database: Path to a database file in csv, xlsx, tsv, or txt format.
-        If provided, input files are quried against this database, defaults to None
-    :type database: str, optional
-    :param output_dir: Path to output directory, defaults to "./STRprofiler"
-    :type output_dir: str, optional
-    :param tan_threshold: Minimum Tanabe score to report as potential matches in summary table, defaults to 80
-    :type tan_threshold: int, optional
-    :param mas_q_threshold: Minimum Masters (vs. query) score to report as potential matches in summary table, defaults to 80
-    :type mas_q_threshold: int, optional
-    :param mas_r_threshold: Minimum Masters (vs. reference) score to report as potential matches in summary table,
-        defaults to 80
-    :type mas_r_threshold: int, optional
-    :param mix_threshold: Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing,
-        defaults to 4
-    :type mix_threshold: int, optional
-    :param amel_col: Name of Amelogenin column in STR file(s), defaults to "AMEL"
-    :type amel_col: str, optional
-    :param sample_col: Name of sample column in STR file(s), defaults to "Sample Name"
-    :type sample_col: str, optional
-    :param marker_col: Name of marker column in STR file(s).
-        Only used if format is 'wide', defaults to "Marker"
-    :type marker_col: str, optional
-    :param penta_fix: Whether to try to harmonize PentaE/D allele spelling, defaults to True
-    :type penta_fix: bool, optional
-    :param score_amel: Use Amelogenin for similarity scoring, defaults to False
-    :type score_amel: bool, optional
-    """
+    """STRprofiler compares STR profiles to each other."""
 
     # Make output directory and open file for logging.
     Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -297,11 +263,7 @@ def strprofiler(
     type=click.Path(exists=True),
 )
 @click.version_option()
-def local_shiny_app(database=None):
-    """STRprofiler shiny application for interactive comparisons & querying of STR profiles.
-
-    :param database: Path to a database file in csv, xlsx, tsv, or txt format. If provided, will be loaded into the app, defaults to None
-    :type database: str, optional
-    """
+def app(database=None):
+    """STRprofiler shiny application for interactive comparisons & querying of STR profiles."""
     str_app = create_app(db=database)
     run_app(str_app)
