@@ -44,29 +44,31 @@ Amelogenin is not included in the score computation by default but can be includ
 Installation
 ============
 
-**STRprofiler** is available on PyPI and can be installed with ``pip``::
+**STRprofiler** is available on PyPi and can be installed with ``pip``::
    
       pip install strprofiler
 
 Usage
 =====
 
-.. autofunction:: strprofiler.strprofiler.strprofiler
-
+.. click:: strprofiler.cli:cli
+  :prog: strprofiler
+  :nested: full
 
 Querying CLASTR
 ===============
 
 **STRprofiler** can also be used to directly query CLASTR via their API. 
-This can be done from within the Shiny application or from the command line via the ``clastr`` command or using the ``clastr_query`` function directly:
-
-.. autofunction:: strprofiler.clastr.clastr_query
+This can be done from within the Shiny application or from the command line via the ``strprofiler clastr`` subcommand or using the ``clastr_query`` function directly.
 
 Input Files(s)
 ~~~~~~~~~~~~~~
 
+An example `input file <https://raw.githubusercontent.com/j-andrews7/STRprofiler/refs/heads/main/tests/ExampleSTR_long.csv>`__ and `reference database <https://raw.githubusercontent.com/j-andrews7/STRprofiler/refs/heads/main/tests/ExampleSTR_database.csv>`__ are available on GitHub.
+
 **STRprofiler** can take either a single STR file or multiple STR files as input. 
-These files can be csv, tsv, tab-separated text, or xlsx (first sheet used) files. The STR file(s) should be in either 'wide' or 'long' format. The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
+These files can be csv, tsv, tab-separated text, or xlsx (first sheet used) files. The STR file(s) should be in either 'wide' or 'long' format. 
+The long format expects all columns to map to the markers except for the designated sample name column with each row reflecting a different profile, e.g.:
 
 +--------+---------+---------+---------+--------+---------+--------+
 | Sample | D1S1656 |  DYS391 | D3S1358 | D2S441 | D16S539 | D5S818 | 
@@ -148,12 +150,18 @@ The wide format expects a line for each marker for each sample, e.g.:
 | Sample2      |  FGA      | 21          | 294.67  | 11941       |             |         |             |             |
 +--------------+-----------+-------------+---------+-------------+-------------+---------+-------------+-------------+
 
-In this format, the ``marker_col`` must be specified. Only columns beginning with "Allele" will be used to parse the alleles for each sample/marker. Any other size or height columns will be ignored.
+In this format, the ``marker_col`` must be specified. 
+Only columns beginning with "Allele" will be used to parse the alleles for each sample/marker. 
+Any other size or height columns will be ignored.
+
 
 Output Files
 ~~~~~~~~~~~~
 
-**STRprofiler** generates two types of output files. The first is a summary file, which contains the top hits for each sample above the specified scoring thresholds. This file provides a useful overview in addition to a flag to identify samples with potential mixing for closer inspection. In the output directory, this file will be named `full_summary.strprofiler.YYYYMMDD.HH_MM_SS.csv` where the date and time are the time the program was run.
+**STRprofiler** generates two types of output files.
+The first is a summary file, which contains the top hits for each sample above the specified scoring thresholds.
+This file provides a useful overview in addition to a flag to identify samples with potential mixing for closer inspection.
+In the output directory, this file will be named `full_summary.strprofiler.YYYYMMDD.HH_MM_SS.csv` where the date and time are the time the program was run.
 
 In addition to the marker columns, the summary file contains the following columns:
 
@@ -173,7 +181,9 @@ In addition to the marker columns, the summary file contains the following colum
 | **masters_ref_matches**   | Name and Masters (vs. reference) score of matches above scoring threshold. |
 +---------------------------+----------------------------------------------------------------------------+
 
-The second is a sample-specific comparison file, which contains the results of the comparison between the query sample and all other provided samples. These files are generated for each STR profile provided in the input file(s) and named after the query sample in question. For example, if the input file contains a sample named `Sample1`, the output file will be named `Sample1.strprofiler.YYYYMMDD.HH_MM_SS.csv`.
+The second is a sample-specific comparison file, which contains the results of the comparison between the query sample and all other provided samples. 
+These files are generated for each STR profile provided in the input file(s) and named after the query sample in question. 
+For example, if the input file contains a sample named `Sample1`, the output file will be named `Sample1.strprofiler.YYYYMMDD.HH_MM_SS.csv`.
 
 In addition to the marker columns, this output contains the following columns:
 
@@ -206,9 +216,10 @@ Database Comparison
 
 .. code:: bash
 
-   strprofiler -db ExampleSTR_database.csv -o ./strprofiler_output STR1.xlsx
+   strprofiler compare -db ExampleSTR_database.csv -o ./strprofiler_output STR1.xlsx
 
-In this mode, inputs are compared against the database samples only, and not among themselves. Outputs will be as described above for sample input(s).
+In this mode, inputs are compared against the database samples only, and not among themselves. 
+Outputs will be as described above for sample input(s).
 
 Database Format
 ^^^^^^^^^^^^^^^
@@ -228,7 +239,7 @@ Optionally, one may provide two metadata columns - "Center" and "Passage", which
 The ``STRprofiler`` App
 =======================
 
-New in v0.2.0 is ``strprofiler-app``, a CLI command that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
+New in v0.2.0 is ``strprofiler app``, a subcommand that launches a Shiny application that allows for user queries against an uploaded or pre-defined database (provided with the `-db` parameter) of STR profiles.
 
 This application can provide a convenient portal to a group's STR database and can be hosted on standard Shiny servers, Posit Connect instances, or ShinyApps.io. 
 
@@ -254,7 +265,7 @@ The database file should be a csv file with the same format as described above.
 Then create a requirements.txt file in the same directory with `strprofiler` listed:
 
 .. code:: bash
-   strprofiler>=0.3.0
+   strprofiler>=0.4.0
 
 This app can then be deployed to any of the above endpoints as `one would with any other Shiny app <https://shiny.posit.co/py/docs/deploy.html>`__.
 
@@ -286,7 +297,7 @@ Reference
 =========
 
 If you use **STRprofiler** in your research, please cite the following:
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.3.0 (v0.3.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.4.0 (v0.4.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
 
 Indices and tables
 ==================

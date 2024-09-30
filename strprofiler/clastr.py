@@ -116,53 +116,7 @@ def clastr_query(
     penta_fix=True,
     score_amel=False,
 ):
-    """clastr compares STR profiles to the human Cellosaurus knowledge base via the CLASTR REST API.
-
-    :param input_files: List of input STR files in csv, xlsx, tsv, or txt format.
-    :type input_files: click.Path
-
-    :param sample_map: Path to sample map in csv format for renaming.
-        First column should be sample names as given in STR file(s),
-        second should be new names to assign. No header. Defaults to None
-    :type sample_map: str, optional
-
-    :param output_dir: Path to output directory, defaults to "./STRprofiler"
-    :type output_dir: str, optional
-
-    :param search_algorithm: Search algorithm to use in the Clastr query, Options: 1 - Tanabe, 2 - Masters (vs. query); 3 - Masters (vs. reference)
-        Defaults to 1 (tanabe).
-    :type search_algorithm: int
-
-    :param scoring_mode: Search mode to account for missing alleles in query or reference.
-        Options: 1 - Non-empty markers, 2 - Query markers, 3 - Reference markers.
-        Defaults to 1 ( Non-empty markers).
-    :type search_algorithm: int
-
-    :param score_filter: Minimum score to report as potential matches in summary table, defaults to 80
-    :type score_filter: int, optional
-
-    :param max_results: Filter defining the maximum number of results to be returned.
-        Note that in the case of conflicted cell lines, the Best and Worst versions are processed as pairs and only the best
-        score is affected by the threshold. Consequently, some Worst cases with a score below the threshold can still be present in the results.
-        Defaults to 200
-    :type mix_threshold: int, optional
-
-    :param min_markers: Filter defining the minimum number of markers for matches to be reported, defaults to 8.
-    :type mix_threshold: int, optional
-
-    :param sample_col: Name of sample column in STR file(s), defaults to "Sample Name"
-    :type sample_col: str, optional
-
-    :param marker_col: Name of marker column in STR file(s).
-        Only used if format is 'wide', defaults to "Marker"
-    :type marker_col: str, optional
-
-    :param penta_fix: Whether to try to harmonize PentaE/D allele spelling, defaults to True
-    :type penta_fix: bool, optional
-
-    :param score_amel: Use Amelogenin for similarity scoring, defaults to False
-    :type score_amel: bool, optional
-    """
+    """clastr compares STR profiles to the human Cellosaurus knowledge base via the CLASTR REST API."""
 
     # Make output directory and open file for logging.
     Path(output_dir).mkdir(parents=True, exist_ok=True)
