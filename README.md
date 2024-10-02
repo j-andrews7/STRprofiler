@@ -45,7 +45,7 @@ pip install strprofiler
 Full usage information can be found by running `strprofiler --help`.
 
 ```bash
- Usage: strprofiler [OPTIONS] INPUT_FILES...   
+ Usage: strprofiler compare [OPTIONS] INPUT_FILES...   
 
  STRprofiler compares STR profiles to each other.  
 
@@ -88,12 +88,12 @@ Additionally, the [Cellosaurus](https://www.cellosaurus.org/description.html) (B
 
 `strprofiler clastr -sm "SampleMap_exp.csv" -scol "Sample Name" -o ./strprofiler_output STR1.xlsx STR2.csv STR3.txt`
 
-Full usage information can be found by running `clastr --help`.
+Full usage information can be found by running `strprofiler clastr --help`.
 
 ```bash
- Usage: clastr [OPTIONS] INPUT_FILES...   
+ Usage: strprofiler clastr [OPTIONS] INPUT_FILES...   
 
-**clastr** compares STR profiles to the human Cellosaurus knowledge base using the CLASTR REST API.
+**strprofiler clastr** compares STR profiles to the human Cellosaurus knowledge base using the CLASTR REST API.
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────╮
 │ --search_algorithm  -sa    INT  Search algorithm to use in the CLASTR query.             |
