@@ -97,6 +97,37 @@ def notify_modal(marker_list):
     )
 
 
+def notify_modal_malformed_input(marker_list=None):
+    if marker_list is not None:
+        message = (
+            "There was a fatal error in the input file.<br><br>"
+            "No marker(s) overlap with the loaded database.<br><br>"
+            "Marker(s): {} are incompatible with the loaded database.<br><br>"
+            "Adjust input file and retry upload/query.".format(str(marker_list)[1:-1])
+        )
+    else:
+        message = (
+            "There was a fatal error in the input file.<br><br>"
+            "Ensure column header: 'Sample' was used.<br><br>"
+            "Adjust input file and retry upload/query."
+        )
+    ui.modal_show(
+        ui.modal(
+            ui.div(
+                {"style": "font-size: 18px"},
+                ui.HTML(
+                    (
+                        message
+                    )
+                ),
+            ),
+            title="Batch Query Error",
+            easy_close=True,
+            footer=None,
+        )
+    )
+
+
 def notify_non_int():
     ui.modal_show(
         ui.notification_show(
@@ -793,22 +824,7 @@ def create_app(db=None):
                 try:
                     return render.DataTable(output_df())
                 except Exception:
-                    m = ui.modal(
-                        ui.div(
-                            {"style": "font-size: 18px"},
-                            ui.HTML(
-                                (
-                                    "There was a fatal error in the query.<br><br>"
-                                    "Ensure marker names match expectation, and that"
-                                    " no special characters (spaces, etc.) were used in sample names."
-                                )
-                            ),
-                        ),
-                        title="Batch Query Error",
-                        easy_close=True,
-                        footer=None,
-                    )
-                    ui.modal_show(m)
+                    notify_modal_malformed_input()
                     return render.DataTable(pd.DataFrame({"Failed Query. Fix Input File": []}))
             elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
                 with warnings.catch_warnings():
@@ -837,22 +853,7 @@ def create_app(db=None):
                     penta_fix=True,
                 ).to_dict(orient="index")
             except Exception:
-                m = ui.modal(
-                    ui.div(
-                        {"style": "font-size: 18px"},
-                        ui.HTML(
-                            (
-                                "There was a fatal error in the input file.<br><br>"
-                                "Ensure column header: 'Sample' was used.<br><br>"
-                                "Adjust input file and retry upload/query."
-                            )
-                        ),
-                    ),
-                    title="Batch Query Error",
-                    easy_close=True,
-                    footer=None,
-                )
-                ui.modal_show(m)
+                notify_modal_malformed_input()
                 return pd.DataFrame({"Failed Query. Fix Input File": []})
 
             ui.remove_ui("#result_selector")
@@ -887,6 +888,11 @@ def create_app(db=None):
 
             with reactive.isolate():
                 if input.search_type_batch() == "STRprofiler Database":
+                    non_overlap_markers = set(query_df[next(iter(query_df))].keys()) - set(markers())
+                    if non_overlap_markers:
+                        notify_modal_malformed_input(non_overlap_markers)
+                        return pd.DataFrame({"Failed Query. Fix Input File": []})
+
                     results = _batch_query(
                         query_df,
                         str_database(),
@@ -896,6 +902,7 @@ def create_app(db=None):
                         input.mas_q_threshold_batch(),
                         input.mas_r_threshold_batch(),
                     )
+
                 elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
                     clastr_query = [(lambda d: d.update(description=key) or d)(val) for (key, val) in query_df.items()]
                     malformed_markers = utils.validate_api_markers(query_df[next(iter(query_df))].keys())

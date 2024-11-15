@@ -235,10 +235,9 @@ def _batch_query(
             try:
                 scores = sp.score_query(query=q, reference=r, use_amel=use_amel)
             except ZeroDivisionError:
-                pass
+                return "No shared markers between query and reference."
             except Exception:
                 return False
-
             # Create dict of scores for each sample comparison.
             samp_out = OrderedDict({"Sample": sa})
             samp_out.update(scores)
