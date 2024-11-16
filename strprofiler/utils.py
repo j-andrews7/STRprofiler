@@ -406,11 +406,16 @@ def make_summary(
         + ": "
         + samp_df["tanabe_score"].round(decimals=2).astype(str).iloc[1]
     )
-    next_hit = (
-        samp_df["Sample"].iloc[2]
-        + ": "
-        + samp_df["tanabe_score"].round(decimals=2).astype(str).iloc[2]
-    )
+    
+    # Check if there is a next hit and include it if so.
+    if len(samp_df) > 2:
+        next_hit = (
+            samp_df["Sample"].iloc[2]
+            + ": "
+            + samp_df["tanabe_score"].round(decimals=2).astype(str).iloc[2]
+        )
+    else:
+        next_hit = ""
 
     masters_q_match = samp_df[samp_df["masters_query_score"] >= mas_q_threshold]
     masters_q_out = (

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "strprofiler"
-version = "0.4.0"
+version = "0.4.1"
 description = "A python package, CLI tool, and Shiny application to compare short tandem repeat (STR) profiles."
 authors = ["Jared Andrews <jared.andrews07@gmail.com>",
            "Mike Lloyd <mike.lloyd@jax.org>"]

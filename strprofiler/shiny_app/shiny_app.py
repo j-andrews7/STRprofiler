@@ -489,8 +489,29 @@ def create_app(db=None):
             ui.nav_spacer(),
             ui.nav_control(
                 ui.a(
+                    ui.p("Docs"),
+                    href="https://strprofiler.readthedocs.io/en/latest/",
+                    target="_blank",
+                ),
+            ),
+            ui.nav_control(
+                ui.a(
+                    ui.p("Package & CLI"),
+                    href="https://pypi.org/project/strprofiler/",
+                    target="_blank",
+                ),
+            ),
+            ui.nav_control(
+                ui.a(
+                    ui.span(ui.p("Bug Reports")),
+                    href="https://github.com/j-andrews7/strprofiler/issues/",
+                    target="_blank",
+                ),
+            ),
+            ui.nav_control(
+                ui.a(
                     icon_svg("github", width="30px"),
-                    href="https://github.com/j-andrews7/strprofiler",
+                    href="https://github.com/j-andrews7/strprofiler/",
                     target="_blank",
                 ),
             ),
