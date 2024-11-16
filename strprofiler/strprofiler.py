@@ -162,11 +162,17 @@ def strprofiler(
 
     samps = df.to_dict(orient="index")
     summaries = []
+    
+    # If fewer than 2 samples and no database provided, exit.
+    if len(samps) < 2 and database is None:
+        print("Only 1 sample provided and no database for comparison, exiting.")
+        print("Only 1 sample provided and no database for comparison, exiting.", file=log_file)
+        log_file.close()
+        return
 
     # Database ingress, if present
     # Set 'reference' for subsequent query to either database or inputs all to all
     if database is not None:
-        # load_database(database)
         df_db = utils.str_ingress(
             paths=[database],
             sample_col=sample_col,
