@@ -253,7 +253,7 @@ The database file uses same format as for the standard `strprofiler` command.
 Then create a requirements.txt file in the same directory with `strprofiler` listed:
 
 ```
-strprofiler>=0.4.0
+strprofiler>=0.4.1
 ```
 
 This app can then be deployed to any of the above endpoints as [one would with any other Shiny app](https://shiny.posit.co/py/docs/deploy.html), e.g.:
@@ -279,7 +279,7 @@ It is released with zero warranty for any purpose and the authors retain no liab
 
 If you use **STRprofiler** in your research, please cite the DOI:
 
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.4.0 (v0.4.0). Zenodo. https://doi.org/10.5281/zenodo.7348386
+Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.4.1 (v0.4.1). Zenodo. https://doi.org/10.5281/zenodo.7348386
 
 If you use the `clastr` command or functionality from the Shiny application, please cite the Cellosaurus and CLASTR publications:
 
