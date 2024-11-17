@@ -8,4 +8,5 @@ faicons
 requests
 flatten-json
 requests
+strprofiler
 sphinx-click
