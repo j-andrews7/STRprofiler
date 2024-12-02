@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.4.2
+
+**Release date: 12/02/2024**
+
+ - Add links to paper in app, README, etc.
+ - Minor documentation fixes.
+
+## v0.4.1
+
+**Release date: 11/16/2024**
+
+ - Improved error handling for edge cases and malformed inputs - [#36](https://github.com/j-andrews7/STRprofiler/issues/36), - [#35](https://github.com/j-andrews7/STRprofiler/issues/35)
+ - Add docs and pypi links to app - [#38](https://github.com/j-andrews7/STRprofiler/issues/38)
+
 ## v0.4.0
 
 **Release date: 09/30/2024**

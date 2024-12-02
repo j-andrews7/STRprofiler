@@ -503,6 +503,13 @@ def create_app(db=None):
             ),
             ui.nav_control(
                 ui.a(
+                    ui.p("Paper"),
+                    href="https://doi.org/10.1093/bioinformatics/btae713",
+                    target="_blank",
+                ),
+            ),
+            ui.nav_control(
+                ui.a(
                     ui.span(ui.p("Bug Reports")),
                     href="https://github.com/j-andrews7/strprofiler/issues/",
                     target="_blank",
