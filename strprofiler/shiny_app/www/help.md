@@ -143,8 +143,10 @@ The full docs are available on [ReadTheDocs](https://strprofiler.readthedocs.io/
 
 # References
 
-`STRprofiler` is provided under the MIT license. If you use this app in your research please cite:    
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). <a href="https://github.com/j-andrews7/strprofiler" target="_blank">j-andrews7/strprofiler</a>: v0.4.1. Zenodo. <a href="https://doi.org/10.5281/zenodo.10544686" target="_blank">https://doi.org/10.5281/zenodo.10544686</a>
+`STRprofiler` is provided under the MIT license. If you use this app in your research, please cite:    
+Jared M Andrews, Michael W Lloyd, Steven B Neuhauser, Margaret Bundy, Emily L Jocoy, Susan D Airhart, Carol J Bult, Yvonne A Evrard, Jeffrey H Chuang, Suzanne Baker, STRprofiler: efficient comparisons of short tandem repeat profiles for biomedical model authentication, Bioinformatics, 2024;, btae713,<a href="https://doi.org/10.1093/bioinformatics/btae713" target="_blank">https://doi.org/10.1093/bioinformatics/btae713</a>
+
+If you use the `strprofiler clastr` command or Cellosaurus database in the app, please cite:
 
 Bairoch A. (2018) The Cellosaurus, a cell line knowledge resource. Journal of Biomolecular Techniques. 29:25-38. DOI: 10.7171/jbt.18-2902-002; PMID: 29805321 
 

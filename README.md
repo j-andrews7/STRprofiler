@@ -277,9 +277,9 @@ It is released with zero warranty for any purpose and the authors retain no liab
 
 ## References
 
-If you use **STRprofiler** in your research, please cite the DOI:
+If you use **STRprofiler** in your research, please cite the following:
 
-Jared Andrews, Mike Lloyd, & Sam Culley. (2024). j-andrews7/strprofiler: v0.4.1 (v0.4.1). Zenodo. https://doi.org/10.5281/zenodo.7348386
+Jared M Andrews, Michael W Lloyd, Steven B Neuhauser, Margaret Bundy, Emily L Jocoy, Susan D Airhart, Carol J Bult, Yvonne A Evrard, Jeffrey H Chuang, Suzanne Baker, STRprofiler: efficient comparisons of short tandem repeat profiles for biomedical model authentication, Bioinformatics, 2024;, btae713, https://doi.org/10.1093/bioinformatics/btae713
 
 If you use the `clastr` command or functionality from the Shiny application, please cite the Cellosaurus and CLASTR publications:
 
