@@ -39,7 +39,7 @@ import strprofiler.utils as utils
     "-mix",
     "--mix_threshold",
     default=3,
-    help="Number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing.",
+    help="Number of markers with > 2 alleles allowed before a sample is flagged for potential mixing.",
     show_default=True,
     type=int,
 )
@@ -107,7 +107,7 @@ import strprofiler.utils as utils
     type=click.Path(),
 )
 @click.argument("input_files", required=True, type=click.Path(exists=True), nargs=-1)
-@click.version_option()
+@click.version_option(package_name="strprofiler")
 def strprofiler(
     input_files,
     sample_map=None,
@@ -116,9 +116,9 @@ def strprofiler(
     tan_threshold=80,
     mas_q_threshold=80,
     mas_r_threshold=80,
-    mix_threshold=4,
+    mix_threshold=3,
     amel_col="AMEL",
-    sample_col="Sample Name",
+    sample_col="Sample",
     marker_col="Marker",
     penta_fix=True,
     score_amel=False,
@@ -268,7 +268,7 @@ def strprofiler(
     help="Path to an STR database file in csv, xlsx, tsv, or txt format.",
     type=click.Path(exists=True),
 )
-@click.version_option()
+@click.version_option(package_name="strprofiler")
 def app(database=None):
     """STRprofiler shiny application for interactive comparisons & querying of STR profiles."""
     str_app = create_app(db=database)

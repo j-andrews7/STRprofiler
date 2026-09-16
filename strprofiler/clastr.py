@@ -19,7 +19,7 @@ import strprofiler.utils as utils
     type=int,
 )
 @click.option(
-    "-sm",
+    "-scm",
     "--scoring_mode",
     default=1,
     help="""Search mode to account for missing alleles in query or reference.
@@ -101,7 +101,7 @@ import strprofiler.utils as utils
     type=click.Path(),
 )
 @click.argument("input_files", required=True, type=click.Path(exists=True), nargs=-1)
-@click.version_option()
+@click.version_option(package_name="strprofiler")
 def clastr_query(
     input_files,
     sample_map=None,
@@ -111,7 +111,7 @@ def clastr_query(
     score_filter=80,
     max_results=200,
     min_markers=8,
-    sample_col="Sample Name",
+    sample_col="Sample",
     marker_col="Marker",
     penta_fix=True,
     score_amel=False,

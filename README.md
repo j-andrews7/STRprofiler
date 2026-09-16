@@ -56,7 +56,7 @@ Full usage information can be found by running `strprofiler --help`.
 |                                      potential matches in summary table. [default: 80]   │
 │ --mas_r_threshold  -masrth  FLOAT    Minimum Masters (vs. reference) score to report as  |
 |                                      potential matches in summary table. [default: 80]   │
-│ --mix_threshold    -mix     INTEGER  Number of markers with >= 2 alleles allowed before  |
+│ --mix_threshold    -mix     INTEGER  Number of markers with > 2 alleles allowed before   |
 |                                      a sample is flagged for potential mixing.           |
 |                                      [default: 3]                                        │
 │ --sample_map       -sm      PATH     Path to sample map in csv format for renaming.      |
@@ -99,7 +99,7 @@ Full usage information can be found by running `strprofiler clastr --help`.
 │ --search_algorithm  -sa    INT  Search algorithm to use in the CLASTR query.             |
 |                                 1 - Tanabe, 2 - Masters (vs. query);                     |
 |                                 3 - Masters (vs. reference) [default: 1]                 │
-│ --scoring_mode      -sm    INT  Search mode to account for missing alleles in query or   |
+│ --scoring_mode      -scm   INT  Search mode to account for missing alleles in query or   |
 |                                 reference. 1 - Non-empty markers, 2 - Query markers,     |
 |                                 3 - Reference markers. [default: 1]                      │
 │ --score_filter      -sf    INT  Minimum score to report as potential matches in          |
@@ -108,6 +108,10 @@ Full usage information can be found by running `strprofiler clastr --help`.
 |                                 returned. [default: 200]                                 │
 │ --min_markers       -mm    INT  Filter defining the minimum number of markers for        |
 |                                 matches to be reported. [default: 8]                     │
+│ --sample_map        -sm    PATH Path to sample map in csv format for renaming.           |
+|                                 First column should be sample names as given in          |
+|                                 STR file(s), second should be new names to assign.       |
+|                                 No header.                                               │
 │ --sample_col        -scol  STR  Name of sample column in STR file(s).                    |
 |                                 [default: 'Sample']                                      │
 │ --marker_col        -mcol  STR  Name of marker column in STR file(s).                    |
@@ -171,6 +175,12 @@ The wide format expects a line for each marker for each sample, e.g.:
 
 In this format, the `marker_col` must be specified. Only columns beginning with "Allele" will be used to parse the alleles for each sample/marker. Any other size or height columns will be ignored.
 
+### Allele Parsing
+
+Alleles are expected to be repeat counts, e.g. `12` or `9.3`. The only non-numeric alleles recognized are the Amelogenin sex markers `X` and `Y`.
+
+Any other non-numeric call - off-ladder (`OL`), ambiguous (`?`), `NR`, `ND` and the like - is discarded during parsing and is never counted as an allele when scoring or checking for sample mixing. A marker left with no valid alleles is treated as untyped and is excluded from comparisons, exactly as if the cell had been empty.
+
 ## Output Files
 
 **STRprofiler** generates two types of output files. The first is a summary file, which contains the top hits for each sample above the specified scoring thresholds. This file provides a useful overview in addition to a flag to identify samples with potential mixing for closer inspection. In the output directory, this file will be named `full_summary.strprofiler.YYYYMMDD.HH_MM_SS.csv` where the date and time are the time the program was run.
@@ -224,7 +234,7 @@ The database should be formatted as a samples by markers matrix and saved as a c
 |sample1      |X,Y       |12    |8      |13     |14    |14     |31,31.2|17,19  |15     |11,12 |11,12 |12,15  |23 |7,9.3|8   |18 |       |       |
 |sample2      |X         |10    |9      |13     |16    |12,14  |29     |20,23  |15,16  |12,13 |9,12  |14,15  |18 |7    |8,9 |15 |       |       |
 
-Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns.
+Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns. They are carried through to the output for reference, but are excluded from similarity scoring and mixing checks.
 
 ## The STRprofiler App
 

@@ -68,7 +68,7 @@ For batched samples, a summary report is generated.
 
 | Output Field | Description |
 | :---        |    :----   |
-| Mixed Sample | Flag to indicate sample mixing. Sample mixing is determined by the "'Mixed' Sample Threshold" option. If more markers have more than 3 alleles for this number of markers, the sample will be flagged as potentially mixed. |
+| Mixed Sample | Flag to indicate sample mixing. Sample mixing is determined by the "'Mixed' Sample Threshold" option. If more markers have more than 2 alleles than this number of markers, the sample will be flagged as potentially mixed. |
 | Top Match |	Name and Tanabe score of top match to sample. |
 | Next Best Match |	Name and Tanabe score of next best match to sample. |
 | Tanabe Matches | Name and Tanabe score of matches above scoring threshold to sample. |
@@ -83,6 +83,8 @@ When `Cellosaurus Database (CLASTR)` is selected as the search type, a report is
 ## Database File Management
 
 Users can upload custom database files. The files must be in CSV format. A 'Sample' header must be present, but custom marker names may be used. Note that to score `Amelogenin` using the option provided, there must be a `Amelogenin` header in the uploaded file.  
+
+Alleles are expected to be repeat counts, e.g. `12` or `9.3`. The only non-numeric alleles recognized are the Amelogenin sex markers `X` and `Y`. Any other non-numeric call - off-ladder (`OL`), ambiguous (`?`), `NR`, `ND` and the like - is discarded and never counted as an allele, whether it comes from an uploaded database or is typed into a marker box.  
 
 ---
 
@@ -114,7 +116,7 @@ Users can upload custom database files. The files must be in CSV format. A 'Samp
 ## Sample Query Options
 
 * Amelogenin scoring is excluded by default but can be included by selecting the option.  
-* 'Mixed' Sample Threshold: is the number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing. [default: 3]  
+* 'Mixed' Sample Threshold: is the number of markers with > 2 alleles allowed before a sample is flagged for potential mixing. [default: 3]  
 * Similarity Score Filter: is the similiarity score used for result filtering. [default: Tanabe]
 * Similarity Score Filter Threshold: is the threshold to filter results. Only those samples with >= the threshold will appear in results. [default: 80]
 

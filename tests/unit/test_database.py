@@ -48,16 +48,12 @@ def test_database_ingress(paths):
 
     # Check the samples are being parsed properly.
     assert list(
-        df.loc[
-            "Ref_SampleA",
-        ]
+        df.loc["Ref_SampleA"]
     ) == ["12,14","12","13","9,10","12,14","X"]
     
     # Check the samples are being parsed properly.
     assert list(
-        df.loc[
-            "Ref_SampleE",
-        ]
+        df.loc["Ref_SampleE"]
     ) == ["14","13","13,15","13","12,15","X,Y"]
 
 

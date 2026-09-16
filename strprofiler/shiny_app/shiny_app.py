@@ -547,7 +547,7 @@ def create_app(db=None):
         output_df = reactive.value(None)
         demo_vals = reactive.value(None)
         demo_name = reactive.value(None)
-        markers = reactive.value([i for i in list(init_db[next(iter(init_db))].keys()) if not any([e for e in ["Center", "Passage"] if e in i])])
+        markers = reactive.value([i for i in list(init_db[next(iter(init_db))].keys()) if i not in utils.METADATA_COLS])
 
         @output
         @render.text
@@ -601,7 +601,7 @@ def create_app(db=None):
             file_check.set(not file_check())
             str_database.set(init_db)
             db_name.set(init_db_name)
-            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ["Center", "Passage"] if e in i])])
+            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if i not in utils.METADATA_COLS])
             ui.remove_ui("#inserted-downloader")
             res_click.set(0)
 
@@ -623,7 +623,7 @@ def create_app(db=None):
             else:
                 return
             str_database.set(database_load(file[0]["datapath"]))
-            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if not any([e for e in ["Center", "Passage"] if e in i])])
+            markers.set([i for i in list(str_database()[next(iter(str_database()))].keys()) if i not in utils.METADATA_COLS])
             [ui.update_text(marker, value="") for marker in markers()]
             db_file_change.set(True)
             ui.remove_ui("#inserted-downloader")

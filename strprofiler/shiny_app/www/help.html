@@ -1656,7 +1656,7 @@ defined by the user.</p>
 <td align="left">Mixed Sample</td>
 <td align="left">Flag to indicate sample mixing. Sample mixing is
 determined by the “‘Mixed’ Sample Threshold” option. If more markers
-have more than 3 alleles for this number of markers, the sample will be
+have more than 2 alleles than this number of markers, the sample will be
 flagged as potentially mixed.</td>
 </tr>
 <tr class="even">
@@ -1700,6 +1700,13 @@ format. A ‘Sample’ header must be present, but custom marker names may
 be used. Note that to score <code>Amelogenin</code> using the option
 provided, there must be a <code>Amelogenin</code> header in the uploaded
 file.</p>
+<p>Alleles are expected to be repeat counts, e.g. <code>12</code> or
+<code>9.3</code>. The only non-numeric alleles recognized are the
+Amelogenin sex markers <code>X</code> and <code>Y</code>. Any other
+non-numeric call - off-ladder (<code>OL</code>), ambiguous
+(<code>?</code>), <code>NR</code>, <code>ND</code> and the like - is
+discarded and never counted as an allele, whether it comes from an
+uploaded database or is typed into a marker box.</p>
 <hr />
 </div>
 </div>
@@ -1736,7 +1743,7 @@ AKA the Sørenson-Dice coefficient</a>:</li>
 <li>Amelogenin scoring is excluded by default but can be included by
 selecting the option.<br />
 </li>
-<li>‘Mixed’ Sample Threshold: is the number of markers with &gt;= 2
+<li>‘Mixed’ Sample Threshold: is the number of markers with &gt; 2
 alleles allowed before a sample is flagged for potential mixing.
 [default: 3]<br />
 </li>

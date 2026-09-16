@@ -154,6 +154,15 @@ In this format, the ``marker_col`` must be specified.
 Only columns beginning with "Allele" will be used to parse the alleles for each sample/marker. 
 Any other size or height columns will be ignored.
 
+Allele Parsing
+~~~~~~~~~~~~~~
+
+Alleles are expected to be repeat counts, e.g. ``12`` or ``9.3``. 
+The only non-numeric alleles recognized are the Amelogenin sex markers ``X`` and ``Y``.
+
+Any other non-numeric call - off-ladder (``OL``), ambiguous (``?``), ``NR``, ``ND`` and the like - is discarded during parsing and is never counted as an allele when scoring or checking for sample mixing. 
+A marker left with no valid alleles is treated as untyped and is excluded from comparisons, exactly as if the cell had been empty.
+
 
 Output Files
 ~~~~~~~~~~~~
@@ -234,7 +243,7 @@ The database should be formatted as a samples by markers matrix and saved as a c
 | sample2   | X          | 10     | 9       | 13      | 16     | 12,14   | 29      | 20,23   | 15,16   |
 +-----------+------------+--------+---------+---------+--------+---------+---------+---------+---------+
 
-Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns.
+Optionally, one may provide two metadata columns - "Center" and "Passage", which will be recognized as non-marker columns. They are carried through to the output for reference, but are excluded from similarity scoring and mixing checks.
 
 The ``STRprofiler`` App
 =======================

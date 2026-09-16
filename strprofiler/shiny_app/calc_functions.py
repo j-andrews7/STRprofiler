@@ -36,7 +36,7 @@ def _single_query(
     :type str_database: dict
     :param use_amel: use Amelogenin for similarity scoring
     :type use_amel: bool
-    :param three_allele_threshold: number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing
+    :param three_allele_threshold: number of markers with > 2 alleles allowed before a sample is flagged for potential mixing
     :type three_allele_threshold: int
     :param query_filter: similiarity score to use. Options are: Tanabe, Masters Query, and Masters Reference
     :type query_filter: str
@@ -88,9 +88,10 @@ def _single_query(
         "tanabe_score": nan,
         "masters_query_score": nan,
         "masters_ref_score": nan,
-        "Center": nan,
-        "Passage": nan
     }
+    # The query has no metadata of its own, but the columns must line up with the
+    # reference rows so they render together.
+    q_out.update({col: nan for col in sp.METADATA_COLS})
     q_out.update(query)
 
     # Put query sample first.
@@ -192,7 +193,7 @@ def _batch_query(
     :type str_database: dict
     :param use_amel: use Amelogenin for similarity scoring
     :type use_amel: bool
-    :param three_allele_threshold: number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing
+    :param three_allele_threshold: number of markers with > 2 alleles allowed before a sample is flagged for potential mixing
     :type three_allele_threshold: int
     :param tan_threshold: Minimum Tanabe score to report as potential matches in summary table
     :type tan_threshold: int
@@ -314,7 +315,7 @@ def _file_query(
     :type query: dict
     :param use_amel: use Amelogenin for similarity scoring
     :type use_amel: bool
-    :param three_allele_threshold: number of markers with >= 2 alleles allowed before a sample is flagged for potential mixing
+    :param three_allele_threshold: number of markers with > 2 alleles allowed before a sample is flagged for potential mixing
     :type three_allele_threshold: int
     :param tan_threshold: Minimum Tanabe score to report as potential matches in summary table
     :type tan_threshold: int

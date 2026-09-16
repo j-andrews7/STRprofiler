@@ -183,7 +183,7 @@ def _clastr_batch_query(query, query_filter, include_amelogenin, score_filter):
     elif query_filter == "Masters Query":
         query = [dict(item, **{"algorithm": 2}) for item in query]
     elif query_filter == "Masters Reference":
-        query = [dict(item, **{"algorithm": 2}) for item in query]
+        query = [dict(item, **{"algorithm": 3}) for item in query]
 
     query = [dict(item, **{"includeAmelogenin": include_amelogenin}) for item in query]
     query = [dict(item, **{"scoreFilter": score_filter}) for item in query]

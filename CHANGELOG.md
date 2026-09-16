@@ -1,5 +1,61 @@
 # Changelog
 
+## v0.5.0
+
+**Release date: 09/16/2026**
+
+Bug fixes:
+
+ - "Center" and "Passage" are no longer scored as STR markers. They were previously
+   counted as shared markers and shared alleles by `score_query()`, which inflated
+   similarity scores between samples that happened to share metadata (including for the
+   example database bundled with the app). `score_query()` and `mixing_check()` now skip them via a
+   new `metadata_cols` argument (defaulting to the `strprofiler.utils.METADATA_COLS`
+   constant). **If you've used these metadata columns in a database in the past, this may affect your score.**
+  - Similarly, `str_ingress()` no longer parses metadata columns as alleles, and takes a
+   `metadata_cols` argument so custom non-marker columns can be declared.
+ - CLASTR batch queries now send proper `algorithm: 3` for "Masters (vs. reference)". They
+   previously erroneously sent `algorithm: 2`, which runs a Masters (vs. query) search.
+ - Better "Penta" allele handling.
+ - `_clean_element()` now drops empty allele tokens, so a trailing comma (e.g. `"12,"`) in
+   a long-format input is no longer counted as an extra allele during scoring.
+ - `make_summary()` no longer raises an `IndexError` when only the query row remains,
+   which was reachable via `strprofiler compare -db` with a single-profile database whose
+   sample name matched the query.
+ - Corrected the `--mix_threshold` documentation, which described the threshold as counting
+   markers with >= 2 alleles when the code counts markers with > 2 alleles. Also fixed
+   `mix_threshold` and `sample_col` defaults in function signatures that disagreed with
+   their `click` decorators.
+ - Non-numeric allele calls are now discarded rather than counted. Off-ladder (`OL`),
+   ambiguous (`?`), `NR`, `ND` and similar values were previously treated as ordinary
+   alleles, so they inflated allele counts, could match each other between unrelated
+   samples, and could push a diploid marker over the tri-allelic mixing threshold. The
+   only non-numeric alleles retained are the Amelogenin sex markers, listed in the new
+   `strprofiler.utils.NON_NUMERIC_ALLELES` constant. Filtering is applied in
+   `str_ingress()`, `score_query()` and `mixing_check()`, so values typed directly into
+   the app's marker boxes are covered too. A marker left with no valid alleles is treated
+   as untyped and excluded from comparisons.
+ - Allele values are better unified before comparison, so `"12.0"`, `" 12"` and `"12"`
+   are recognized as the same allele, and `"x"` matches `"X"`.
+ - `strprofiler --version` (and the `compare`, `clastr` and `app` subcommands) reported
+   rich-click's version rather than STRprofiler's, which has now been corrected.
+ - **`strprofiler clastr --scoring_mode` has moved from `-sm` to `-scm`.** `-sm` was
+   declared twice, for both `--scoring_mode` and `--sample_map`, so click warned on every
+   invocation and one option silently shadowed the other. `-sm` remains `--sample_map`, to
+   match `strprofiler compare`. The `--sample_map` option was also missing from the
+   `clastr` options table in the README.
+ - Updated the GitHub Actions used by the test workflow, which was throwing a fit [#42](https://github.com/j-andrews7/STRprofiler/issues/42). `actions/cache` is
+   now at v4, as the legacy cache service used by v1-v3 has been retired. 
+
+Other changes:
+
+ - **Support for Python 3.9 and 3.10 has been dropped.** The minimum supported version is
+   now Python 3.11, as required by pandas 3.
+ - Bumped `pandas` to `^3.0` and `numpy` to `^2.0`, and adapted to pandas 3 semantics
+   (`DataFrame.set_index(verify_integrity=...)` is deprecated; duplicate sample
+   identifiers now raise a `ValueError` directly).
+ - CI now tests Python 3.11 through 3.14.
+
 ## v0.4.2
 
 **Release date: 12/02/2024**

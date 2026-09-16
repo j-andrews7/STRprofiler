@@ -2,71 +2,142 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from importlib.metadata import version
+from math import isfinite
 import sys
 from pathlib import Path
 from collections import OrderedDict
+
+
+#: Columns recognized as sample metadata rather than STR markers.
+#: These are carried through ingress and reporting, but never scored.
+METADATA_COLS = ("Center", "Passage")
+
+#: Non-numeric allele calls that carry meaning and are retained. Amelogenin is
+#: reported as the sex markers X/Y rather than as a repeat count. Any other
+#: non-numeric call - off-ladder ("OL"), ambiguous ("?"), "NR", "ND" and the
+#: like - conveys no comparable allele and is discarded.
+NON_NUMERIC_ALLELES = ("X", "Y")
+
+
+def _parse_allele(allele):
+    """Normalizes a single allele call, or returns None if it is not a real call.
+
+    :param allele: A single allele, e.g. "12", "9.3" or "X".
+    :type allele: str
+    :return: The repeat count as a float, a recognized non-numeric call upper-cased,
+        or None if the call should be discarded.
+    :rtype: float or str or None
+    """
+    allele = allele.strip()
+
+    if allele == "":
+        return None
+
+    try:
+        value = float(allele)
+    except ValueError:
+        if allele.upper() in NON_NUMERIC_ALLELES:
+            return allele.upper()
+        return None
+
+    # Guards against literal "nan"/"inf" cells, which float() happily accepts.
+    return value if isfinite(value) else None
+
+
+def _format_allele(allele):
+    """Renders a parsed allele back to its canonical string form, trimming a trailing ".0"."""
+    if isinstance(allele, str):
+        return allele
+
+    text = str(allele)
+
+    return text[:-2] if text.endswith(".0") else text
+
+
+def _split_alleles(value):
+    """Splits a comma-separated allele string into a set of unique, valid alleles.
+
+    Discards empty and non-numeric calls that are not in :data:`NON_NUMERIC_ALLELES`,
+    so they are never counted as alleles during scoring or mixing checks.
+
+    :param value: Comma-separated alleles for a single marker.
+    :type value: str
+    :return: Unique, canonicalized alleles.
+    :rtype: set of str
+    """
+    alleles = set()
+
+    for element in value.split(","):
+        parsed = _parse_allele(element)
+        if parsed is not None:
+            alleles.add(_format_allele(parsed))
+
+    return alleles
 
 
 def _clean_element(x):
     """
     Takes a string of alleles, removes duplicates, trims trailing .0, and returns a cleaned string.
     Sorts elements in ascending numeric order, with strings coming after numbers.
+    Empty tokens (e.g. from a trailing comma) are discarded, as are non-numeric calls
+    that are not recognized alleles (see :data:`NON_NUMERIC_ALLELES`).
     """
-    elements = [s.strip() for s in x.split(",")]
-
-    # Separate elements into numeric and string categories
     numeric_elements = []
     string_elements = []
-    for e in elements:
-        try:
-            numeric_elements.append(float(e))
-        except ValueError:
-            string_elements.append(e)
+
+    for element in x.split(","):
+        parsed = _parse_allele(element)
+        if parsed is None:
+            continue
+        if isinstance(parsed, str):
+            string_elements.append(parsed)
+        else:
+            numeric_elements.append(parsed)
 
     # Remove duplicates and sort numeric elements in ascending order
-    numeric_elements = sorted(list(set(numeric_elements)))
-    string_elements = sorted(list(set(string_elements)))
+    numeric_elements = sorted(set(numeric_elements))
+    string_elements = sorted(set(string_elements))
 
-    # Convert numeric elements back to string and remove trailing .0 if needed
-    numeric_elements = [str(e)[:-2] if str(e).endswith('.0') else str(e) for e in numeric_elements]
-
-    sorted_elements = numeric_elements + string_elements
+    sorted_elements = [_format_allele(e) for e in numeric_elements] + string_elements
 
     return ",".join(sorted_elements)
+
+
+def _rename_marker(samps_dict, src, dest):
+    """Renames marker key ``src`` to ``dest``, merging alleles if ``dest`` already exists.
+
+    Both spellings of a Penta marker can be present for the same sample, in which case a
+    plain rename would silently discard one of the two calls. String values are merged and
+    de-duplicated via :func:`_clean_element`. Non-string values (e.g. columns of a
+    DataFrame) are renamed without merging, as ``_pentafix`` is also applied to DataFrames.
+    """
+    if src not in samps_dict.keys():
+        return samps_dict
+
+    value = samps_dict.pop(src)
+
+    if dest in samps_dict.keys():
+        existing = samps_dict[dest]
+        if isinstance(existing, str) and isinstance(value, str):
+            samps_dict[dest] = _clean_element(",".join([existing, value]))
+        else:
+            samps_dict[dest] = value
+    else:
+        samps_dict[dest] = value
+
+    return samps_dict
 
 
 def _pentafix(samps_dict, reverse=False):
     """Takes a dictionary of alleles and returns a dictionary with common Penta markers renamed for consistency."""
     if not reverse:
-        if "Penta C" in samps_dict.keys():
-            samps_dict["PentaC"] = samps_dict.pop("Penta C")
-        elif "Penta_C" in samps_dict.keys():
-            samps_dict["PentaC"] = samps_dict.pop("Penta_C")
-
-        if "Penta D" in samps_dict.keys():
-            samps_dict["PentaD"] = samps_dict.pop("Penta D")
-        elif "Penta_D" in samps_dict.keys():
-            samps_dict["PentaD"] = samps_dict.pop("Penta_D")
-
-        if "Penta E" in samps_dict.keys():
-            samps_dict["PentaE"] = samps_dict.pop("Penta E")
-        elif "Penta_E" in samps_dict.keys():
-            samps_dict["PentaE"] = samps_dict.pop("Penta_E")
+        for marker in ["C", "D", "E"]:
+            for src in ["Penta " + marker, "Penta_" + marker]:
+                samps_dict = _rename_marker(samps_dict, src, "Penta" + marker)
     else:
-        if "PentaC" in samps_dict.keys():
-            samps_dict["Penta C"] = samps_dict.pop("PentaC")
-        elif "Penta_C" in samps_dict.keys():
-            samps_dict["Penta C"] = samps_dict.pop("Penta_C")
-
-        if "PentaD" in samps_dict.keys():
-            samps_dict["Penta D"] = samps_dict.pop("PentaD")
-        elif "Penta_D" in samps_dict.keys():
-            samps_dict["Penta D"] = samps_dict.pop("Penta_D")
-
-        if "PentaE" in samps_dict.keys():
-            samps_dict["Penta E"] = samps_dict.pop("PentaE")
-        elif "Penta_E" in samps_dict.keys():
-            samps_dict["Penta E"] = samps_dict.pop("Penta_E")
+        for marker in ["C", "D", "E"]:
+            for src in ["Penta" + marker, "Penta_" + marker]:
+                samps_dict = _rename_marker(samps_dict, src, "Penta " + marker)
 
     return samps_dict
 
@@ -174,7 +245,8 @@ def _make_html(dataframe: pd.DataFrame):
 
 
 def str_ingress(
-    paths, sample_col="Sample", marker_col="Marker", sample_map=None, penta_fix=True
+    paths, sample_col="Sample", marker_col="Marker", sample_map=None, penta_fix=True,
+    metadata_cols=METADATA_COLS
 ):
     """Reads in a list of paths and returns a pandas DataFrame of STR alleles in long format.
 
@@ -190,11 +262,16 @@ def str_ingress(
     :type sample_map: pandas.DataFrame, optional
     :param penta_fix: Whether to try to coerce "Penta" alleles to a common spelling, defaults to True
     :type penta_fix: bool, optional
+    :param metadata_cols: Names of non-marker metadata columns, which are carried through
+        verbatim rather than parsed as alleles, defaults to ("Center", "Passage")
+    :type metadata_cols: collection of str, optional
     :return: A pandas DataFrame of STR alleles in long format.
     :rtype: pandas.DataFrame
     """
 
     samps_dicts = []
+    # Metadata is not allele data and must not be run through _clean_element.
+    skip_cols = {"Sample"} | (set(metadata_cols) if metadata_cols is not None else set())
 
     for path in paths:
         path = Path(path)
@@ -237,7 +314,7 @@ def str_ingress(
 
                 # Remove duplicate alleles.
                 for k in samps_dict.keys():
-                    if k != "Sample":
+                    if k not in skip_cols:
                         samps_dict[k] = _clean_element(samps_dict[k])
 
                 # Rename PentaD and PentaE from common spellings.
@@ -255,7 +332,7 @@ def str_ingress(
 
                 # Remove duplicate alleles, trim trailing ".0".
                 for k in s.keys():
-                    if k != "Sample":
+                    if k not in skip_cols:
                         s[k] = _clean_element(s[k])
 
                 # Rename PentaD and PentaE from common spellings.
@@ -273,16 +350,43 @@ def str_ingress(
                 sample_map.iloc[:, 0] == id
             ].to_string(header=False, index=False)
 
-    # Set index to sample name.
-    allele_df.set_index("Sample", inplace=True, verify_integrity=True)
+    # Set index to sample name, erroring on duplicate sample identifiers.
+    allele_df = allele_df.set_index("Sample")
+    if not allele_df.index.is_unique:
+        duplicates = allele_df.index[allele_df.index.duplicated()].unique().tolist()
+        raise ValueError("Index has duplicate keys: " + str(duplicates))
 
     # Remove Nans.
-    allele_df = allele_df.replace({np.nan: ""})
+    allele_df = allele_df.fillna("")
 
     return allele_df
 
 
-def score_query(query, reference, use_amel=False, amel_col="AMEL"):
+def _marker_alleles(profile, metadata_cols):
+    """Maps each scoreable marker in a profile to its set of valid alleles.
+
+    Metadata columns and markers left without a single valid allele are omitted.
+
+    :param profile: Alleles for a sample, keyed by marker.
+    :type profile: dict
+    :param metadata_cols: Names of non-marker metadata columns to exclude.
+    :type metadata_cols: set of str
+    :return: Valid alleles keyed by marker.
+    :rtype: dict
+    """
+    markers = {}
+
+    for marker, value in profile.items():
+        if marker in metadata_cols:
+            continue
+        alleles = _split_alleles(value)
+        if alleles:
+            markers[marker] = alleles
+
+    return markers
+
+
+def score_query(query, reference, use_amel=False, amel_col="AMEL", metadata_cols=METADATA_COLS):
     """Calculates the Tanabe and Masters scores for a query sample against a reference sample.
 
     :param query: Alleles for query sample.
@@ -293,6 +397,9 @@ def score_query(query, reference, use_amel=False, amel_col="AMEL"):
     :type use_amel: bool, optional
     :param amel_col: Name of amelogenin column, defaults to "AMEL"
     :type amel_col: str, optional
+    :param metadata_cols: Names of non-marker metadata columns to exclude from scoring,
+        defaults to ("Center", "Passage")
+    :type metadata_cols: collection of str, optional
     :return: Dictionary of scores for query sample against reference sample.
     :rtype: dict
     """
@@ -302,9 +409,11 @@ def score_query(query, reference, use_amel=False, amel_col="AMEL"):
 
     n_shared_alleles = 0
 
-    # Convert allele values to lists, removing markers with no alleles, and uniquifying alleles.
-    query = {k: list(set(v.split(","))) for k, v in query.items() if v != ""}
-    reference = {k: list(set(v.split(","))) for k, v in reference.items() if v != ""}
+    metadata_cols = set(metadata_cols) if metadata_cols is not None else set()
+
+    # Drop metadata columns, invalid alleles, and markers left with no alleles.
+    query = _marker_alleles(query, metadata_cols)
+    reference = _marker_alleles(reference, metadata_cols)
 
     # Get unique markers in query and reference.
     markers = list(set(query.keys()) & set(reference.keys()))
@@ -321,7 +430,7 @@ def score_query(query, reference, use_amel=False, amel_col="AMEL"):
     for m in markers:
         n_r_alleles += len(reference[m])
         n_q_alleles += len(query[m])
-        n_shared_alleles += len(set(reference[m]) & set(query[m]))
+        n_shared_alleles += len(reference[m] & query[m])
 
     # Calculate the scores.
     tanabe_score = 100 * ((2 * n_shared_alleles) / (n_q_alleles + n_r_alleles))
@@ -342,7 +451,7 @@ def score_query(query, reference, use_amel=False, amel_col="AMEL"):
     return out
 
 
-def mixing_check(alleles, three_allele_threshold=3):
+def mixing_check(alleles, three_allele_threshold=3, metadata_cols=METADATA_COLS):
     """Checks for potential sample mixing.
 
     :param alleles: Alleles for sample.
@@ -350,6 +459,9 @@ def mixing_check(alleles, three_allele_threshold=3):
     :param three_allele_threshold: Number of markers with >2 alleles allowed before
         sample is flagged for potential mixing, defaults to 3
     :type three_allele_threshold: int, optional
+    :param metadata_cols: Names of non-marker metadata columns to ignore,
+        defaults to ("Center", "Passage")
+    :type metadata_cols: collection of str, optional
     :return: Whether sample is potentially mixed.
     :rtype: bool
     """
@@ -357,8 +469,12 @@ def mixing_check(alleles, three_allele_threshold=3):
     mixed = False
     past_th = 0
 
+    metadata_cols = set(metadata_cols) if metadata_cols is not None else set()
+
     for a in alleles.keys():
-        all_a = alleles[a].split(",")
+        if a in metadata_cols:
+            continue
+        all_a = _split_alleles(alleles[a])
         if len(all_a) > 2:
             past_th += 1
 
@@ -401,12 +517,16 @@ def make_summary(
     tanabe_out = "; ".join(tanabe_out)
 
     # Get the top hits.
-    top_hit = (
-        samp_df["Sample"].iloc[1]
-        + ": "
-        + samp_df["tanabe_score"].round(decimals=2).astype(str).iloc[1]
-    )
-    
+    # Position 0 is the query sample itself, so a hit only exists with >1 row.
+    if len(samp_df) > 1:
+        top_hit = (
+            samp_df["Sample"].iloc[1]
+            + ": "
+            + samp_df["tanabe_score"].round(decimals=2).astype(str).iloc[1]
+        )
+    else:
+        top_hit = ""
+
     # Check if there is a next hit and include it if so.
     if len(samp_df) > 2:
         next_hit = (
@@ -497,7 +617,10 @@ def validate_api_markers(markers):
                          "SE33"]
 
     # remove extra fields, if present as keys may come from _clastr_query or other.
-    query_markers = [marker for marker in markers if marker not in ["algorithm", "includeAmelogenin", "scoreFilter", "description"]]
+    non_marker_fields = set(
+        ["algorithm", "includeAmelogenin", "scoreFilter", "description"]
+    ) | set(METADATA_COLS)
+    query_markers = [marker for marker in markers if marker not in non_marker_fields]
 
     missing_markers = list(set(query_markers) - set(valid_api_markers))
 
