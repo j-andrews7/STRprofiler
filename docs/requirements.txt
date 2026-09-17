@@ -1,5 +1,6 @@
 sphinx-rtd-theme
-pandas
+numpy>=2.0,<3.0
+pandas>=3.0,<4.0
 myst-parser
 rich-click
 shiny
