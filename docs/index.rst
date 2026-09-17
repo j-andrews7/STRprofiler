@@ -10,8 +10,8 @@ STRprofiler
    :maxdepth: 2
    :caption: Contents:
 
-.. image:: https://zenodo.org/badge/523477912.svg
-   :target: https://zenodo.org/badge/latestdoi/523477912
+.. image:: https://zenodo.org/badge/doi/10.5281/zenodo.7348386.svg
+   :target: https://doi.org/10.5281/zenodo.7348386
 
 **STRprofiler** is a python package, CLI tool, and `Shiny application <https://sj-bakerlab.shinyapps.io/strprofiler/>`__ to compare short tandem repeat (STR) profiles. 
 In particular, it is designed to aid research labs in comparing models (e.g. cell lines or xenografts) generated from primary tissue samples to ensure authenticity. 
