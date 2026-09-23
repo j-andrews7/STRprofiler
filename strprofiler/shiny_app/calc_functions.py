@@ -234,9 +234,13 @@ def _batch_query(
             r = str_database[sa]
 
             try:
-                scores = sp.score_query(query=q, reference=r, use_amel=use_amel)
+                scores = sp.score_query(
+                    query=q, reference=r, use_amel=use_amel, amel_col="Amelogenin"
+                )
             except ZeroDivisionError:
-                return "No shared markers between query and reference."
+                # No scoreable alleles shared with this reference, so skip it rather
+                # than failing the whole batch.
+                continue
             except Exception:
                 return False
             # Create dict of scores for each sample comparison.
@@ -355,7 +359,13 @@ def _file_query(
         for sa in query_df.keys():
             if sa != s:
                 r = query_df[sa]
-                scores = sp.score_query(query=q, reference=r, use_amel=use_amel)
+                try:
+                    scores = sp.score_query(
+                        query=q, reference=r, use_amel=use_amel, amel_col="Amelogenin"
+                    )
+                except ZeroDivisionError:
+                    # No scoreable alleles shared with this sample, so skip it.
+                    continue
 
                 # Create dict of scores for each sample comparison.
                 samp_out = OrderedDict({"Sample": sa})

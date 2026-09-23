@@ -725,7 +725,9 @@ def create_app(db=None):
                 query = {m: "" for m in markers()}
                 reset_count_db.set(input.reset_db())
             else:
-                query = {m: input[m]() for m in markers()}
+                # Canonicalize typed alleles as database values are on ingress, so the
+                # query row displays and highlights consistently with how it is scored.
+                query = {m: utils._clean_element(input[m]()) for m in markers()}
                 reset_count.set(input.reset())
 
             if not any(query.values()):
@@ -916,7 +918,9 @@ def create_app(db=None):
 
             with reactive.isolate():
                 if input.search_type_batch() == "STRprofiler Database":
-                    non_overlap_markers = set(query_df[next(iter(query_df))].keys()) - set(markers())
+                    non_overlap_markers = (
+                        set(query_df[next(iter(query_df))].keys()) - set(markers()) - set(utils.METADATA_COLS)
+                    )
                     if non_overlap_markers:
                         notify_modal_malformed_input(non_overlap_markers)
                         return pd.DataFrame({"Failed Query. Fix Input File": []})
@@ -932,7 +936,11 @@ def create_app(db=None):
                     )
 
                 elif input.search_type_batch() == "Cellosaurus Database (CLASTR)":
-                    clastr_query = [(lambda d: d.update(description=key) or d)(val) for (key, val) in query_df.items()]
+                    # Metadata columns are not markers and are not sent to the API.
+                    clastr_query = [
+                        dict({k: v for k, v in val.items() if k not in utils.METADATA_COLS}, description=key)
+                        for (key, val) in query_df.items()
+                    ]
                     malformed_markers = utils.validate_api_markers(query_df[next(iter(query_df))].keys())
                     if malformed_markers:
                         notify_modal(malformed_markers)

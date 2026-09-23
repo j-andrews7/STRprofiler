@@ -94,9 +94,9 @@ import strprofiler.utils as utils
     "-amel",
     "--score_amel",
     help="""Use Amelogenin for similarity scoring.""",
+    is_flag=True,
     default=False,
     show_default=True,
-    type=bool,
 )
 @click.option(
     "-o",
@@ -212,7 +212,9 @@ def strprofiler(
             if sa != s:
                 r = reference_samps[sa]
                 print("Comparing " + s + " to " + sa, file=log_file)
-                scores = utils.score_query(query=q, reference=r, use_amel=score_amel)
+                scores = utils.score_query(
+                    query=q, reference=r, use_amel=score_amel, amel_col=amel_col
+                )
 
                 # Create dict of scores for each sample comparison.
                 samp_out = OrderedDict({"Sample": sa})

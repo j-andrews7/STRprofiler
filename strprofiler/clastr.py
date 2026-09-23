@@ -88,9 +88,9 @@ import strprofiler.utils as utils
     "-amel",
     "--score_amel",
     help="""Use Amelogenin for similarity scoring.""",
+    is_flag=True,
     default=False,
     show_default=True,
-    type=bool,
 )
 @click.option(
     "-o",

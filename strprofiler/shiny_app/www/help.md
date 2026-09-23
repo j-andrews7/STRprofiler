@@ -86,6 +86,8 @@ Users can upload custom database files. The files must be in CSV format. A 'Samp
 
 Alleles are expected to be repeat counts, e.g. `12` or `9.3`. The only non-numeric alleles recognized are the Amelogenin sex markers `X` and `Y`. Any other non-numeric call - off-ladder (`OL`), ambiguous (`?`), `NR`, `ND` and the like - is discarded and never counted as an allele, whether it comes from an uploaded database or is typed into a marker box.  
 
+Optional `Center` and `Passage` columns are recognized as sample metadata rather than markers. They are displayed alongside results, but are excluded from similarity scoring and mixing checks. They may also be present in batch query files.  
+
 ---
 
 # Reported Similarity Scores

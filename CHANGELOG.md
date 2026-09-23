@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.5.1
+
+**Release date: 09/23/2026**
+
+Bug fixes:
+
+ - The app's "Score Amelogenin" switch had no effect on "STRprofiler Database" and "Within File
+   Query" batch searches, which always scored Amelogenin. They now honor the switch, as single
+   queries already did.
+ - `strprofiler compare --amel_col` was ignored, so an Amelogenin column not named `AMEL` was
+   always scored, even without `--score_amel`. The option is now passed through to scoring.
+ - A single reference with no scoreable alleles in common with a query no longer aborts an
+   entire app batch query (or crashes a "Within File Query"); that reference is skipped instead.
+ - Alleles typed into the app's marker boxes are now normalized the same way as database values
+   (sorted, de-duplicated, with discarded calls removed), so the query row and mismatch
+   highlighting agree with how the query is scored. A query made up only of discarded calls
+   (e.g. `OL`) is now treated as empty.
+ - App batch files containing the `Center`/`Passage` metadata columns are no longer rejected
+   as having incompatible markers, and those columns are no longer sent to the CLASTR API.
+ - The app's usage guide now documents the `Center`/`Passage` metadata columns.
+ - **`-amel/--score_amel` is now a true flag for `strprofiler compare` and `strprofiler clastr`**,
+   as the README already documented. It previously required a value (e.g. `-amel True`), and
+   passing it bare consumed the next argument.
+
 ## v0.5.0
 
 **Release date: 09/16/2026**

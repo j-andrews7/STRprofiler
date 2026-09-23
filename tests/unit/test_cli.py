@@ -70,6 +70,15 @@ def test_clastr_scoring_mode_and_sample_map_flags():
     assert "-sm" in params["sample_map"]
 
 
+@pytest.mark.parametrize("name", ["compare", "clastr"])
+def test_score_amel_is_a_flag(name):
+    """`-amel` takes no value; it previously required e.g. `-amel True`."""
+    params = {param.name: param for param in cli.commands[name].params}
+
+    assert params["score_amel"].is_flag
+    assert params["score_amel"].default is False
+
+
 @pytest.mark.parametrize("name", sorted(cli.commands))
 def test_help_emits_no_parameter_warnings(runner, name):
     """click warns on duplicate flags while building the parser."""
@@ -167,3 +176,29 @@ def test_compare_writes_html_summary(runner, tmp_path):
     html = list(Path(tmp_path).glob("full_summary.strprofiler.*.html"))
     assert len(html) == 1
     assert "STRprofiler Results" in html[0].read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize(
+    "score_amel, expected", [([], "Sample_B: 100.0"), (["-amel"], "Sample_B: 88.89")]
+)
+def test_compare_honors_amel_col(runner, tmp_path, score_amel, expected):
+    """A custom --amel_col is only scored when --score_amel is passed.
+
+    The option was previously ignored, so this column was always scored.
+    """
+    input_file = tmp_path / "amel.csv"
+    input_file.write_text(
+        "Sample,Amelogenin,m1,m2,m3\n"
+        "Sample_A,X,12,14,9\n"
+        "Sample_B,\"X,Y\",12,14,9\n"
+    )
+    out_dir = tmp_path / "out"
+
+    result = runner.invoke(
+        cli,
+        ["compare", "-acol", "Amelogenin", *score_amel, "-o", str(out_dir), str(input_file)],
+    )
+
+    assert result.exit_code == 0, result.output
+    summary = _summary(out_dir)
+    assert summary.loc[summary["Sample"] == "Sample_A", "top_hit"].item() == expected
