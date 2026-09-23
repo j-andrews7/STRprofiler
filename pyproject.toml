@@ -22,7 +22,8 @@ faicons = "^0.2.2"
 requests = "^2.31.0"
 flatten-json = "^0.1.14"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8.0"
 
 [tool.poetry.urls]
 "Paper" = "https://doi.org/10.1093/bioinformatics/btae713"
